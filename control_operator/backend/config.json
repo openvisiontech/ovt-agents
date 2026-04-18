@@ -1,0 +1,11 @@
+{
+    "working_dir": ".",
+    "expiration_time": 10.0,
+    "render_interval": 0.1,
+    "agent_config": {
+        "model": "default",
+        "claude_api_key": "YOUR_CLAUDE_API_KEY",
+        "gemini_api_key": "YOUR_GEMINI_API_KEY",
+        "openai_api_key": "YOUR_OPENAI_API_KEY"
+    }
+}

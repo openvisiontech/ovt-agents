@@ -1,0 +1,5 @@
+{
+    "workingDirectory": "/home/ovt/uli_deploy",
+    "webRtcUrl": "ws://127.0.0.1:8080/ws/rtc",
+    "retryWebRTCConnect": 10000
+}
