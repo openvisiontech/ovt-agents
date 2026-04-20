@@ -5,14 +5,16 @@ import 'process_stream.dart';
 import 'process_gamepad.dart';
 import 'expire_stream_data.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 class BackgroundTasksManager {
-  static Future<void> startAll() async {
-    processActionRequests(null);
-    processMediaRequests(null);
-    processChat(null);
-    processStream(null);
-    processGamepad(null);
-    expireStreamData(null);
+  static Future<void> startAll(ProviderContainer container) async {
+    processActionRequests(container);
+    processMediaRequests(container);
+    processChat(container);
+    processStream(container);
+    processGamepad(container);
+    expireStreamData(container);
   }
 
   static void stopAll() {

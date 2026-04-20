@@ -16,6 +16,8 @@ class DomainDataModel extends Notifier<DomainDataModel> {
   String _currentAssetControlStatus = "";
   String _currentAssetControlAvail = "";
 
+  List<String> assetItems = List.generate(20, (index) => "Asset ${index + 1}");
+
   List<dynamic> get subsystemControlAbstractions =>
       _subsystemControlAbstractions;
   int get currentAssetIndex => _currentAssetIndex;
@@ -26,8 +28,58 @@ class DomainDataModel extends Notifier<DomainDataModel> {
   String get currentAssetControlStatus => _currentAssetControlStatus;
   String get currentAssetControlAvail => _currentAssetControlAvail;
 
+  void moveAssetUp() {
+    if (_currentAssetIndex > 0) {
+      _currentAssetIndex--;
+      _updateCurrentAssetInfo();
+      state = this;
+    }
+  }
+
+  void moveAssetDown() {
+    if (_currentAssetIndex < assetItems.length - 1) {
+      _currentAssetIndex++;
+      _updateCurrentAssetInfo();
+      state = this;
+    }
+  }
+
+  void setCurrentAssetIndex(int index) {
+    if (index >= 0 && index < assetItems.length) {
+      _currentAssetIndex = index;
+      _updateCurrentAssetInfo();
+      state = this;
+    }
+  }
+
+  void _updateCurrentAssetInfo() {
+    if (_subsystemControlAbstractions.isNotEmpty &&
+        _currentAssetIndex < _subsystemControlAbstractions.length) {
+      final asset = _subsystemControlAbstractions[_currentAssetIndex];
+      if (asset is Map) {
+        _currentAssetSubsystemId = asset['subsystemId'] ?? 0;
+        _currentAssetNodeId = asset['nodeId'] ?? 0;
+        _currentAssetCompId = asset['compId'] ?? 0;
+        _currentAssetName = asset['name']?.toString() ?? "UNKNOWN";
+        _currentAssetControlStatus =
+            asset['controlStatus']?.toString() ?? "UNKNOWN";
+        _currentAssetControlAvail =
+            asset['controlAvail']?.toString() ?? "UNKNOWN";
+      }
+    }
+  }
+
   set subsystemControlAbstractions(List<dynamic> val) {
     _subsystemControlAbstractions = val;
+    assetItems = val.map((e) {
+      if (e is Map) {
+        return "${e['Name'] ?? 'Unknown'} (${e['SubsystemType'] ?? ''}) - ${e['ControlStatus'] ?? ''}";
+      }
+      return "Unknown Asset";
+    }).toList();
+    if (assetItems.isEmpty) {
+      assetItems = List.generate(20, (index) => "Asset ${index + 1}");
+    }
     state = this;
   }
 

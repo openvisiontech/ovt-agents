@@ -7,10 +7,10 @@ This is the strictly modular frontend application for the Control Operator syste
 The application is structured into the following key modules:
 
 - **`lib/main.dart` & `lib/main_layout.dart`**: The entrypoint and the core UI wrapper. `MainLayout` dynamically structures the header, global navigation buttons (Domain, Asset, AI Assist, Settings, EStop), and conditionally embeds the selected central screens.
-- **`lib/models/data_models.dart`**: Contains the strongly typed Riverpod `ChangeNotifier` state models defining the structure of the data: `GuiDataModel`, `HeaderDataModel`, `AssetDataModel`, `DomainDataModel`, `ActionRequestsDataModel`, `GamepadDataModel`, and `StreamDataModel`.
-- **`lib/providers/data_providers.dart`**: Instantiates and serves the globally accessible Riverpod `ChangeNotifierProvider` wrappers for the models.
+- **`lib/models/*.dart`**: Contains the strongly typed Riverpod `Notifier` state models defining the structure of the specific data instances. Each core state is compartmentalized into files such as `gui_data_model.dart`, `header_data_model.dart`, `asset_data_model.dart`, `domain_data_model.dart`, `action_requests_data_model.dart`, `gamepad_data_model.dart`, and `stream_data_model.dart`.
+- **`lib/providers/data_providers.dart`**: Instantiates and serves the globally accessible Riverpod `NotifierProvider` wrappers for the models.
 - **`lib/providers/web_rtc_client.dart`**: A singleton WebRTC implementation establishing the communication link to the backend. It initializes twin data channels (`chat_channel` and `stream_channel`) and isolates the incoming/outgoing streams utilizing native event queues (`chatRequestQueue`, `streamRequestQueue`, `chatQueue`, `streamQueue`).
-- **`lib/tasks/background_tasks.dart`**: Handles continuous polling operations across dedicated Dart `Isolates` preventing the main UI pipeline from stuttering. This encapsulates routines such as `processChat`, `processActionRequests`, and `processGamepad`.
+- **`lib/tasks/background_tasks_manager.dart` & `lib/tasks/*.dart`**: Handles continuous polling operations natively as asynchronous functions on the main execution loop (removing any Isolates to preserve complete Web compatibility). This encapsulates independent async routines such as `processChat`, `processActionRequests`, and `processGamepad`.
 - **`lib/screens/`**: Houses the specific views injected into `MainLayout`. 
   - `asset_screen.dart`: Visualizes robotics or network asset telemetry and allows parameter assignments to individual agents.
   - `domain_screen.dart`: Displays the relational map traversing overarching subsystems.

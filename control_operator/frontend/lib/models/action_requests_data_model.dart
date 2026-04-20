@@ -19,7 +19,7 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
   bool transformReporterListUpdate = false;
   bool statusDetailsUpdate = false;
   bool resourceDetailsUpdate = false;
-  bool agentStatusListUpdate = false;
+  bool agentStatusUpdate = false;
   bool agentDetailsUpdate = false;
   bool serviceListAutoUpdate = false;
 }

@@ -16,107 +16,128 @@ class GuiDataModel extends Notifier<GuiDataModel> {
   bool get navigatorBoxOnoff => _navigatorBoxOnoff;
 
   bool menuVisible = true;
-  bool haveControl = false;
-  bool commanderVisible = true;
-  bool agentsSidebarVisible = false;
-  bool domainSidebarVisible = false;
+
+  int _smallScreenBoxIndex = 1;
+  int get smallScreenBoxIndex => _smallScreenBoxIndex;
+
+  void _sanitizeSmallScreenBoxIndex() {
+    bool hasLeft = false;
+    bool hasRight = false;
+
+    if (currentScreen == 'DomainScreen') {
+      hasLeft = domainLeftSidebarVisible;
+      hasRight = domainRightSidebarVisible;
+    } else if (currentScreen == 'AssetScreen') {
+      hasLeft = assetLeftSidebarVisible;
+      hasRight = assetRightSidebarVisible;
+    }
+
+    if (_smallScreenBoxIndex == 0 && !hasLeft) _smallScreenBoxIndex = 1;
+    if (_smallScreenBoxIndex == 2 && !hasRight) _smallScreenBoxIndex = 1;
+  }
+
+  void cycleSmallScreenBox() {
+    bool hasLeft = false;
+    bool hasRight = false;
+
+    if (currentScreen == 'DomainScreen') {
+      hasLeft = domainLeftSidebarVisible;
+      hasRight = domainRightSidebarVisible;
+    } else if (currentScreen == 'AssetScreen') {
+      hasLeft = assetLeftSidebarVisible;
+      hasRight = assetRightSidebarVisible;
+    }
+
+    int nextIndex = _smallScreenBoxIndex;
+    for (int i = 0; i < 3; i++) {
+      nextIndex = (nextIndex + 1) % 3;
+      if (nextIndex == 0 && hasLeft) break;
+      if (nextIndex == 1) break;
+      if (nextIndex == 2 && hasRight) break;
+    }
+    _smallScreenBoxIndex = nextIndex;
+    state = this;
+  }
+
+  bool domainLeftSidebarVisible = false;
+  bool domainRightSidebarVisible = false;
   bool domainCommanderVisible = true;
 
-  void toggleControl() {
-    haveControl = !haveControl;
+  bool assetLeftSidebarVisible = false;
+  bool assetRightSidebarVisible = false;
+  bool assetCommanderVisible = true;
+
+  // Selected Asset Info
+  dynamic subsystemId;
+  dynamic nodeId;
+  dynamic compId;
+  String name = "";
+  String controlStatus = "UNKNOWN";
+  String controlAvail = "UNKNOWN";
+  String haveAccess = "UNKNOWN";
+  String appAccessRight = "UNKNOWN";
+  String dataAccessRight = "UNKNOWN";
+  String haveControl = "UNKNOWN";
+  String subsystemState = "UNKNOWN";
+  String operatingCategory = "UNKNOWN";
+  String operatingMode = "UNKNOWN";
+
+  void toggleAssetCommander() {
+    assetCommanderVisible = !assetCommanderVisible;
     state = this;
   }
 
-  void toggleCommander() {
-    commanderVisible = !commanderVisible;
+  void toggleAssetLeftSidebar() {
+    assetLeftSidebarVisible = !assetLeftSidebarVisible;
+    if (assetLeftSidebarVisible)
+      _smallScreenBoxIndex = 0;
+    else
+      _sanitizeSmallScreenBoxIndex();
     state = this;
   }
 
-  void toggleAgentsSidebar() {
-    agentsSidebarVisible = !agentsSidebarVisible;
+  void hideAssetLeftSidebar() {
+    assetLeftSidebarVisible = false;
+    _sanitizeSmallScreenBoxIndex();
     state = this;
   }
 
-  void hideAgentsSidebar() {
-    agentsSidebarVisible = false;
+  void toggleDomainLeftSidebar() {
+    domainLeftSidebarVisible = !domainLeftSidebarVisible;
+    if (domainLeftSidebarVisible)
+      _smallScreenBoxIndex = 0;
+    else
+      _sanitizeSmallScreenBoxIndex();
     state = this;
   }
 
-  void toggleDomainSidebar() {
-    domainSidebarVisible = !domainSidebarVisible;
+  void hideDomainLeftSidebar() {
+    domainLeftSidebarVisible = false;
+    _sanitizeSmallScreenBoxIndex();
+    state = this;
+  }
+
+  void toggleDomainRightSidebar() {
+    domainRightSidebarVisible = !domainRightSidebarVisible;
+    if (domainRightSidebarVisible)
+      _smallScreenBoxIndex = 2;
+    else
+      _sanitizeSmallScreenBoxIndex();
+    state = this;
+  }
+
+  void toggleAssetRightSidebar() {
+    assetRightSidebarVisible = !assetRightSidebarVisible;
+    if (assetRightSidebarVisible)
+      _smallScreenBoxIndex = 2;
+    else
+      _sanitizeSmallScreenBoxIndex();
     state = this;
   }
 
   void toggleDomainCommander() {
     domainCommanderVisible = !domainCommanderVisible;
     state = this;
-  }
-
-  List<String> agentItems = List.generate(
-    20,
-    (index) => "Agent Item ${index + 1}",
-  );
-  int currentAgentIndex = 0;
-  String selectedAgentContent = "";
-
-  List<String> assetItems = List.generate(20, (index) => "Asset ${index + 1}");
-  int currentAssetIndex = 0;
-  String selectedAssetContent = "";
-
-  void moveAgentUp() {
-    if (currentAgentIndex > 0) {
-      currentAgentIndex--;
-      state = this;
-    }
-  }
-
-  void moveAgentDown() {
-    if (currentAgentIndex < agentItems.length - 1) {
-      currentAgentIndex++;
-      state = this;
-    }
-  }
-
-  void setCurrentAgentIndex(int index) {
-    if (index >= 0 && index < agentItems.length) {
-      currentAgentIndex = index;
-      state = this;
-    }
-  }
-
-  void selectAgent() {
-    if (currentAgentIndex >= 0 && currentAgentIndex < agentItems.length) {
-      selectedAgentContent = agentItems[currentAgentIndex];
-      state = this;
-    }
-  }
-
-  void moveAssetUp() {
-    if (currentAssetIndex > 0) {
-      currentAssetIndex--;
-      state = this;
-    }
-  }
-
-  void moveAssetDown() {
-    if (currentAssetIndex < assetItems.length - 1) {
-      currentAssetIndex++;
-      state = this;
-    }
-  }
-
-  void setCurrentAssetIndex(int index) {
-    if (index >= 0 && index < assetItems.length) {
-      currentAssetIndex = index;
-      state = this;
-    }
-  }
-
-  void selectAsset() {
-    if (currentAssetIndex >= 0 && currentAssetIndex < assetItems.length) {
-      selectedAssetContent = assetItems[currentAssetIndex];
-      state = this;
-    }
   }
 
   bool get estop => _estop;
@@ -151,19 +172,26 @@ class GuiDataModel extends Notifier<GuiDataModel> {
   void goAssetScreen() {
     previousScreen = currentScreen;
     currentScreen = 'AssetScreen';
+    _sanitizeSmallScreenBoxIndex();
+    state = this;
   }
 
   void goDomainScreen() {
     previousScreen = currentScreen;
     currentScreen = 'DomainScreen';
+    _sanitizeSmallScreenBoxIndex();
+    state = this;
   }
 
   void goAIAssistScreen() {
     previousScreen = currentScreen;
     currentScreen = 'AIAssistScreen';
+    _sanitizeSmallScreenBoxIndex();
+    state = this;
   }
 
   void toggleMenu() {
     navigatorBoxOnoff = !navigatorBoxOnoff;
+    state = this;
   }
 }

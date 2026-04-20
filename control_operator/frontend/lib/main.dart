@@ -34,14 +34,13 @@ void main(List<String> args) async {
   );
 
   WebRTCClient().connect(appConfig.webRtcUrl, appConfig.retryWebRTCConnect);
-  BackgroundTasksManager.startAll();
 
-  runApp(
-    ProviderScope(
-      overrides: [appConfigProvider.overrideWithValue(appConfig)],
-      child: const MyApp(),
-    ),
+  final container = ProviderContainer(
+    overrides: [appConfigProvider.overrideWithValue(appConfig)],
   );
+  BackgroundTasksManager.startAll(container);
+
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {

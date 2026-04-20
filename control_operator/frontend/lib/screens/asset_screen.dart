@@ -29,10 +29,10 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
         backgroundColor: Style.navigatorBackgroundColor,
         hoverColor: Style.navigatorBtnHoverColor,
         iconSize: Style.navigatorBtnIconPixelSize,
-        highlight: guiData.agentsSidebarVisible,
+        highlight: guiData.assetLeftSidebarVisible,
         onPressed: () {
           // goAgentsView
-          guiData.toggleAgentsSidebar();
+          guiData.toggleAssetLeftSidebar();
         },
       ),
       SizedBox(
@@ -49,7 +49,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
         iconSize: Style.navigatorBtnIconPixelSize,
         onPressed: () {
           // goDataView (placeholder)
-          guiData.hideAgentsSidebar();
+          guiData.hideAssetLeftSidebar();
         },
       ),
       SizedBox(
@@ -66,7 +66,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
         iconSize: Style.navigatorBtnIconPixelSize,
         onPressed: () {
           // goInsightView
-          guiData.hideAgentsSidebar();
+          guiData.hideAssetLeftSidebar();
         },
       ),
     ];
@@ -93,65 +93,88 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
           )
         : null;
 
+    final mainContent = Container(
+      color: Colors.black,
+      child: Stack(
+        children: [
+          const Positioned.fill(child: SceneWidget()),
+          if (guiData.assetLeftSidebarVisible && !isSmallScreen)
+            Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.5,
+                heightFactor: 0.5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Item Content",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+
     Widget contentBox = Expanded(
       child: Stack(
         children: [
           Column(
             children: [
-              // Center Box (Main Content)
+              // Center Box
               Expanded(
-                child: Row(
-                  children: [
-                    if (guiData.agentsSidebarVisible)
-                      const Expanded(flex: 1, child: AgentsSidebar()),
-                    Expanded(
-                      flex: 4,
-                      child: Container(
-                        color: Colors.black,
-                        child: Stack(
-                          children: [
-                            const Positioned.fill(child: SceneWidget()),
-                            if (guiData.agentsSidebarVisible)
-                              Center(
-                                child: FractionallySizedBox(
-                                  widthFactor: 0.5,
-                                  heightFactor: 0.5,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.9),
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: Colors.grey),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.3),
-                                          blurRadius: 10,
-                                          spreadRadius: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        "Item Content",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                child: isSmallScreen
+                    ? IndexedStack(
+                        index: guiData.smallScreenBoxIndex,
+                        children: [
+                          const AgentsSidebar(),
+                          mainContent,
+                          const Center(
+                            child: Text(
+                              "Right Sidebar Placeholder",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          if (guiData.assetLeftSidebarVisible)
+                            const Expanded(flex: 1, child: AgentsSidebar()),
+                          Expanded(flex: 4, child: mainContent),
+                          if (guiData.assetRightSidebarVisible)
+                            const Expanded(
+                              flex: 1,
+                              child: Center(
+                                child: Text(
+                                  "Right Sidebar Placeholder",
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
 
               // Footer Box (Commander)
-              if (guiData.commanderVisible)
+              if (guiData.assetCommanderVisible)
                 Container(
                   height: Style.commanderHeight,
                   color: Style.commanderBackgroundColor,
@@ -161,10 +184,10 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     child: Row(
                       children: [
                         IconTextBtn(
-                          icon: guiData.haveControl
+                          icon: (guiData.haveControl == "YES")
                               ? Icons.cancel
                               : Icons.gamepad,
-                          description: guiData.haveControl
+                          description: (guiData.haveControl == "YES")
                               ? "Release"
                               : "Control",
                           width: Style.commanderBtnWidth,
@@ -173,7 +196,9 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           hoverColor: Style.commanderHoverColor,
                           iconSize: Style.commanderBtnIconPixelSize,
                           onPressed: () {
-                            guiData.toggleControl();
+                            guiData.haveControl = (guiData.haveControl == "YES")
+                                ? "NO"
+                                : "YES";
                           },
                         ),
                         SizedBox(width: Style.commanderBtnSpacing),
@@ -237,13 +262,13 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
           Positioned(
             left: 0,
             right: 0,
-            bottom: guiData.commanderVisible ? Style.commanderHeight : 0,
+            bottom: guiData.assetCommanderVisible ? Style.commanderHeight : 0,
             child: Center(
               child: MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
                   onTap: () {
-                    guiData.toggleCommander();
+                    guiData.toggleAssetCommander();
                   },
                   child: Container(
                     width: 60,
@@ -260,7 +285,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                       ),
                     ),
                     child: Icon(
-                      guiData.commanderVisible
+                      guiData.assetCommanderVisible
                           ? Icons.expand_more
                           : Icons.expand_less,
                       color: Style.commanderHoverColor,
@@ -325,7 +350,7 @@ class _AgentsSidebarState extends ConsumerState<AgentsSidebar> {
 
   @override
   Widget build(BuildContext context) {
-    final guiData = ref.watch(guiDataProvider);
+    final assetData = ref.watch(assetDataProvider);
 
     return Container(
       decoration: ShapeDecoration(
@@ -346,15 +371,15 @@ class _AgentsSidebarState extends ConsumerState<AgentsSidebar> {
                 IconButton(
                   icon: const Icon(Icons.arrow_upward, color: Colors.white),
                   onPressed: () {
-                    guiData.moveAgentUp();
-                    _scrollToIndex(guiData.currentAgentIndex);
+                    assetData.moveAgentUp();
+                    _scrollToIndex(assetData.currentAgentIndex);
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.arrow_downward, color: Colors.white),
                   onPressed: () {
-                    guiData.moveAgentDown();
-                    _scrollToIndex(guiData.currentAgentIndex);
+                    assetData.moveAgentDown();
+                    _scrollToIndex(assetData.currentAgentIndex);
                   },
                 ),
                 const Expanded(
@@ -372,7 +397,7 @@ class _AgentsSidebarState extends ConsumerState<AgentsSidebar> {
                 IconButton(
                   icon: const Icon(Icons.check, color: Colors.white),
                   onPressed: () {
-                    guiData.selectAgent();
+                    assetData.selectAgent();
                   },
                 ),
               ],
@@ -382,16 +407,16 @@ class _AgentsSidebarState extends ConsumerState<AgentsSidebar> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              itemCount: guiData.agentItems.length,
+              itemCount: assetData.agentItems.length,
               itemBuilder: (context, index) {
                 return Container(
-                  color: index == guiData.currentAgentIndex
+                  color: index == assetData.currentAgentIndex
                       ? Colors.blue[100]
                       : null,
                   child: ListTile(
-                    title: Text(guiData.agentItems[index]),
+                    title: Text(assetData.agentItems[index]),
                     onTap: () {
-                      guiData.setCurrentAgentIndex(index);
+                      assetData.setCurrentAgentIndex(index);
                     },
                   ),
                 );
@@ -404,20 +429,39 @@ class _AgentsSidebarState extends ConsumerState<AgentsSidebar> {
   }
 }
 
-class AssetHeaderWidget extends StatelessWidget {
-  const AssetHeaderWidget({super.key});
+class AssetHeaderWidget extends ConsumerWidget {
+  final bool isSmallScreen;
+  const AssetHeaderWidget({super.key, required this.isSmallScreen});
 
   @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        "Asset: Target",
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final guiData = ref.watch(guiDataProvider);
+    final address =
+        "${guiData.subsystemId}.${guiData.nodeId}.${guiData.compId}";
+    final name = guiData.name.isNotEmpty ? guiData.name : "Target";
+
+    return Row(
+      children: [
+        Expanded(
+          child: Center(
+            child: Text(
+              "Asset: $name ($address)",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
-      ),
+        if (isSmallScreen)
+          IconButton(
+            icon: const Icon(Icons.view_carousel, color: Colors.white),
+            onPressed: () {
+              guiData.cycleSmallScreenBox();
+            },
+          ),
+      ],
     );
   }
 }

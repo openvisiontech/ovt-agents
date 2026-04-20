@@ -67,20 +67,58 @@ class _AIAssistScreenState extends ConsumerState<AIAssistScreen> {
           )
         : null;
 
-    Widget contentBox = Expanded(
-      child: Container(
-        color: Colors.black, // Match thematic background
-        child: const Center(
-          child: Text(
-            "AI Assist Content",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+    final mainContent = Container(
+      color: Colors.black, // Match thematic background
+      child: const Center(
+        child: Text(
+          "AI Assist Content",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ),
+    );
+
+    Widget contentBox = Expanded(
+      child: isSmallScreen
+          ? IndexedStack(
+              index: guiData.smallScreenBoxIndex,
+              children: [
+                const Center(
+                  child: Text(
+                    "Left Sidebar Placeholder",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                mainContent,
+                const Center(
+                  child: Text(
+                    "Right Sidebar Placeholder",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                // Assuming placeholders for sidebar until AI Assist logic requires specific sidebars.
+                // Or if AI Assist has visible sidebars tracking logic:
+                if (guiData
+                    .domainLeftSidebarVisible) // Place holder toggle logic if any needed
+                  const Expanded(
+                    flex: 1,
+                    child: Center(
+                      child: Text(
+                        "Left Sidebar Placeholder",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                Expanded(flex: 4, child: mainContent),
+              ],
+            ),
     );
 
     if (isSmallScreen) {
@@ -91,20 +129,36 @@ class _AIAssistScreenState extends ConsumerState<AIAssistScreen> {
   }
 }
 
-class AIAssistHeaderWidget extends StatelessWidget {
-  const AIAssistHeaderWidget({super.key});
+class AIAssistHeaderWidget extends ConsumerWidget {
+  final bool isSmallScreen;
+  const AIAssistHeaderWidget({super.key, required this.isSmallScreen});
 
   @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        "AI Assist",
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final guiData = ref.watch(guiDataProvider);
+
+    return Row(
+      children: [
+        const Expanded(
+          child: Center(
+            child: Text(
+              "AI Assist",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
-      ),
+        if (isSmallScreen)
+          IconButton(
+            icon: const Icon(Icons.view_carousel, color: Colors.white),
+            onPressed: () {
+              guiData.cycleSmallScreenBox();
+            },
+          ),
+      ],
     );
   }
 }

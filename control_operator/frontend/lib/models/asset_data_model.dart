@@ -13,7 +13,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   Map<String, dynamic> _statusDetails = {};
   List<dynamic> _agentList = [];
 
-  int _currentAgentIndex = -1;
+  int _currentAgentIndex = 0;
   String _currentAgentName = "UNKNOWN";
   String _currentAgentUri = "";
   String _userPresent = "UNKNOWN";
@@ -31,6 +31,57 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   String _agentControlCmd = "UNKNOWN";
   String _userParams = "";
   int _agentCompletionTimeout = 0;
+
+  List<String> agentItems = List.generate(
+    20,
+    (index) => "Agent Item ${index + 1}",
+  );
+
+  void moveAgentUp() {
+    if (_currentAgentIndex > 0) {
+      _currentAgentIndex--;
+      _updateCurrentAgentInfo();
+      state = this;
+    }
+  }
+
+  void moveAgentDown() {
+    if (_currentAgentIndex < agentItems.length - 1) {
+      _currentAgentIndex++;
+      _updateCurrentAgentInfo();
+      state = this;
+    }
+  }
+
+  void setCurrentAgentIndex(int index) {
+    if (index >= 0 && index < agentItems.length) {
+      _currentAgentIndex = index;
+      _updateCurrentAgentInfo();
+      state = this;
+    }
+  }
+
+  void _updateCurrentAgentInfo() {
+    if (_agentList.isNotEmpty && _currentAgentIndex < _agentList.length) {
+      final agent = _agentList[_currentAgentIndex];
+      if (agent is Map) {
+        _currentAgentName = agent['Name']?.toString() ?? "UNKNOWN";
+        _currentAgentUri = agent['Uri']?.toString() ?? "";
+      }
+    }
+  }
+
+  void selectAgent() {
+    if (_currentAgentIndex >= 0 && _currentAgentIndex < agentItems.length) {
+      _selectedAgentName = _currentAgentName;
+      _selectedAgentUri = _currentAgentUri;
+      _agentRunningCmd = "UNKNOWN";
+      _agentControlCmd = "UNKNOWN";
+      _userParams = "";
+      _agentCompletionTimeout = 0;
+      state = this;
+    }
+  }
 
   // Getters
   Map<String, dynamic> get assetAccessInfo => _assetAccessInfo;
@@ -86,6 +137,15 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   set agentList(List<dynamic> val) {
     _agentList = val;
+    agentItems = val.map((e) {
+      if (e is Map) {
+        return "${e['Name']} (${e['Uri']})";
+      }
+      return "Unknown Agent";
+    }).toList();
+    if (agentItems.isEmpty) {
+      agentItems = List.generate(20, (index) => "Agent Item ${index + 1}");
+    }
     state = this;
   }
 

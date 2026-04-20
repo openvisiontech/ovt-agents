@@ -21,11 +21,11 @@ class MainLayout extends ConsumerWidget {
 
     Widget currentHeaderWidget = const SizedBox.shrink();
     if (guiData.currentScreen == 'AssetScreen') {
-      currentHeaderWidget = const AssetHeaderWidget();
+      currentHeaderWidget = AssetHeaderWidget(isSmallScreen: isSmallScreen);
     } else if (guiData.currentScreen == 'DomainScreen') {
-      currentHeaderWidget = const DomainHeaderWidget();
+      currentHeaderWidget = DomainHeaderWidget(isSmallScreen: isSmallScreen);
     } else if (guiData.currentScreen == 'AIAssistScreen') {
-      currentHeaderWidget = const AIAssistHeaderWidget();
+      currentHeaderWidget = AIAssistHeaderWidget(isSmallScreen: isSmallScreen);
     }
 
     return Scaffold(
@@ -144,7 +144,9 @@ class MainLayout extends ConsumerWidget {
                     height: double.infinity,
                     highlightColor: Style.stopColor,
                     iconSize: Style.headerIconPixelSize,
-                    greyout: headerData.estop != 'SET' && headerData.estop != 'CLEAR',
+                    greyout:
+                        headerData.estop != 'SET' &&
+                        headerData.estop != 'CLEAR',
                     highlight: headerData.estop == 'SET',
                     onPressed: () {
                       if (headerData.estop == 'SET') {

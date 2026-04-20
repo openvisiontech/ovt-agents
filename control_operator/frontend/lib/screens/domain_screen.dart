@@ -22,9 +22,9 @@ class DomainScreen extends ConsumerWidget {
         backgroundColor: Style.navigatorBackgroundColor,
         hoverColor: Style.navigatorBtnHoverColor,
         iconSize: Style.navigatorBtnIconPixelSize,
-        highlight: guiData.domainSidebarVisible,
+        highlight: guiData.domainLeftSidebarVisible,
         onPressed: () {
-          guiData.toggleDomainSidebar();
+          guiData.toggleDomainLeftSidebar();
         },
       ),
     ];
@@ -51,62 +51,84 @@ class DomainScreen extends ConsumerWidget {
           )
         : null;
 
+    final mainContent = Container(
+      color: Colors.red[100],
+      child: Stack(
+        children: [
+          const Center(child: Text("Domain View Content")),
+          if (guiData.domainLeftSidebarVisible && !isSmallScreen)
+            Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.5,
+                heightFactor: 0.5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Item Content",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+
     Widget contentBox = Expanded(
       child: Stack(
         children: [
           Column(
             children: [
-              // Center Box (Main Content)
-              // Center Box (Main Content)
+              // Center Box
               Expanded(
-                child: Row(
-                  children: [
-                    if (guiData.domainSidebarVisible)
-                      const Expanded(flex: 1, child: DomainSidebar()),
-                    Expanded(
-                      flex: 4,
-                      child: Container(
-                        color: Colors.red[100],
-                        child: Stack(
-                          children: [
-                            const Center(child: Text("Domain View Content")),
-                            if (guiData.domainSidebarVisible)
-                              Center(
-                                child: FractionallySizedBox(
-                                  widthFactor: 0.5,
-                                  heightFactor: 0.5,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.9),
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: Colors.grey),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.3),
-                                          blurRadius: 10,
-                                          spreadRadius: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        "Item Content",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                child: isSmallScreen
+                    ? IndexedStack(
+                        index: guiData.smallScreenBoxIndex,
+                        children: [
+                          const DomainSidebar(),
+                          mainContent,
+                          const Center(
+                            child: Text(
+                              "Right Sidebar Placeholder",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          if (guiData.domainLeftSidebarVisible)
+                            const Expanded(flex: 1, child: DomainSidebar()),
+                          Expanded(flex: 4, child: mainContent),
+                          if (guiData.domainRightSidebarVisible)
+                            const Expanded(
+                              flex: 1,
+                              child: Center(
+                                child: Text(
+                                  "Right Sidebar Placeholder",
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
 
               // Footer Box (Bottom Bar)
@@ -286,6 +308,7 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
   @override
   Widget build(BuildContext context) {
     final guiData = ref.watch(guiDataProvider);
+    final domainData = ref.watch(domainDataProvider);
 
     return Container(
       decoration: ShapeDecoration(
@@ -306,15 +329,15 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
                 IconButton(
                   icon: const Icon(Icons.arrow_upward, color: Colors.white),
                   onPressed: () {
-                    guiData.moveAssetUp();
-                    _scrollToIndex(guiData.currentAssetIndex);
+                    domainData.moveAssetUp();
+                    _scrollToIndex(domainData.currentAssetIndex);
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.arrow_downward, color: Colors.white),
                   onPressed: () {
-                    guiData.moveAssetDown();
-                    _scrollToIndex(guiData.currentAssetIndex);
+                    domainData.moveAssetDown();
+                    _scrollToIndex(domainData.currentAssetIndex);
                   },
                 ),
                 const Expanded(
@@ -332,7 +355,40 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
                 IconButton(
                   icon: const Icon(Icons.check, color: Colors.white),
                   onPressed: () {
-                    guiData.selectAsset();
+                    if (domainData.subsystemControlAbstractions.isNotEmpty &&
+                        domainData.currentAssetIndex <
+                            domainData.subsystemControlAbstractions.length) {
+                      guiData.subsystemId = domainData.currentAssetSubsystemId;
+                      guiData.nodeId = domainData.currentAssetNodeId;
+                      guiData.compId = domainData.currentAssetCompId;
+                      guiData.name = domainData.currentAssetName;
+                      guiData.controlStatus = "UNKNOWN";
+                      guiData.controlAvail = "UNKNOWN";
+                      guiData.haveAccess = "UNKNOWN";
+                      guiData.appAccessRight = "UNKNOWN";
+                      guiData.dataAccessRight = "UNKNOWN";
+                      guiData.haveControl = "UNKNOWN";
+                      guiData.subsystemState = "UNKNOWN";
+                      guiData.operatingCategory = "UNKNOWN";
+                      guiData.operatingMode = "UNKNOWN";
+
+                      final assetData = ref.read(assetDataProvider.notifier);
+                      assetData.subsystemId =
+                          domainData.currentAssetSubsystemId;
+                      assetData.nodeId = domainData.currentAssetNodeId;
+                      assetData.compId = domainData.currentAssetCompId;
+                      assetData.interactionMode = "WATCH";
+                      assetData.estopButton = "CLEAR";
+                      assetData.subsystemStateCmd = "UNKNOWN";
+                      assetData.operatingCategory = "UNKNOWN";
+                      assetData.operatingMode = "UNKNOWN";
+                      assetData.selectedAgentName = "";
+                      assetData.selectedAgentUri = "";
+                      assetData.agentRunningCmd = "UNKNOWN";
+                      assetData.agentControlCmd = "UNKNOWN";
+                      assetData.userParams = "";
+                      assetData.agentCompletionTimeout = 0;
+                    }
                   },
                 ),
               ],
@@ -342,16 +398,16 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              itemCount: guiData.assetItems.length,
+              itemCount: domainData.assetItems.length,
               itemBuilder: (context, index) {
                 return Container(
-                  color: index == guiData.currentAssetIndex
+                  color: index == domainData.currentAssetIndex
                       ? Colors.blue[100]
                       : null,
                   child: ListTile(
-                    title: Text(guiData.assetItems[index]),
+                    title: Text(domainData.assetItems[index]),
                     onTap: () {
-                      guiData.setCurrentAssetIndex(index);
+                      domainData.setCurrentAssetIndex(index);
                     },
                   ),
                 );
@@ -364,20 +420,36 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
   }
 }
 
-class DomainHeaderWidget extends StatelessWidget {
-  const DomainHeaderWidget({super.key});
+class DomainHeaderWidget extends ConsumerWidget {
+  final bool isSmallScreen;
+  const DomainHeaderWidget({super.key, required this.isSmallScreen});
 
   @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        "Domain View",
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final guiData = ref.watch(guiDataProvider);
+
+    return Row(
+      children: [
+        const Expanded(
+          child: Center(
+            child: Text(
+              "Domain View",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
-      ),
+        if (isSmallScreen)
+          IconButton(
+            icon: const Icon(Icons.view_carousel, color: Colors.white),
+            onPressed: () {
+              guiData.cycleSmallScreenBox();
+            },
+          ),
+      ],
     );
   }
 }

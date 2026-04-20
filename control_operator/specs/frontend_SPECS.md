@@ -11,17 +11,17 @@ It creates a WebRTC connection to the backend with two data channels: char chann
 
 On the other hand, it also receives Json Topics from the backend over the stream channel. These Json Topics are the data topics from ULI SDK applications and the agent responses from DeepAgent. The frontend unpacks the Json Topics and displays the data in the frontend.
 
-### Core Stack
+### 1.1 Core Stack
 - **Framework:** Flutter
 - **State Management:** Riverpod (`flutter_riverpod`)
 - **Dependency Injection:** Conditional Platform Import Factory Pattern
 - **Configuration:** Static JSON asset (`assets/config.json`)
 
-### Implementation Notes
+### 1.2 Implementation Notes
 - The frontend is implemented in the 'frontend' folder.
 - The frontend should be modular and easy to maintain, refer to `reference_implementation/ocu_ui`.
 
-### Coding Styles
+### 1.3 Coding Styles
 - The class names should be in PascalCase.
 - The method names should be in snake_case.
 - The variable names should be in snake_case.
@@ -33,12 +33,12 @@ On the other hand, it also receives Json Topics from the backend over the stream
 
 ## 2. Configuration
 
-### Configurations (`assets/config.json`)
+### 2.1 Configurations (`assets/config.json`)
 The configuration features are:
 - `workingDirectory`: Base path consumed by the Linux FFI module.
 - `webRtcUrl`: WebSocket signaling path consumed by WebRTC providers dynamically on Mobile/Web.
 
-## 3WebRTC
+## 3. WebRTC
 
 The frontend creates a WebRTC connection to the backend with two data channels: char channel and stream channel. The WebRTC connection is used to send chat messages to the backend to request data or actions. It also sends the audio and image data, packed in the Json Topics, to the backend over the stream channel.
 
@@ -66,11 +66,11 @@ The WebRTC client should have async tasks to process the chatRequestQueue and st
 
 The frontend leverages Riverpod wrapping riverpod 3 notifier inheritance chains to broadcast structural state mutations efficiently to the UI layer components.
 
-### Data Models
+### 4.1 Data Models
 
 Data for the GUI is organized into three main data models. Each data model is a `Notifier` that notifies its listeners of any changes.
 
-####**`GuiDataModel`**: Data related to the GUI.
+#### 4.1.1**`GuiDataModel`**: Data related to the GUI.
 
   -userPresent: "UNKNOWN | PRESENT | NOT_PRESENT"
 
@@ -86,21 +86,40 @@ Data for the GUI is organized into three main data models. Each data model is a 
   - currentScreen: string
   Updated when the user navigates between screens
 
-####**`HeaderDataModel`**: Data to be populated in the header of the GUI. 
+  - domainLeftSidebarVisible: boolean
+  Toggled by the List button in the NavigatorBox
+
+  - domainRightSidebarVisible: boolean
+  To be determined
+
+  - domainCommanderVisible: boolean
+  Toggled by the Commander button
+
+  - assetLeftSidebarVisible: boolean
+  Toggled by the Agent button in the NavigatorBox
+
+  - assetRightSidebarVisible: boolean
+  To be determined
+
+  - assetCommanderVisible: boolean
+  Toggled by the Commander button in the NavigatorBox
+
+#### 4.1.2**`HeaderDataModel`**: Data to be populated in the header of the GUI. 
 
   Data displayed in the header of the GUI:
 
   estop: "CLEAR | ESTOP"
 
-####**`DomainDataModel`**: A data model that holds the states needed for the domain screen with user interactions of the frontend.
+#### 4.1.3**`DomainDataModel`**: holds the states needed for the domain screen with user interactions of the frontend.
 
   - subsystemControlAbstractions: 
 
-  Updated by the chat message "all_control_abstractions" from the backend. It is a list of the control abstractions of all the discovered subsystems. Refer to WebRTC_intf_SPECS.md for the payload structure.
+  Updated by the chat message "all_control_abstractions" from the backend. It is a list of the control abstractions of all the discovered subsystems (assets). Refer to WebRTC_intf_SPECS.md for the payload structure.
 
-  The asset list of the domain screen is updated with each list item displaying the `Name`, `SubsystemType`, and `ControlStatus` of the subsystemControlAbstraction.
-
-  - fields updated by UI operations
+  - asset list:
+  
+  Updated with each list item displaying the `Name`, `SubsystemType`, and `ControlStatus` of the subsystemControlAbstraction.
+  The left sidebar of the domain screen is updated with the asset list. When traversing the asset list, the following fields are updated with the corresponding fields of the current subsystemControlAbstraction:
 
   currentAssetIndex: index of the current asset in the asset list
   currentAssetSubsystemId: subsystem id of the current asset
@@ -110,10 +129,9 @@ Data for the GUI is organized into three main data models. Each data model is a 
   currentAssetControlStatus: control status of the current asset
   currentAssetControlAvail: control availability of the current asset
 
-  When traversing the asset list, the above fields are updated with the corresponding fields of the subsystemControlAbstraction.
   When the "Check" button is pressed, the current asset is selected. The following actions are performed:
   
-  1. The fields in the GuiDataModel related to selected asset are updated as below:
+  1) The fields in the GuiDataModel related to selected asset are updated as below:
    
     subsystemId = subsystemControlAbstraction.subsystemId
     nodeId = subsystemControlAbstraction.nodeId
@@ -129,7 +147,7 @@ Data for the GUI is organized into three main data models. Each data model is a 
     operatingCategory = "UNKNOWN"
     operatingMode = "UNKNOWN"
 
-  2. The fields in the AssetDataModel related to selected asset are updated as below:
+  2) The fields in the AssetDataModel related to selected asset are updated as below:
    
     subsystemId = subsystemControlAbstraction.subsystemId
     nodeId = subsystemControlAbstraction.nodeId
@@ -148,11 +166,11 @@ Data for the GUI is organized into three main data models. Each data model is a 
     userParams = ""
     agentCompletionTimeout = 0
 
-#### **`AssetDataModel`**: A data model that holds the states needed for the asset components interactions of the frontend. It is a `Notifier` that notifies its listeners of any changes.
+#### 4.1.4 **`AssetDataModel`**: A data model that holds the states needed for the asset components interactions of the frontend. It is a `Notifier` that notifies its listeners of any changes.
 
   - assetAccessInfo:
   
-  Updated by the chat message "asset_access_info" from the backend. It is the info of access client to the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure.
+    Updated by the chat message "asset_access_info" from the backend. It is the info of access client to the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure.
 
   - assetControlInfo:
 
@@ -172,7 +190,7 @@ Data for the GUI is organized into three main data models. Each data model is a 
       
   - agentList:
 
-    Updated by the chat message "available_agents" from the backend. It is the list of agents of the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure.
+    Updated with each list item displaying the `Name` and `Uri` of the agent by the chat message "available_agents" from the backend. It is the list of agents of the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure. The agent list is displayed in the left sidebar of the asset screen.
 
   - fields updated by UI operations
 
@@ -204,7 +222,7 @@ Data for the GUI is organized into three main data models. Each data model is a 
     userParams = ""
     agentCompletionTimeout = 0
   
-#### **`ActionRequestsDataModel`**: A data model that allows the GUI to request actions from the backend. When the GUI wants to request an action from the backend, it sets the corresponding boolean to true. A background async task, `processActionRequests()` is to go through the action requests and put the corresponding chat message to the chat request queue of the WebRTC client and set the boolean to false after queueing the chat message. The async task is to be run in a separate isolate.
+#### 4.1.5 **`ActionRequestsDataModel`**: A data model that allows the GUI to request actions from the backend. When the GUI wants to request an action from the backend, it sets the corresponding boolean to true. A background async task, `processActionRequests()` is to go through the action requests and put the corresponding chat message to the chat request queue of the WebRTC client and set the boolean to false after queueing the chat message. The async task is to be run in a separate isolate.
 
   - assetListUpdate
   - assetListAutoUpdate
@@ -218,11 +236,11 @@ Data for the GUI is organized into three main data models. Each data model is a 
 
   - statusDetailsUpdate
   - resourceDetailsUpdate
-  - agentStatusListUpdate
+  - agentStatusUpdate
   - agentDetailsUpdate
   - serviceListAutoUpdate
 
-#### **`GamepadDataModel`**: A data model that holds the states needed for the gamepad components interactions of the frontend. It is a `Notifier` that notifies its listeners of any changes.
+#### 4.1.6 **`GamepadDataModel`**: A data model that holds the states needed for the gamepad components interactions of the frontend. It is a `Notifier` that notifies its listeners of any changes.
 
   - gamepadDataReceived: boolean
   - leftJoystickX: number
@@ -247,51 +265,90 @@ Data for the GUI is organized into three main data models. Each data model is a 
   - buttonSelect: "UNKNOWN | PRESSED | RELEASED"
   - buttonHome: "UNKNOWN | PRESSED | RELEASED"  
 
-#### **`StreamDataModel`**: A data model that holds a list of received Json Topics to display. It is a `ChangeNotifier` that notifies its listeners of any changes.
+#### 4.1.7 **`StreamDataModel`**: A data model that holds a list of received Json Topics to display. It is a `Notifier` that notifies its listeners of any changes.
+
+  - Json Topics list
+    
+    The list is updated by the stream messages from the backend. The background async task `processStreamMessages()` is to go through the stream messages and put the corresponding json topics to the json topics list. The Json Topics are displayed in the center views of the domain screen and the asset screen.
+
+    The background task `expireJsonTopics()` is to go through the json topics list and remove the expired json topics. The expiration time is specified in the data topic list from the backend.
 
 ---
 
-## 4. Background Async Tasks
+## 5. Background Async Tasks
 
 All the background async tasks are run as asynchronous functions onto the main execution loop
 
-### **`processActionRequests()`**
+### 5.1 **`processActionRequests()`**
 
-It periodically goes through the action requests and puts the corresponding chat message to the chat request queue of the WebRTC client and set the boolean to false after queueing the chat message. It is loop interval is 10ms.
+It periodically goes through the action requests and puts the corresponding chat message to the chat request queue of the WebRTC client and set the boolean to false after queueing the chat message. It is loop interval is 10ms. The `processActionRequests()` gets the requests from the ActionRequestsDataModel.
 
-### **`processMediaRequests()`**
+Perform the following actions every 50ms:
+
+  1) if `assetListUpdate` is true, put to the chatRequestQueue the chat message for get_all_control_abstractions action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `assetListUpdate` to false.
+
+  2) if `agentListUpdate` is true, put to the chatRequestQueue the chat message for get_available_agents action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `agentListUpdate` to false.
+
+  3) if `dataTopicListUpdate` is true, put to the chatRequestQueue the chat message for get_data_topic_list action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `dataTopicListUpdate` to false.
+
+  4) if `dataTopicClientListUpdate` is true, put to the chatRequestQueue the chat message for get_data_topic_clients action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `dataTopicClientListUpdate` to false.
+
+  5) if `transformReporterListUpdate` is true, put to the chatRequestQueue the chat message for get_transform_reporters action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `transformReporterListUpdate` to false.
+
+  6) if `statusDetailsUpdate` is true, put to the chatRequestQueue the chat message for get_status_details action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `statusDetailsUpdate` to false.
+
+  7) if `agentStatusUpdate` is true, put to the chatRequestQueue the chat message for get_agent_status action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `agentStatusUpdate` to false.
+
+  8) if `agentDetailsUpdate` is true, put to the chatRequestQueue the chat message for get_agent_details action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `agentDetailsUpdate` to false.
+
+
+Perform the following actions every 100ms:
+
+  1) if `assetListAutoUpdate` is true, put to the chatRequestQueue the chat message for get_all_control_abstractions action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then keep the assetListAutoUpdate as true.
+
+  2) put to the chatRequestQueue the chat message for get_asset_access_info action, refer to WebRTC_intf_SPECS.md for the chat message structure.
+
+  3) Put to the chatRequestQueue the chat message for get_asset_control_info action, refer to WebRTC_intf_SPCS.md for the chat message structure.
+
+  4) Put to the chatRequestQueue the chat message for get_state_info action, refer to WebRTC_intf_SPCS.md for the chat message structure.
+
+  5) Put to the chatRequestQueue the chat message for get_operating_mode_info action, refer to WebRTC_intf_SPCS.md for the chat message structure.
+
+### 5.2 **`processMediaRequests()`**
 
 It periodically goes through the media requests and puts the corresponding Json Topics to the stream request queue of the WebRTC client and set the boolean to false after queueing the Json Topics. It is loop interval is 10ms.
 
-### **`processChat()`**
+### 5.3 **`processChat()`**
 
 It waits for the chat messages from the Chat Queue of the WebRTC client and updates the corresponding data models. It is loop interval is 10ms.
 
-### **`processStream()`**
+### 5.4 **`processStream()`**
 
 It waits for the Json Topics from the Stream Queue of the WebRTC client and updates the `StreamDataModel`. When a Json Topic is entered into the `StreamDataModel`, its pub_time is updated to the current time and will be displayed. The `expireStreamData()` is to be run to remove the expired Json Topics from the `StreamDataModel`. It is loop interval is 10ms.
 
-### **`processGamepad()`**
+### 5.5 **`processGamepad()`**
 
 It periodically polls the gamepad states and updates the `GamepadDataModel`. It is loop interval is 100ms.
 
-### **`expireStreamData()`**
+### 5.6 **`expireStreamData()`**
 
 It periodically checks the `StreamDataModel` and removes the expired Json Topics. It is loop interval is 100ms.
 
 ---
 
-## 5. User Interface (UI) Components
+## 6. User Interface (UI) Components
 
 The UI Main Layout and the subscreens are the same as the reference implementation exception that views are renamed screens. Refer to `specs\frontend_reference_SPECS.md` for the details.
 
-### Core Layout Component (`MainLayout`)
-- Reactively spans infinite dimensions `double.infinity` dynamically matching the host Window Manager restrictions. (Note: Embedded GTK application settings have OS-level decorations globally enforced to permit universal dragging/resizing via `gtk_window_set_decorated(window, TRUE)`).
-- **Responsive Navigation:** Reads `MediaQuery.of(context).size.width` identifying `Style.smallDeviceBreakpoint` limits. 
-  - Standard View: Buttons layout laterally along a single unified horizontal header array.
-  - Small Form Factor: Buttons snap to grid layouts seamlessly placing context titles vertically.
+### 6.1 Core Layout Component (`MainLayout`)
 
-###**`MainLayout`**
+- Reactively spans infinite dimensions `double.infinity` dynamically matching the host Window Manager restrictions. (Note: Embedded GTK application settings have OS-level decorations globally enforced to permit universal dragging/resizing via `gtk_window_set_decorated(window, TRUE)`).
+
+- **Responsive Navigation:** Reads `MediaQuery.of(context).size.width` identifying `Style.smallDeviceBreakpoint` limits. 
+  1) Standard View: Buttons layout laterally along a single unified horizontal header array.
+  2) Small Form Factor: Buttons snap to grid layouts seamlessly placing context titles vertically.
+
+### 6.2 **`MainLayout`**
 
 The main layout includes the header and the context box. It dynamically injects the sub-screens into the context box based on `guiData.currentScreen`.
 
@@ -310,11 +367,43 @@ The Header Center View is the area for the sub-screen to display its header info
   subsystemState: "UNKNOWN | RESET | SHUTDOWN | RENDER_USELESS | OPERATIONAL"
   operatingMode: "UNKNOWN | STANDARD_OPERATING | REDUCED | RIGOROUS | SILENT | HIBERNATED | TRAINING | MAINTENANCE"
 
-### Sub-Screens
+### 6.3 Sub-Screens
 
-- **`AssetScreen`**: Visualizes immediate robotics or network asset telemetries and metrics realistically. Same as the asset_view in the reference implementation.
-- **`DomainScreen`**: Renders holistic overarching topological and relational maps cleanly. Same as the domain_view in the reference implementation.
-- **`AIAssistScreen`**: Centralizes interactive conversational interfaces rendering LLM operations directly inside the payload scopes seamlessly. Same as the ai_assist_view in the reference implementation.
+#### 6.3.1 **`Common Sub-Screen Components`**
 
-### Styling Elements (`Style`)
+All the sub-screens have the same layout structure below. The difference is the content of the sub-screen.
+
+  1) NavigatorBox - host a list of buttons to navigate functions of the sub-screen.
+  
+  2) CenterBox - host the main view of the sub-screen. It consists of three parts:
+   
+    - LeftSideBar: 1/4 of the CenterBox width if visible, else 0. It is populated with the list of items, for example, asset list in the domain screen, agent list in the asset screen.
+    - MainContent: rest of the CenterBox width. It hosts a foating fractionally sized window for displaying detailed information of the selected item.
+    - RightSideBar: 1/4 of the CenterBox width if visible, else 0.
+   
+    The LeftSideBar and RightSideBar are in the same row with the MainContent, and the MainContent is in the middle of the LeftSideBar and RightSideBar.
+
+    In case of small screen, the LeftSideBar, MainContent, and RightSideBar are in full screen width and stacked on top of each other in the order of LeftSideBar, MainContent, and RightSideBar. A wheel button is displayed on the header to slide through the LeftSideBar, MainContent, and RightSideBar to toggle their visibility.
+
+  3) Footer - host the drawer style of the commander buttons of the sub-screen.
+
+#### 6.3.2 **`DomainScreen`**:
+  Renders holistic overarching topological and relational maps cleanly. Same as the domain_view in the reference implementation.
+  The `List` button toggles the visibility of the LeftSideBar.
+  The `Graph` button toggles the visibility of the RightSideBar.
+  The LeftSideBar is populated with the asset list.
+  The MainContent is populated with the domain graph that is the 3D visualization of the domain.
+  The RightSideBar is invisible by default.
+
+#### 6.3.3 **`AssetScreen`**:
+  Visualizes immediate robotics or network asset telemetries and metrics realistically. Same as the asset_view in the reference implementation.
+  The `Agents` button toggles the visibility of the LeftSideBar.
+  The LeftSideBar is populated with the agents list.
+  The MainContent is populated with the asset graph that is the 3D visualization of the data topics published by the asset.
+  The RightSideBar is invisible by default.
+
+#### 6.3.4 **`AIAssistScreen`**:
+  Centralizes interactive conversational interfaces rendering LLM operations directly inside the payload scopes seamlessly. Same as the ai_assist_view in the reference implementation.
+
+### 6.4 Styling Elements (`Style`)
 To maintain consistency seamlessly, UI aesthetics (margins, exact breakpoints globally bounding elements, highlight hex parameters seamlessly) are statically constrained identically inside `lib/style.dart`.
