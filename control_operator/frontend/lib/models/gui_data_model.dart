@@ -30,6 +30,9 @@ class GuiDataModel extends Notifier<GuiDataModel> {
     } else if (currentScreen == 'AssetScreen') {
       hasLeft = assetLeftSidebarVisible;
       hasRight = assetRightSidebarVisible;
+    } else if (currentScreen == 'AIAssistScreen') {
+      hasLeft = aiAssistLeftSidebarVisible;
+      hasRight = aiAssistRightSidebarVisible;
     }
 
     if (_smallScreenBoxIndex == 0 && !hasLeft) _smallScreenBoxIndex = 1;
@@ -46,6 +49,9 @@ class GuiDataModel extends Notifier<GuiDataModel> {
     } else if (currentScreen == 'AssetScreen') {
       hasLeft = assetLeftSidebarVisible;
       hasRight = assetRightSidebarVisible;
+    } else if (currentScreen == 'AIAssistScreen') {
+      hasLeft = aiAssistLeftSidebarVisible;
+      hasRight = aiAssistRightSidebarVisible;
     }
 
     int nextIndex = _smallScreenBoxIndex;
@@ -61,26 +67,17 @@ class GuiDataModel extends Notifier<GuiDataModel> {
 
   bool domainLeftSidebarVisible = false;
   bool domainRightSidebarVisible = false;
+  bool domainPopupVisible = false;
   bool domainCommanderVisible = true;
 
   bool assetLeftSidebarVisible = false;
   bool assetRightSidebarVisible = false;
+  bool assetPopupVisible = false;
   bool assetCommanderVisible = true;
 
-  // Selected Asset Info
-  dynamic subsystemId;
-  dynamic nodeId;
-  dynamic compId;
-  String name = "";
-  String controlStatus = "UNKNOWN";
-  String controlAvail = "UNKNOWN";
-  String haveAccess = "UNKNOWN";
-  String appAccessRight = "UNKNOWN";
-  String dataAccessRight = "UNKNOWN";
-  String haveControl = "UNKNOWN";
-  String subsystemState = "UNKNOWN";
-  String operatingCategory = "UNKNOWN";
-  String operatingMode = "UNKNOWN";
+  bool aiAssistLeftSidebarVisible = false;
+  bool aiAssistRightSidebarVisible = false;
+  bool aiAssistPopupVisible = false;
 
   void toggleAssetCommander() {
     assetCommanderVisible = !assetCommanderVisible;
@@ -120,6 +117,30 @@ class GuiDataModel extends Notifier<GuiDataModel> {
   void toggleDomainRightSidebar() {
     domainRightSidebarVisible = !domainRightSidebarVisible;
     if (domainRightSidebarVisible)
+      _smallScreenBoxIndex = 2;
+    else
+      _sanitizeSmallScreenBoxIndex();
+    state = this;
+  }
+
+  void toggleAIAssistLeftSidebar() {
+    aiAssistLeftSidebarVisible = !aiAssistLeftSidebarVisible;
+    if (aiAssistLeftSidebarVisible)
+      _smallScreenBoxIndex = 0;
+    else
+      _sanitizeSmallScreenBoxIndex();
+    state = this;
+  }
+
+  void hideAIAssistLeftSidebar() {
+    aiAssistLeftSidebarVisible = false;
+    _sanitizeSmallScreenBoxIndex();
+    state = this;
+  }
+
+  void toggleAIAssistRightSidebar() {
+    aiAssistRightSidebarVisible = !aiAssistRightSidebarVisible;
+    if (aiAssistRightSidebarVisible)
       _smallScreenBoxIndex = 2;
     else
       _sanitizeSmallScreenBoxIndex();

@@ -56,11 +56,11 @@ class DomainScreen extends ConsumerWidget {
       child: Stack(
         children: [
           const Center(child: Text("Domain View Content")),
-          if (guiData.domainLeftSidebarVisible && !isSmallScreen)
+          if (guiData.domainPopupVisible && !isSmallScreen)
             Center(
               child: FractionallySizedBox(
-                widthFactor: 0.5,
-                heightFactor: 0.5,
+                widthFactor: 0.33,
+                heightFactor: 0.33,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.9),
@@ -115,11 +115,11 @@ class DomainScreen extends ConsumerWidget {
                     : Row(
                         children: [
                           if (guiData.domainLeftSidebarVisible)
-                            const Expanded(flex: 1, child: DomainSidebar()),
-                          Expanded(flex: 4, child: mainContent),
+                            const Expanded(flex: 2, child: DomainSidebar()),
+                          Expanded(flex: 7, child: mainContent),
                           if (guiData.domainRightSidebarVisible)
                             const Expanded(
-                              flex: 1,
+                              flex: 3,
                               child: Center(
                                 child: Text(
                                   "Right Sidebar Placeholder",
@@ -307,7 +307,6 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
 
   @override
   Widget build(BuildContext context) {
-    final guiData = ref.watch(guiDataProvider);
     final domainData = ref.watch(domainDataProvider);
 
     return Container(
@@ -358,27 +357,38 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
                     if (domainData.subsystemControlAbstractions.isNotEmpty &&
                         domainData.currentAssetIndex <
                             domainData.subsystemControlAbstractions.length) {
-                      guiData.subsystemId = domainData.currentAssetSubsystemId;
-                      guiData.nodeId = domainData.currentAssetNodeId;
-                      guiData.compId = domainData.currentAssetCompId;
-                      guiData.name = domainData.currentAssetName;
-                      guiData.controlStatus = "UNKNOWN";
-                      guiData.controlAvail = "UNKNOWN";
-                      guiData.haveAccess = "UNKNOWN";
-                      guiData.appAccessRight = "UNKNOWN";
-                      guiData.dataAccessRight = "UNKNOWN";
-                      guiData.haveControl = "UNKNOWN";
-                      guiData.subsystemState = "UNKNOWN";
-                      guiData.operatingCategory = "UNKNOWN";
-                      guiData.operatingMode = "UNKNOWN";
-
                       final assetData = ref.read(assetDataProvider.notifier);
+                      assetData.assetName = domainData.currentAssetName;
                       assetData.subsystemId =
-                          domainData.currentAssetSubsystemId;
-                      assetData.nodeId = domainData.currentAssetNodeId;
-                      assetData.compId = domainData.currentAssetCompId;
+                          int.tryParse(
+                            domainData.currentAssetSubsystemId.toString(),
+                          ) ??
+                          0;
+                      assetData.nodeId =
+                          int.tryParse(
+                            domainData.currentAssetNodeId.toString(),
+                          ) ??
+                          0;
+                      assetData.compId =
+                          int.tryParse(
+                            domainData.currentAssetCompId.toString(),
+                          ) ??
+                          0;
+
+                      assetData.controlStatus =
+                          domainData.currentAssetControlStatus;
+                      assetData.controlAvail =
+                          domainData.currentAssetControlAvail;
+
+                      assetData.haveAccess = "UNKNOWN";
+                      assetData.appAccessRight = "UNKNOWN";
+                      assetData.dataAccessRight = "UNKNOWN";
+                      assetData.haveControl = "UNKNOWN";
+                      assetData.subsystemStateCmd = "UNKNOWN";
+                      assetData.operatingCategory = "UNKNOWN";
+                      assetData.operatingMode = "UNKNOWN";
+
                       assetData.interactionMode = "WATCH";
-                      assetData.estopButton = "CLEAR";
                       assetData.subsystemStateCmd = "UNKNOWN";
                       assetData.operatingCategory = "UNKNOWN";
                       assetData.operatingMode = "UNKNOWN";
@@ -386,7 +396,7 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
                       assetData.selectedAgentUri = "";
                       assetData.agentRunningCmd = "UNKNOWN";
                       assetData.agentControlCmd = "UNKNOWN";
-                      assetData.userParams = "";
+                      assetData.userParams = {};
                       assetData.agentCompletionTimeout = 0;
                     }
                   },

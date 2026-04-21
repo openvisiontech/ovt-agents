@@ -8,15 +8,15 @@ class DomainDataModel extends Notifier<DomainDataModel> {
       true;
 
   List<dynamic> _subsystemControlAbstractions = [];
-  int _currentAssetIndex = 0;
+  int _currentAssetIndex = -1;
   dynamic _currentAssetSubsystemId;
   dynamic _currentAssetNodeId;
   dynamic _currentAssetCompId;
   String _currentAssetName = "";
   String _currentAssetControlStatus = "";
-  String _currentAssetControlAvail = "";
+  bool _currentAssetControlAvail = false;
 
-  List<String> assetItems = List.generate(20, (index) => "Asset ${index + 1}");
+  List<String> assetItems = [];
 
   List<dynamic> get subsystemControlAbstractions =>
       _subsystemControlAbstractions;
@@ -26,7 +26,7 @@ class DomainDataModel extends Notifier<DomainDataModel> {
   dynamic get currentAssetCompId => _currentAssetCompId;
   String get currentAssetName => _currentAssetName;
   String get currentAssetControlStatus => _currentAssetControlStatus;
-  String get currentAssetControlAvail => _currentAssetControlAvail;
+  bool get currentAssetControlAvail => _currentAssetControlAvail;
 
   void moveAssetUp() {
     if (_currentAssetIndex > 0) {
@@ -57,14 +57,15 @@ class DomainDataModel extends Notifier<DomainDataModel> {
         _currentAssetIndex < _subsystemControlAbstractions.length) {
       final asset = _subsystemControlAbstractions[_currentAssetIndex];
       if (asset is Map) {
-        _currentAssetSubsystemId = asset['subsystemId'] ?? 0;
-        _currentAssetNodeId = asset['nodeId'] ?? 0;
-        _currentAssetCompId = asset['compId'] ?? 0;
-        _currentAssetName = asset['name']?.toString() ?? "UNKNOWN";
+        _currentAssetSubsystemId = asset['Address']['SubsystemId'] ?? 0;
+        _currentAssetNodeId = asset['Address']['NodeId'] ?? 0;
+        _currentAssetCompId = asset['Address']['CompId'] ?? 0;
+        _currentAssetName = asset['Name']?.toString() ?? "UNKNOWN";
         _currentAssetControlStatus =
-            asset['controlStatus']?.toString() ?? "UNKNOWN";
+            asset['ControlStatus']?.toString() ?? "UNKNOWN";
         _currentAssetControlAvail =
-            asset['controlAvail']?.toString() ?? "UNKNOWN";
+            !(_currentAssetControlStatus == "UNKNOWN" ||
+                _currentAssetControlStatus == "NOT_AVAILABLE");
       }
     }
   }
@@ -80,41 +81,6 @@ class DomainDataModel extends Notifier<DomainDataModel> {
     if (assetItems.isEmpty) {
       assetItems = List.generate(20, (index) => "Asset ${index + 1}");
     }
-    state = this;
-  }
-
-  set currentAssetIndex(int val) {
-    _currentAssetIndex = val;
-    state = this;
-  }
-
-  set currentAssetSubsystemId(val) {
-    _currentAssetSubsystemId = val;
-    state = this;
-  }
-
-  set currentAssetNodeId(val) {
-    _currentAssetNodeId = val;
-    state = this;
-  }
-
-  set currentAssetCompId(val) {
-    _currentAssetCompId = val;
-    state = this;
-  }
-
-  set currentAssetName(String val) {
-    _currentAssetName = val;
-    state = this;
-  }
-
-  set currentAssetControlStatus(String val) {
-    _currentAssetControlStatus = val;
-    state = this;
-  }
-
-  set currentAssetControlAvail(String val) {
-    _currentAssetControlAvail = val;
     state = this;
   }
 }

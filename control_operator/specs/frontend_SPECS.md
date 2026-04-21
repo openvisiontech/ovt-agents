@@ -320,7 +320,59 @@ It periodically goes through the media requests and puts the corresponding Json 
 
 ### 5.3 **`processChat()`**
 
-It waits for the chat messages from the Chat Queue of the WebRTC client and updates the corresponding data models. It is loop interval is 10ms.
+It waits for the chat messages from the Chat Queue of the WebRTC client and updates the corresponding data models. Refer to Section 2.1.2 `Backend to Frontend messages` in the WebRTC_intf_SPECS.md for the chat message structure.
+
+1) Receive action `all_control_abstractions`
+
+   - Update the subsystemControlAbstractions list in the `DomainDataModel` with the received "subsystemcontrolabstractions" list.
+
+2) Receive action `asset_access_info`
+
+   - Update the _assetAccessInfo in the `AssetDataModel` with the received "assetclient" object.
+
+3) Receive action `asset_control_info`
+
+   - Update the _assetControlInfo in the `AssetDataModel` with the received "controlclient" object.
+
+4) Receive action `state_info`
+
+   - Update the stateInfo in the `AssetDataModel` with the received "stateclient" object.
+
+5) Receive action `operating_mode_info`
+
+   - Update the operatingModeInfo in the `AssetDataModel` with the received "operatingmodeclient" object.
+
+6) Receive action `status_details`
+
+   - Update the statusDetails list in the `AssetDataModel` with the received "statusdetails" list.
+
+7) Receive action `available_agents`
+
+   - Update the _agentList in the `AssetDataModel` with the received "agentlist" list.
+
+8) Receive action `agent_status`
+
+   - Update the _agentStatus in the `AssetDataModel` with the received "agentstatuslist" list.
+  
+9) Receive action `agent_details`
+
+   - Update the _agentDetails in the `AssetDataModel` with the received "agentdetails" object.
+
+10) Receive action `data_topic_list`
+
+   - Update the _dataTopicList in the `AssetDataModel` with the received "datatopiclist" list.
+
+11) Receive action `data_topic_clients`
+
+   - Update the _dataTopicClientList in the `AssetDataModel` with the received "datatopicclientlist" list.
+
+12) Receive action `transform_reporters`
+
+   - Update the _transformReporterList in the `AssetDataModel` with the received "transformreporterlist" list.
+
+13) Receive action `transform_reporters_clients`
+
+   - Update the _transformClientList in the `AssetDataModel` with the received "transformclientlist" list.
 
 ### 5.4 **`processStream()`**
 
@@ -401,6 +453,20 @@ All the sub-screens have the same layout structure below. The difference is the 
   The LeftSideBar is populated with the agents list.
   The MainContent is populated with the asset graph that is the 3D visualization of the data topics published by the asset.
   The RightSideBar is invisible by default.
+
+  The assetHeaderWidget is to be injected to the Header Center View when the Asset Screen is on display. It is to display the following information of the selected asset, which is updated through the AssetDataModel.
+
+  address: subsystemId + "." + nodeId + "." + compId
+  name: string
+  
+  if (haveAccess == "YES")
+    appAccessRight: "UNKNOWN | NOT_ALLOWED | OPERATOR | MAINTAINER | ADMINISTRATOR"
+    dataAccessRight: "UNKNOWN | NOT_ALLOWED | UNCLASSIFIED | CONTROLLED | CLASSIFIED"
+
+  haveControl: use an icon to indicate the state. If haveControl == "NO", the icon is gray. If haveControl == "YES", the icon is green.
+
+  subsystemState: "UNKNOWN | RESET | SHUTDOWN | RENDER_USELESS | OPERATIONAL"
+  operatingMode: "UNKNOWN | STANDARD_OPERATING | REDUCED | RIGOROUS | SILENT | HIBERNATED | TRAINING | MAINTENANCE"
 
 #### 6.3.4 **`AIAssistScreen`**:
   Centralizes interactive conversational interfaces rendering LLM operations directly inside the payload scopes seamlessly. Same as the ai_assist_view in the reference implementation.

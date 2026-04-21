@@ -2,21 +2,21 @@
 
 This document describes the communication messaging between the frontend and the backend. It is implemented over the WebRTC, refer to `specs\WebRTC_server_SPECS.md` and `specs\WebRTC_client_SPECS.md`.
 
-## overview
+## 1. Overview
 
 There are two channels for the communication between the frontend and the backend: chat channel and stream channel. The chat channel is used for the control messaging, and the stream channel is used for the high throughput data streaming.
 
-## Core Components
+## 2. Core Components
 
 The interface consists of the following components:
 
-### Chat Channel protocol
+### 2.1 Chat Channel protocol
 
 The Chat Channel is a two-way channel. It uses json string messages for the communication between the backend and the frontend. The json string contains two fields: action and payload. The action field is a string that specifies the action to be performed, and the payload field is a json object that contains the data needed to perform the action.
 
-#### Front end to back end messages
+#### 2.1.1 Front end to back end messages
 
-1. Retrieve the subsystem control abstractions of all the discovered assets.
+1) Retrieve the subsystem control abstractions of all the discovered assets.
    message:
 
    ```json
@@ -27,7 +27,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-2. Retrieve the access client record of the selected subsystem.
+2) Retrieve the access client record of the selected subsystem.
    message:
 
    ```json
@@ -38,7 +38,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-3. Retrieve the control client record of the selected subsystem.
+3) Retrieve the control client record of the selected subsystem.
    message:
 
    ```json
@@ -49,7 +49,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-4. Retieve the subsystem state client record of the selected subsystem.
+4) Retieve the subsystem state client record of the selected subsystem.
    message:
 
    ```json
@@ -60,7 +60,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-5. Retieve the operating mode client record of the selected subsystem.
+5) Retieve the operating mode client record of the selected subsystem.
    message:
 
    ```json
@@ -70,7 +70,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
          }
       }
 
-6. Retrieve the status details of the selected subsystem.
+6) Retrieve the status details of the selected subsystem.
    message:
 
    ```json
@@ -81,7 +81,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-7. Retrieve the available agents of the selected subsystem.
+7) Retrieve the available agents of the selected subsystem.
    message:
 
    ```json
@@ -92,7 +92,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-8. Retrieve the list of the status of all the agents of the selected subsystem.
+8) Retrieve the list of the status of all the agents of the selected subsystem.
    message:
 
    ```json
@@ -103,7 +103,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-9. Retrieve the details of the agents of the selected subsystem.
+9) Retrieve the details of the agents of the selected subsystem.
    message:
 
    ```json
@@ -114,7 +114,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-10. Retrieve the list of the data topics the selected subsystem is publishing.
+10) Retrieve the list of the data topics the selected subsystem is publishing.
     message:
 
     ```json
@@ -125,7 +125,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-11. Retrieve the list of the clients who subscribe the data topics of the selected subsystem.
+11) Retrieve the list of the clients who subscribe the data topics of the selected subsystem.
     message:
 
     ```json
@@ -136,7 +136,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-12. Retrieve the list of the transform reporters of the selected subsystem.
+12) Retrieve the list of the transform reporters of the selected subsystem.
     message:
 
     ```json
@@ -147,7 +147,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-13. Retrieve the list of the clients who subscribe the transform reporters of the selected subsystem.
+13) Retrieve the list of the clients who subscribe the transform reporters of the selected subsystem.
     message:
 
     ```json
@@ -158,7 +158,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-14. Set the gui record. Front end needs to periodically send this message to keep the connection alive.
+14) Set the gui record. Front end needs to periodically send this message to keep the connection alive.
     message:
 
     ```json
@@ -167,7 +167,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
           "payload": {
             "guirec": {
             "UserPresent": "UNKNOWN | PRESENT | NOT_PRESENT",
-            "Subsystemmanager": {
+            "SubsystemManager": {
               "SubsystemId": "number",
               "NodeId": "number",
               "CompId": "number"
@@ -188,7 +188,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-15. Set the joystick record. Front end needs to periodically send this message when the running agent requires the joystick as user parameters.
+15) Set the joystick record. Front end needs to periodically send this message when the running agent requires the joystick as user parameters.
     message:
 
     ```json
@@ -207,9 +207,9 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-#### Back end to front end messages
+#### 2.1.2 Backend to frontend messages
 
-1. Response with the subsystem control abstractions of all the discovered assets.
+1) Rsponse with the subsystem control abstractions of all the discovered assets.
    message:
 
   ```json
@@ -233,7 +233,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-2. Response with the access client record of the selected subsystem.
+2) Response with the access client record of the selected subsystem.
    message:
 
   ```json
@@ -255,7 +255,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
     }
   ```
-3. Response with the control client record of the selected subsystem.
+3) Response with the control client record of the selected subsystem.
    message:
 
   ```json
@@ -276,7 +276,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-4. Response with the subsystem state client record of the selected subsystem.
+4) Response with the subsystem state client record of the selected subsystem.
    message:
 
   ```json
@@ -298,7 +298,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-5. Response with the operating mode client record of the selected subsystem.
+5) Rsponse with the operating mode client record of the selected subsystem.
    message:
 
   ```json
@@ -319,7 +319,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-6. Response with the status details of the selected subsystem.
+6) Response with the status details of the selected subsystem.
    message:
 
   ```json
@@ -401,7 +401,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-7. Response with the available agents of the selected subsystem.
+7) Response with the available agents of the selected subsystem.
    message:
 
   ```json
@@ -428,7 +428,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-8 Response with the list of the status of all the agents of the selected subsystem.
+8) Response with the list of the status of all the agents of the selected subsystem.
    message:
 
   ```json
@@ -465,7 +465,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-9. Response with the details of the agents of the selected subsystem.
+9) Response with the details of the agents of the selected subsystem.
    message:
 
   ```json
@@ -505,7 +505,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-10. Response with the list of the data topics the selected subsystem is publishing.
+10) Response with the list of the data topics the selected subsystem is publishing.
     message:
 
   ```json
@@ -552,7 +552,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-11. Response with the list of the clients who subscribe the data topics of the selected subsystem.
+11) Response with the list of the clients who subscribe the data topics of the selected subsystem.
     message:
 
   ```json
@@ -625,7 +625,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-12. Response with the list of the transform reporters of the selected subsystem.
+12) Response with the list of the transform reporters of the selected subsystem.
     message:
 
   ```json
@@ -654,7 +654,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-13. Response with the list of the clients who subscribe the transform reporters of the selected subsystem.
+13) Reponse with the list of the clients who subscribe the transform reporters of the selected subsystem.
     message:
 
   ```json
@@ -683,10 +683,10 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
     }
   ```
 
-### Stream Channel protocol
+### 2.2 Stream Channel protocol
 
 The Stream Channel is meant for two-way high speed streaming. It used the Json Topic messages. 
 
-#### Front end to back end data topics
+#### 2.2.1 Front end to back end data topics
 
-#### Back end to front end data topics
+#### 2.2.2 Back end to front end data topics

@@ -27,7 +27,10 @@ class _AIAssistScreenState extends ConsumerState<AIAssistScreen> {
         backgroundColor: Style.navigatorBackgroundColor,
         hoverColor: Style.navigatorBtnHoverColor,
         iconSize: Style.navigatorBtnIconPixelSize,
-        onPressed: () {},
+        highlight: guiData.aiAssistLeftSidebarVisible,
+        onPressed: () {
+          guiData.toggleAIAssistLeftSidebar();
+        },
       ),
       SizedBox(
         width: isSmallScreen ? Style.navigatorBtnSpacing : 0,
@@ -41,7 +44,10 @@ class _AIAssistScreenState extends ConsumerState<AIAssistScreen> {
         backgroundColor: Style.navigatorBackgroundColor,
         hoverColor: Style.navigatorBtnHoverColor,
         iconSize: Style.navigatorBtnIconPixelSize,
-        onPressed: () {},
+        highlight: guiData.aiAssistRightSidebarVisible,
+        onPressed: () {
+          guiData.toggleAIAssistRightSidebar();
+        },
       ),
     ];
 
@@ -69,56 +75,121 @@ class _AIAssistScreenState extends ConsumerState<AIAssistScreen> {
 
     final mainContent = Container(
       color: Colors.black, // Match thematic background
-      child: const Center(
-        child: Text(
-          "AI Assist Content",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+      child: Stack(
+        children: [
+          const Center(
+            child: Text(
+              "AI Assist Content",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
-        ),
+          if (guiData.aiAssistPopupVisible && !isSmallScreen)
+            Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.33,
+                heightFactor: 0.33,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Item Content",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
 
     Widget contentBox = Expanded(
-      child: isSmallScreen
-          ? IndexedStack(
-              index: guiData.smallScreenBoxIndex,
-              children: [
-                const Center(
-                  child: Text(
-                    "Left Sidebar Placeholder",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                mainContent,
-                const Center(
-                  child: Text(
-                    "Right Sidebar Placeholder",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            )
-          : Row(
-              children: [
-                // Assuming placeholders for sidebar until AI Assist logic requires specific sidebars.
-                // Or if AI Assist has visible sidebars tracking logic:
-                if (guiData
-                    .domainLeftSidebarVisible) // Place holder toggle logic if any needed
-                  const Expanded(
-                    flex: 1,
-                    child: Center(
-                      child: Text(
-                        "Left Sidebar Placeholder",
-                        style: TextStyle(color: Colors.white),
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              // Center Box
+              Expanded(
+                child: isSmallScreen
+                    ? IndexedStack(
+                        index: guiData.smallScreenBoxIndex,
+                        children: [
+                          Container(
+                            color: Colors.yellow,
+                            child: const Center(
+                              child: Text(
+                                "Left Sidebar Placeholder",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ),
+                          mainContent,
+                          Container(
+                            color: Colors.green,
+                            child: const Center(
+                              child: Text(
+                                "Right Sidebar Placeholder",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          if (guiData.aiAssistLeftSidebarVisible)
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                color: Colors.yellow,
+                                child: const Center(
+                                  child: Text(
+                                    "Left Sidebar Placeholder",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Expanded(flex: 7, child: mainContent),
+                          if (guiData.aiAssistRightSidebarVisible)
+                            Expanded(
+                              flex: 3,
+                              child: Container(
+                                color: Colors.green,
+                                child: const Center(
+                                  child: Text(
+                                    "Right Sidebar Placeholder",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ),
-                Expanded(flex: 4, child: mainContent),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
 
     if (isSmallScreen) {

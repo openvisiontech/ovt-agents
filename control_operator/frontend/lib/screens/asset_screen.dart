@@ -17,6 +17,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
   @override
   Widget build(BuildContext context) {
     final guiData = ref.watch(guiDataProvider);
+    final assetData = ref.watch(assetDataProvider);
     final isSmallScreen =
         MediaQuery.of(context).size.width < Style.smallDeviceBreakpoint;
 
@@ -98,11 +99,11 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
       child: Stack(
         children: [
           const Positioned.fill(child: SceneWidget()),
-          if (guiData.assetLeftSidebarVisible && !isSmallScreen)
+          if (guiData.assetPopupVisible && !isSmallScreen)
             Center(
               child: FractionallySizedBox(
-                widthFactor: 0.5,
-                heightFactor: 0.5,
+                widthFactor: 0.33,
+                heightFactor: 0.33,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.9),
@@ -157,11 +158,11 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     : Row(
                         children: [
                           if (guiData.assetLeftSidebarVisible)
-                            const Expanded(flex: 1, child: AgentsSidebar()),
-                          Expanded(flex: 4, child: mainContent),
+                            const Expanded(flex: 2, child: AgentsSidebar()),
+                          Expanded(flex: 7, child: mainContent),
                           if (guiData.assetRightSidebarVisible)
                             const Expanded(
-                              flex: 1,
+                              flex: 3,
                               child: Center(
                                 child: Text(
                                   "Right Sidebar Placeholder",
@@ -184,10 +185,10 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     child: Row(
                       children: [
                         IconTextBtn(
-                          icon: (guiData.haveControl == "YES")
+                          icon: (assetData.haveControl == "YES")
                               ? Icons.cancel
                               : Icons.gamepad,
-                          description: (guiData.haveControl == "YES")
+                          description: (assetData.haveControl == "YES")
                               ? "Release"
                               : "Control",
                           width: Style.commanderBtnWidth,
@@ -196,9 +197,8 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           hoverColor: Style.commanderHoverColor,
                           iconSize: Style.commanderBtnIconPixelSize,
                           onPressed: () {
-                            guiData.haveControl = (guiData.haveControl == "YES")
-                                ? "NO"
-                                : "YES";
+                            assetData.haveControl =
+                                (assetData.haveControl == "YES") ? "NO" : "YES";
                           },
                         ),
                         SizedBox(width: Style.commanderBtnSpacing),
@@ -210,6 +210,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           backgroundColor: Style.commanderBackgroundColor,
                           hoverColor: Style.commanderHoverColor,
                           iconSize: Style.commanderBtnIconPixelSize,
+                          greyout: assetData.haveControl != "YES",
                           onPressed: () {
                             // Open Mode Dialog
                           },
@@ -223,6 +224,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           backgroundColor: Style.commanderBackgroundColor,
                           hoverColor: Style.commanderHoverColor,
                           iconSize: Style.commanderBtnIconPixelSize,
+                          greyout: assetData.haveControl != "YES",
                           onPressed: () {
                             // Reset command
                           },
@@ -236,6 +238,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           backgroundColor: Style.commanderBackgroundColor,
                           hoverColor: Style.commanderHoverColor,
                           iconSize: Style.commanderBtnIconPixelSize,
+                          greyout: assetData.haveControl != "YES",
                           onPressed: () {
                             // Render Useless command
                           },
@@ -249,6 +252,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           backgroundColor: Style.commanderBackgroundColor,
                           hoverColor: Style.commanderHoverColor,
                           iconSize: Style.commanderBtnIconPixelSize,
+                          greyout: assetData.haveControl != "YES",
                           onPressed: () {
                             // Shutdown command
                           },
@@ -436,21 +440,58 @@ class AssetHeaderWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final guiData = ref.watch(guiDataProvider);
+    final assetData = ref.watch(assetDataProvider);
     final address =
-        "${guiData.subsystemId}.${guiData.nodeId}.${guiData.compId}";
-    final name = guiData.name.isNotEmpty ? guiData.name : "Target";
+        "${assetData.subsystemId}.${assetData.nodeId}.${assetData.compId}";
+    final name = assetData.assetName.isNotEmpty ? assetData.assetName : "";
 
     return Row(
       children: [
         Expanded(
-          child: Center(
-            child: Text(
-              "Asset: $name ($address)",
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Asset: $name ($address)",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                if (assetData.haveAccess == "YES") ...[
+                  Text(
+                    "App: ${assetData.appAccessRight} | Data: ${assetData.dataAccessRight}",
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                  const SizedBox(width: 20),
+                ],
+                const Text(
+                  "Ctrl: ",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                Icon(
+                  Icons.sports_esports,
+                  color: assetData.haveControl == "YES"
+                      ? Colors.green
+                      : Colors.grey,
+                  size: 22,
+                ),
+                const SizedBox(width: 20),
+                Text(
+                  "State: ${assetData.subsystemStateCmd}",
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+                const SizedBox(width: 20),
+                Text(
+                  "Mode: ${assetData.operatingMode}",
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ],
             ),
           ),
         ),
