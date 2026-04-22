@@ -1,7 +1,7 @@
 import json
 import logging
 
-from pybinds.uli_py import Ocu
+from uli_py import Ocu
 
 logger = logging.getLogger("ocu_interface")
 

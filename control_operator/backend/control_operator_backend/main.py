@@ -7,19 +7,20 @@ import uuid
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from aiortc import RTCSessionDescription
+from aiortc.sdp import candidate_from_sdp
 
 try:
-    from pybinds.uli_py import Ocu
+    from uli_py import Ocu
 except ImportError:
     # Dummy class to prevent crash if not compiled locally
-    logging.warning("pybinds.uli_py not found. Mocking Ocu for testing.")
+    logging.warning("uli_py not found. Mocking Ocu for testing.")
     class Ocu:
         def __init__(self, *args, **kwargs): pass
         def initialize(self): pass
         def instantiate(self): pass
         def set_up_actions(self): pass
         def start_up_actions(self): pass
-        def shutdown_actions(self): pass
+        def shutdown(self): pass
         def destroy(self): pass
         async def get_data(self, url): return "{}"
         async def set_data(self, url, data): return
@@ -64,8 +65,11 @@ async def agent_response_distribution_task():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global ocu
-    config = load_config("control_operator/backend/config.json")
+    config = load_config("./config.json")
     working_dir = config.get("working_dir", ".")
+    
+    logger.info(f"[Main] Config: {config}")
+    logger.info(f"[Main] Working directory: {working_dir}")
     
     ocu = Ocu(working_dir)
     ocu.initialize()
@@ -87,7 +91,20 @@ async def lifespan(app: FastAPI):
     
     yield
     
-    ocu.shutdown_actions()
+    logger.info("[Main] Initiating graceful shutdown...")
+    
+    # Close all active WebRTC connections
+    for conn in list(connections.values()):
+        try:
+            await conn.close()
+        except Exception as e:
+            logger.error(f"[Main] Error closing connection {conn.id}: {e}")
+            
+    try:
+        ocu.shutdown()
+    except Exception as e:
+        logger.error(f"[Main] Error in Ocu shutdown: {e}")
+    
     dist_task.cancel()
     agent_task.cancel()
     
@@ -122,12 +139,10 @@ async def websocket_endpoint(websocket: WebSocket):
             
             elif message_type == "candidate" and conn:
                 candidate_data = data.get("candidate")
-                if candidate_data:
-                    candidate = RTCSessionDescription(
-                        candidate=candidate_data.get("candidate"),
-                        sdpMid=candidate_data.get("sdpMid"),
-                        sdpMLineIndex=candidate_data.get("sdpMLineIndex")
-                    )
+                if candidate_data and candidate_data.get("candidate"):
+                    candidate = candidate_from_sdp(candidate_data.get("candidate"))
+                    candidate.sdpMid = candidate_data.get("sdpMid")
+                    candidate.sdpMLineIndex = candidate_data.get("sdpMLineIndex")
                     await conn.pc.addIceCandidate(candidate)
 
     except WebSocketDisconnect:
@@ -138,6 +153,9 @@ async def websocket_endpoint(websocket: WebSocket):
             if conn.id in connections:
                 del connections[conn.id]
 
-if __name__ == "__main__":
+def run_server():
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run("control_operator_backend.main:app", host="0.0.0.0", port=8080)
+
+if __name__ == "__main__":
+    run_server()

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/data_providers.dart';
-import '../providers/web_rtc_client.dart';
+import '../comms/web_rtc_client.dart';
 
 void processActionRequests(dynamic message) async {
   if (message is! ProviderContainer) return;

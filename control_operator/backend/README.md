@@ -2,7 +2,7 @@
 
 This module houses the backend server for the Control Operator, built dynamically leveraging the FastAPI framework, `aiortc` for WebRTC communication, and the ULI SDK native Python wrap APIs (`pybinds.uli_py`).
 
-## Implementation Outline
+## 1. Implementation Outline
 
 The backend is modularized into several core specialized Python files:
 
@@ -17,7 +17,7 @@ The backend is modularized into several core specialized Python files:
 -   **`config.json` & `config.py`**:
     Serves and validates default behavioral constants inside the application environment.
 
-## Configurations (`config.json`)
+## 2. Configurations (`config.json`)
 
 `config.json` drives runtime arguments instantiated during startup. Below are the basic structures to be provided:
 
@@ -43,14 +43,49 @@ The backend is modularized into several core specialized Python files:
 -   **`agent_config.gemini_api_key`**: API key to authenticate with Google services for Gemini models.
 -   **`agent_config.openai_api_key`**: API key to authenticate with OpenAI services for ChatGPT models.
 
-## How to Run
+## 3. Prerequisites
+- Python 3.10
+- uv
+- FastAPI
+- aiortc
+- uli_py
 
-Ensure that your environment activates any specific PyBind environments and installs prerequisites (`uv`, FastAPI, aiortc, etc).
-
-To launch the server locally for development with hot-reloading:
+Follow the instructions below to build and deploy uli_py:
 
 ```bash
-uvicorn control_operator.backend.main:app --host 0.0.0.0 --port 8080 --reload
+cd ../uli_sdk
+
+# Build the pybinds
+./build/pkg_build.sh -d x86_64 -p //pybinds/uli_py:uli_py-pkg
+./build/pkg_stage.sh -d x86_64 --clean
+./build/pkg_stage.sh -d x86_64 //pybinds/uli_py:uli_py-pkg
+./build/pkg_deploy.sh -d x86_64 -h localhost --deploy_path uli_deploy/pybinds/uli_py
+```
+
+## 4. Installation
+
+The backend is packaged as a standard Python module using `pyproject.toml`. You can install it locally using `pip` or `uv` to automatically satisfy all Python dependencies:
+
+```bash
+cd /home/ovt/develop/ovt-agents/control_operator/backend
+uv pip install -e .
+# Or simply pip install -e .
+```
+
+## 5. How to Run
+
+After installation, the `control-operator-backend` CLI command is automatically registered in your environment. You can launch the backend webserver from anywhere in the filesystem:
+
+```bash
+export PYTHONPATH=/home/ovt/uli_deploy/pybinds:$PYTHONPATH
+control-operator-backend
+```
+
+Alternatively, you can just run the `start_backend.sh` script located in the `scripts` directory of the overarching `control_operator` project root which wraps this functionality!
+
+```bash
+cd /home/ovt/develop/ovt-agents/control_operator
+./scripts/start_backend.sh
 ```
 
 The WebRTC Signalling Server will become available at:

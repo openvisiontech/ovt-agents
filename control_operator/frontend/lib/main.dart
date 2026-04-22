@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'providers/data_providers.dart';
 import 'models/app_config.dart';
 import 'package:logging/logging.dart';
@@ -9,24 +11,68 @@ import 'platform_utils.dart';
 import 'dart:ui';
 
 import 'main_layout.dart';
-import 'providers/web_rtc_client.dart';
+import 'comms/web_rtc_client.dart';
 import 'tasks/background_tasks_manager.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set up logging
-  Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen((record) {
-    print('${record.level.name}: ${record.time}: ${record.message}');
-  });
-
-  final log = Logger('ocu_ui');
-
   // Load config
   final configString = await rootBundle.loadString('assets/config.json');
   final configJson = jsonDecode(configString);
   final appConfig = AppConfig.fromJson(configJson);
+
+  IOSink? logSink;
+  if (!kIsWeb) {
+    final logFile = File('${appConfig.workingDirectory}/control_operator.log');
+    logSink = logFile.openWrite(mode: FileMode.append);
+  }
+
+  // Set up logging
+  Logger.root.onRecord.listen((record) {
+    final logLine = '${record.level.name}: ${record.time}: ${record.message}';
+    print(logLine);
+    logSink?.writeln(logLine);
+  });
+
+  final log = Logger('ocu_ui');
+
+  Level parsedLevel;
+  switch (appConfig.logLevel.toUpperCase()) {
+    case 'ALL':
+      parsedLevel = Level.ALL;
+      break;
+    case 'FINEST':
+      parsedLevel = Level.FINEST;
+      break;
+    case 'FINER':
+      parsedLevel = Level.FINER;
+      break;
+    case 'FINE':
+      parsedLevel = Level.FINE;
+      break;
+    case 'CONFIG':
+      parsedLevel = Level.CONFIG;
+      break;
+    case 'INFO':
+      parsedLevel = Level.INFO;
+      break;
+    case 'WARNING':
+      parsedLevel = Level.WARNING;
+      break;
+    case 'SEVERE':
+      parsedLevel = Level.SEVERE;
+      break;
+    case 'SHOUT':
+      parsedLevel = Level.SHOUT;
+      break;
+    case 'OFF':
+      parsedLevel = Level.OFF;
+      break;
+    default:
+      parsedLevel = Level.INFO;
+  }
+  Logger.root.level = parsedLevel;
 
   log.info('Current working directory: ${PlatformUtils.currentDirectory}');
   log.info(

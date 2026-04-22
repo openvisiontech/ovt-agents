@@ -95,7 +95,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
         : null;
 
     final mainContent = Container(
-      color: Colors.black,
+      color: Style.backgroundColor,
       child: Stack(
         children: [
           const Positioned.fill(child: SceneWidget()),
@@ -177,87 +177,98 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
               // Footer Box (Commander)
               if (guiData.assetCommanderVisible)
                 Container(
+                  width: double.infinity,
                   height: Style.commanderHeight,
-                  color: Style.commanderBackgroundColor,
+                  decoration: BoxDecoration(
+                    color: Style.commanderBackgroundColor,
+                    border: Border.all(
+                      color: Style.commanderBorderColor,
+                      width: 1.0,
+                    ),
+                  ),
                   padding: EdgeInsets.all(Style.margin),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        IconTextBtn(
-                          icon: (assetData.haveControl == "YES")
-                              ? Icons.cancel
-                              : Icons.gamepad,
-                          description: (assetData.haveControl == "YES")
-                              ? "Release"
-                              : "Control",
-                          width: Style.commanderBtnWidth,
-                          height: double.infinity,
-                          backgroundColor: Style.commanderBackgroundColor,
-                          hoverColor: Style.commanderHoverColor,
-                          iconSize: Style.commanderBtnIconPixelSize,
-                          onPressed: () {
-                            assetData.haveControl =
-                                (assetData.haveControl == "YES") ? "NO" : "YES";
-                          },
-                        ),
-                        SizedBox(width: Style.commanderBtnSpacing),
-                        IconTextBtn(
-                          icon: Icons.person, // Mode
-                          description: "Mode",
-                          width: Style.commanderBtnWidth,
-                          height: double.infinity,
-                          backgroundColor: Style.commanderBackgroundColor,
-                          hoverColor: Style.commanderHoverColor,
-                          iconSize: Style.commanderBtnIconPixelSize,
-                          greyout: assetData.haveControl != "YES",
-                          onPressed: () {
-                            // Open Mode Dialog
-                          },
-                        ),
-                        SizedBox(width: Style.commanderBtnSpacing),
-                        IconTextBtn(
-                          icon: Icons.refresh, // Reset
-                          description: "Reset",
-                          width: Style.commanderBtnWidth,
-                          height: double.infinity,
-                          backgroundColor: Style.commanderBackgroundColor,
-                          hoverColor: Style.commanderHoverColor,
-                          iconSize: Style.commanderBtnIconPixelSize,
-                          greyout: assetData.haveControl != "YES",
-                          onPressed: () {
-                            // Reset command
-                          },
-                        ),
-                        SizedBox(width: Style.commanderBtnSpacing),
-                        IconTextBtn(
-                          icon: Icons.delete_forever, // Render Useless
-                          description: "RndrUseles",
-                          width: Style.commanderBtnWidth,
-                          height: double.infinity,
-                          backgroundColor: Style.commanderBackgroundColor,
-                          hoverColor: Style.commanderHoverColor,
-                          iconSize: Style.commanderBtnIconPixelSize,
-                          greyout: assetData.haveControl != "YES",
-                          onPressed: () {
-                            // Render Useless command
-                          },
-                        ),
-                        SizedBox(width: Style.commanderBtnSpacing),
-                        IconTextBtn(
-                          icon: Icons.power_settings_new, // Shutdown
-                          description: "Shutdown",
-                          width: Style.commanderBtnWidth,
-                          height: double.infinity,
-                          backgroundColor: Style.commanderBackgroundColor,
-                          hoverColor: Style.commanderHoverColor,
-                          iconSize: Style.commanderBtnIconPixelSize,
-                          greyout: assetData.haveControl != "YES",
-                          onPressed: () {
-                            // Shutdown command
-                          },
-                        ),
-                      ],
+                  child: Center(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          IconTextBtn(
+                            icon: (assetData.haveControl == "YES")
+                                ? Icons.cancel
+                                : Icons.gamepad,
+                            description: (assetData.haveControl == "YES")
+                                ? "Release"
+                                : "Control",
+                            width: Style.commanderBtnWidth,
+                            height: double.infinity,
+                            backgroundColor: Style.commanderBtnBackgroundColor,
+                            hoverColor: Style.commanderBtnHoverColor,
+                            iconSize: Style.commanderBtnIconPixelSize,
+                            onPressed: () {
+                              assetData.haveControl =
+                                  (assetData.haveControl == "YES")
+                                  ? "NO"
+                                  : "YES";
+                            },
+                          ),
+                          SizedBox(width: Style.commanderBtnSpacing),
+                          IconTextBtn(
+                            icon: Icons.person, // Mode
+                            description: "Mode",
+                            width: Style.commanderBtnWidth,
+                            height: double.infinity,
+                            backgroundColor: Style.commanderBtnBackgroundColor,
+                            hoverColor: Style.commanderBtnHoverColor,
+                            iconSize: Style.commanderBtnIconPixelSize,
+                            greyout: assetData.haveControl != "YES",
+                            onPressed: () {
+                              // Open Mode Dialog
+                            },
+                          ),
+                          SizedBox(width: Style.commanderBtnSpacing),
+                          IconTextBtn(
+                            icon: Icons.refresh, // Reset
+                            description: "Reset",
+                            width: Style.commanderBtnWidth,
+                            height: double.infinity,
+                            backgroundColor: Style.commanderBtnBackgroundColor,
+                            hoverColor: Style.commanderBtnHoverColor,
+                            iconSize: Style.commanderBtnIconPixelSize,
+                            greyout: assetData.haveControl != "YES",
+                            onPressed: () {
+                              // Reset command
+                            },
+                          ),
+                          SizedBox(width: Style.commanderBtnSpacing),
+                          IconTextBtn(
+                            icon: Icons.delete_forever, // Render Useless
+                            description: "RndrUseles",
+                            width: Style.commanderBtnWidth,
+                            height: double.infinity,
+                            backgroundColor: Style.commanderBtnBackgroundColor,
+                            hoverColor: Style.commanderBtnHoverColor,
+                            iconSize: Style.commanderBtnIconPixelSize,
+                            greyout: assetData.haveControl != "YES",
+                            onPressed: () {
+                              // Render Useless command
+                            },
+                          ),
+                          SizedBox(width: Style.commanderBtnSpacing),
+                          IconTextBtn(
+                            icon: Icons.power_settings_new, // Shutdown
+                            description: "Shutdown",
+                            width: Style.commanderBtnWidth,
+                            height: double.infinity,
+                            backgroundColor: Style.commanderBtnBackgroundColor,
+                            hoverColor: Style.commanderBtnHoverColor,
+                            iconSize: Style.commanderBtnIconPixelSize,
+                            greyout: assetData.haveControl != "YES",
+                            onPressed: () {
+                              // Shutdown command
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -292,7 +303,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                       guiData.assetCommanderVisible
                           ? Icons.expand_more
                           : Icons.expand_less,
-                      color: Style.commanderHoverColor,
+                      color: Style.commanderBtnHoverColor,
                       size: 20,
                     ),
                   ),

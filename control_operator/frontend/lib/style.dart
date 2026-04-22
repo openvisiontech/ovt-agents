@@ -33,6 +33,9 @@ class Style {
   // Navigator
   static const Color navigatorBackgroundColor = Color(0xFF696969); // dimgray
   static const Color navigatorBorderColor = Colors.white;
+  static const Color navigatorBtnHighlightColor = Color(
+    0xFFDAA520,
+  ); // goldenrod
   static const Color navigatorBtnHoverColor = Color.fromARGB(255, 32, 54, 218);
   static const double navigatorWidth = 80;
   static const double navigatorBtnWidth = 80;
@@ -41,10 +44,13 @@ class Style {
   static const double navigatorBtnIconPixelSize = 40;
 
   // Commander
-  static const Color commanderBackgroundColor = Color(0xFF696969); // dimgray
+  static const Color commanderBackgroundColor = Color(0xFF5F9EA0); // cadetblue
   static const Color commanderBorderColor = Colors.white;
-  static const Color commanderHighlightColor = Color(0xFF5F9EA0); // cadetblue
-  static const Color commanderHoverColor = Color.fromARGB(255, 32, 54, 218);
+  static const Color commanderBtnBackgroundColor = Color(0xFF696969); // dimgray
+  static const Color commanderBtnHighlightColor = Color(
+    0xFFDAA520,
+  ); // goldenrod
+  static const Color commanderBtnHoverColor = Color.fromARGB(255, 32, 54, 218);
   static const double commanderHeight = 72;
   static const double commanderBtnWidth = 80;
   static const double commanderBtnHeight = 80; // Inferred or default

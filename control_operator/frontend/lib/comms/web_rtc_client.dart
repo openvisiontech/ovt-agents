@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 class WebRTCClient {
   static final WebRTCClient _instance = WebRTCClient._internal();
@@ -11,6 +12,7 @@ class WebRTCClient {
   WebRTCClient._internal();
 
   final _log = Logger('WebRTCClient');
+  final ValueNotifier<String> connectionState = ValueNotifier('disconnected');
 
   RTCDataChannel? _chatChannel;
   RTCDataChannel? _streamChannel;
@@ -36,6 +38,7 @@ class WebRTCClient {
   ) async {
     while (_isProcessing) {
       try {
+        connectionState.value = 'connecting';
         _log.info('Attempting WebRTC signaling connection to $signalingUrl');
         _signalingChannel = WebSocketChannel.connect(Uri.parse(signalingUrl));
 
@@ -71,6 +74,7 @@ class WebRTCClient {
   }
 
   void _cleanupConnection() {
+    connectionState.value = 'disconnected';
     _chatChannel?.close();
     _streamChannel?.close();
     _peerConnection?.close();
@@ -92,6 +96,7 @@ class WebRTCClient {
       if (chatRequestQueue.isNotEmpty && _chatChannel != null) {
         final msg = chatRequestQueue.removeAt(0);
         _chatChannel!.send(RTCDataChannelMessage(msg));
+        _log.fine('Chat message sent: $msg');
       }
       await Future.delayed(Duration(milliseconds: 10));
     }
@@ -107,6 +112,7 @@ class WebRTCClient {
             Uint8List.fromList(json.encode(msg).codeUnits),
           ),
         );
+        _log.fine('Stream message sent: $msg');
       }
       await Future.delayed(Duration(milliseconds: 10));
     }
@@ -124,9 +130,15 @@ class WebRTCClient {
 
     _peerConnection!.onConnectionState = (state) {
       if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+        connectionState.value = 'connected';
         _log.info(
           'WebRTC connection successfully established to $signalingUrl',
         );
+      } else if (state ==
+              RTCPeerConnectionState.RTCPeerConnectionStateDisconnected ||
+          state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
+          state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
+        connectionState.value = 'disconnected';
       }
     };
 

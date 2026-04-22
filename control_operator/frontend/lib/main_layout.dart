@@ -8,6 +8,7 @@ import 'providers/data_providers.dart';
 import 'screens/asset_screen.dart';
 import 'screens/domain_screen.dart';
 import 'screens/ai_assist_screen.dart';
+import 'comms/web_rtc_client.dart';
 
 class MainLayout extends ConsumerWidget {
   const MainLayout({super.key});
@@ -110,6 +111,29 @@ class MainLayout extends ConsumerWidget {
                       child: isSmallScreen ? null : currentHeaderWidget,
                     ),
                   ),
+                  ValueListenableBuilder<String>(
+                    valueListenable: WebRTCClient().connectionState,
+                    builder: (context, state, child) {
+                      IconData iconData = Icons.wifi_off;
+                      Color iconColor = Colors.red;
+                      if (state == 'connected') {
+                        iconData = Icons.wifi;
+                        iconColor = Colors.green;
+                      } else if (state == 'connecting') {
+                        iconData = Icons.sync;
+                        iconColor = Colors.orange;
+                      }
+                      return Tooltip(
+                        message: 'WebRTC: $state',
+                        child: Icon(
+                          iconData,
+                          color: iconColor,
+                          size: Style.headerIconPixelSize,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: Style.margin),
                   IconTextBtn(
                     icon: Icons.menu, // \ue5d2
                     description: "Toggle",

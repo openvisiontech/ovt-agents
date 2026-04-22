@@ -6,7 +6,8 @@ The Control Operator frontend is a heavily modularized Flutter application tailo
 ## 2. Directory Structure
 - `lib/main.dart` & `lib/main_layout.dart`: The global configuration entrypoint and the top-level responsive scaffold orchestrating screen embedding.
 - `lib/models/`: Holds independent state classes (e.g., `gui_data_model.dart`, `stream_data_model.dart`) decentralizing application memory.
-- `lib/providers/web_rtc_client.dart`: A centralized Singleton governing WebSocket handshakes and RTC Datachannel connectivity completely independently from the UI stack.
+- `lib/providers/data_providers.dart`: Instantiates and serves the globally accessible Riverpod `NotifierProvider` wrappers for the models.
+- `lib/comms/web_rtc_client.dart`: A centralized Singleton governing WebSocket handshakes and RTC Datachannel connectivity completely independently from the UI stack.
 - `lib/tasks/`: Contains precise background polling loops executed natively onto the flutter primary thread ensuring non-blocking operations and full web runtime support.
 - `lib/screens/`: Maintains discrete presentation files for specific workflows: domains, assets, and AI assistance.
 - `assets/config.json`: The core static configuration bundle utilized for injecting WebSockets and intervals variables dynamically.
@@ -25,8 +26,15 @@ The core screens (Domain, Asset, and AI Assist) share a unified layout paradigm 
 ## 4. Component Integrations
 ### 4.1 The Presentation Shell (`main_layout.dart`)
 Serves as the master scaffold container dynamically adapting to runtime screen breakpoints:
-- Manages global Header controls (including Estop buttons) and sets global View routing statically natively.
 - Evaluates screen-specific header content dynamically shifting view perspectives conditionally around smaller breakpoints minimizing visual clutter.
+
+#### 4.1.1 The Global Header
+The persistent top navigation bar hosted within `MainLayout` provides instant access to crucial components:
+- **Screen Selection Buttons**: Main navigation triggers interchanging the central view stack between "Domain", "Asset", "AI Assist", and "Settings".
+- **WebRTC Connection Status**: A dynamic visual indicator mapping the connection state of the `WebRTCClient`, reflecting disconnected (red), connecting (orange), or actively connected (green).
+- **Toggle Button**: Activates and collapses the structural Navigation boundaries (e.g. Left Side Bar).
+- **Exit Button**: Cleanly breaks execution contexts enforcing graceful Desktop shutdown natively (ignored on Web).
+- **EStop Button**: A brightly highlighted global Emergency Stop module instantly intercepting active actions or macros securely.
 
 ### 4.2 Provider Ecosystem (`data_providers.dart` & `models/`)
 Integrates the `Riverpod` framework (combining `ChangeNotifierProvider` and standard `NotifierProviders`) to seamlessly propagate deep state modifications across `ConsumerWidget` builders natively.
