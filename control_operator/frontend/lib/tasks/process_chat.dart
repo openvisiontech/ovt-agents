@@ -17,6 +17,7 @@ void processChat(dynamic message) async {
 
     final domainData = container.read(domainDataProvider.notifier);
     final assetData = container.read(assetDataProvider.notifier);
+    final guiData = container.read(guiDataProvider.notifier);
 
     while (webrtcClient.chatQueue.isNotEmpty) {
       final msgStr = webrtcClient.chatQueue.removeAt(0);
@@ -27,8 +28,12 @@ void processChat(dynamic message) async {
 
         switch (action) {
           case 'all_control_abstractions':
+            guiData.showDomainLeftSidebar();
             domainData.subsystemControlAbstractions =
-                payload['subsystemcontrolabstractions'] ?? [];
+                List<Map<String, dynamic>>.from(
+                  payload['subsystemcontrolabstractions'] ?? [],
+                );
+            print("processChat received all_control_abstractions");
             break;
           case 'asset_access_info':
             assetData.assetAccessInfo = payload['accessclient'] ?? {};
@@ -48,6 +53,7 @@ void processChat(dynamic message) async {
             );
             break;
           case 'available_agents':
+            guiData.showAssetLeftSidebar();
             assetData.agentList = List<Map<String, dynamic>>.from(
               payload['agentlist'] ?? [],
             );

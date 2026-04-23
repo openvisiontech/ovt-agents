@@ -18,6 +18,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
   Widget build(BuildContext context) {
     final guiData = ref.watch(guiDataProvider);
     final assetData = ref.watch(assetDataProvider);
+    final actionRequests = ref.watch(actionRequestsProvider);
     final isSmallScreen =
         MediaQuery.of(context).size.width < Style.smallDeviceBreakpoint;
 
@@ -32,8 +33,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
         iconSize: Style.navigatorBtnIconPixelSize,
         highlight: guiData.assetLeftSidebarVisible,
         onPressed: () {
-          // goAgentsView
-          guiData.toggleAssetLeftSidebar();
+          actionRequests.agentListUpdate = true;
         },
       ),
       SizedBox(

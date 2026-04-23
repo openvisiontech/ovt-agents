@@ -126,55 +126,71 @@ class WebRTCConnection:
                     if action == "get_all_control_abstractions":
                         res = await self.ocu_interface.get_all_control_abstractions()
                         await self.send_chat("all_control_abstractions", json.loads(res))
+                        logger.info(f"[{self.id}] send all_control_abstractions {res}")
                     elif action == "get_asset_access_info":
                         res = await self.ocu_interface.get_asset_access_info()
                         await self.send_chat("asset_access_info", json.loads(res))
+                        logger.debug(f"[{self.id}] send asset_access_info {res}")
                     elif action == "get_asset_control_info":
                         res = await self.ocu_interface.get_asset_control_info()
                         await self.send_chat("asset_control_info", json.loads(res))
+                        logger.debug(f"[{self.id}] send asset_control_info {res}")
                     elif action == "get_state_info":
                         res = await self.ocu_interface.get_state_info()
                         await self.send_chat("state_info", json.loads(res))
+                        logger.debug(f"[{self.id}] send state_info {res}")
                     elif action == "get_operating_mode_info":
                         res = await self.ocu_interface.get_operating_mode_info()
                         await self.send_chat("operating_mode_info", json.loads(res))
+                        logger.debug(f"[{self.id}] send operating_mode_info {res}")
                     elif action == "get_status_details":
                         res = await self.ocu_interface.get_status_details()
                         await self.send_chat("status_details", json.loads(res))
+                        logger.debug(f"[{self.id}] send status_details {res}")
                     elif action == "get_available_agents":
                         res = await self.ocu_interface.get_available_agents()
                         await self.send_chat("available_agents", json.loads(res))
+                        logger.debug(f"[{self.id}] send available_agents {res}")
                     elif action == "get_agent_status":
                         res = await self.ocu_interface.get_agent_status()
                         await self.send_chat("agent_status", json.loads(res))
+                        logger.debug(f"[{self.id}] send agent_status {res}")
                     elif action == "get_agent_details":
                         res = await self.ocu_interface.get_agent_details()
                         await self.send_chat("agent_details", json.loads(res))
+                        logger.debug(f"[{self.id}] send agent_details {res}")
                     elif action == "get_data_topic_list":
                         res = await self.ocu_interface.get_data_topic_list()
                         await self.send_chat("data_topic_list", json.loads(res))
+                        logger.debug(f"[{self.id}] send data_topic_list {res}")
                     elif action == "get_data_topic_clients":
                         res = await self.ocu_interface.get_data_topic_clients()
                         await self.send_chat("data_topic_clients", json.loads(res))
+                        logger.debug(f"[{self.id}] send data_topic_clients {res}")
                     elif action == "get_transform_reporters":
                         res = await self.ocu_interface.get_transform_reporters()
                         await self.send_chat("transform_reporters", json.loads(res))
+                        logger.debug(f"[{self.id}] send transform_reporters {res}")
                     elif action == "get_transform_reporters_clients":
                         res = await self.ocu_interface.get_transform_reporters_clients()
                         await self.send_chat("transform_reporters_clients", json.loads(res))
+                        logger.debug(f"[{self.id}] send transform_reporters_clients {res}")
                     elif action == "set_gui_rec":
                         guirec = payload.get("guirec")
                         if guirec:
                             await self.ocu_interface.set_gui_rec(guirec)
+                            logger.debug(f"[{self.id}] set_gui_rec {guirec}")
                     elif action == "set_joystick":
                         joy1 = payload.get("joystick1rec")
                         joy2 = payload.get("joystick2rec")
                         await self.ocu_interface.set_joystick(joy1, joy2)
+                        logger.debug(f"[{self.id}] set_joystick {joy1} {joy2}")
                     elif action == "user_prompt":
                         agent_name = payload.get("agent_name", "unknown")
                         prompt = payload.get("prompt", "")
                         response = await self.agent_handler.process_prompt(agent_name, prompt)
                         await self.send_chat("agent_response", {"agent_name": agent_name, "response": response})
+                        logger.debug(f"[{self.id}] user_prompt {agent_name} {prompt}")
                     else:
                         logger.warning(f"Unknown action received: {action}")
 

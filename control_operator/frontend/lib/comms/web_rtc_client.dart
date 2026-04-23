@@ -21,7 +21,7 @@ class WebRTCClient {
 
   // The 4 async queues
   List<String> chatRequestQueue = [];
-  List<dynamic> streamRequestQueue = [];
+  List<Uint8List> streamRequestQueue = [];
   List<String> chatQueue = [];
   List<dynamic> streamQueue = [];
 
@@ -93,28 +93,45 @@ class WebRTCClient {
 
   Future<void> _processChatRequestQueue() async {
     while (_isProcessing) {
-      if (chatRequestQueue.isNotEmpty && _chatChannel != null) {
-        final msg = chatRequestQueue.removeAt(0);
-        _chatChannel!.send(RTCDataChannelMessage(msg));
-        _log.fine('Chat message sent: $msg');
+      try {
+        if (chatRequestQueue.isNotEmpty) {
+          if (_chatChannel == null ||
+              _chatChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
+            chatRequestQueue.clear();
+            _log.warning('Chat channel not open, clearing chat request queue');
+          } else {
+            final msg = chatRequestQueue.removeAt(0);
+            _chatChannel!.send(RTCDataChannelMessage(msg));
+            _log.fine('Chat message sent: $msg');
+          }
+        }
+      } catch (e) {
+        _log.severe('Error processing chat queue: $e');
       }
-      await Future.delayed(Duration(milliseconds: 10));
+      await Future.delayed(const Duration(milliseconds: 10));
     }
   }
 
   Future<void> _processStreamRequestQueue() async {
     while (_isProcessing) {
-      if (streamRequestQueue.isNotEmpty && _streamChannel != null) {
-        final msg = streamRequestQueue.removeAt(0);
-        // Assuming stream requests serialize to string for now, could be binary
-        _streamChannel!.send(
-          RTCDataChannelMessage.fromBinary(
-            Uint8List.fromList(json.encode(msg).codeUnits),
-          ),
-        );
-        _log.fine('Stream message sent: $msg');
+      try {
+        if (streamRequestQueue.isNotEmpty) {
+          if (_streamChannel == null ||
+              _streamChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
+            streamRequestQueue.clear();
+            _log.warning(
+              'Stream channel not open, clearing stream request queue',
+            );
+          } else {
+            final msg = streamRequestQueue.removeAt(0);
+            _streamChannel!.send(RTCDataChannelMessage.fromBinary(msg));
+            _log.fine('Stream message sent: ${msg.length} bytes');
+          }
+        }
+      } catch (e) {
+        _log.severe('Error processing stream queue: $e');
       }
-      await Future.delayed(Duration(milliseconds: 10));
+      await Future.delayed(const Duration(milliseconds: 10));
     }
   }
 

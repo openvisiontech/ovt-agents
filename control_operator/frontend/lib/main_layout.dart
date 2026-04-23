@@ -71,6 +71,16 @@ class MainLayout extends ConsumerWidget {
                     highlight: guiData.currentScreen == 'AssetScreen',
                     onPressed: () {
                       if (guiData.currentScreen != 'AssetScreen') {
+                        if (guiData.currentScreen == 'DomainScreen') {
+                          ref
+                                  .read(actionRequestsProvider.notifier)
+                                  .assetListAutoUpdate =
+                              false;
+                          ref
+                              .read(domainDataProvider.notifier)
+                              .assetItems
+                              .clear();
+                        }
                         guiData.goAssetScreen();
                       }
                     },
@@ -87,6 +97,16 @@ class MainLayout extends ConsumerWidget {
                     highlight: guiData.currentScreen == 'AIAssistScreen',
                     onPressed: () {
                       if (guiData.currentScreen != 'AIAssistScreen') {
+                        if (guiData.currentScreen == 'DomainScreen') {
+                          ref
+                                  .read(actionRequestsProvider.notifier)
+                                  .assetListAutoUpdate =
+                              false;
+                          ref
+                              .read(domainDataProvider.notifier)
+                              .assetItems
+                              .clear();
+                        }
                         guiData.goAIAssistScreen();
                       }
                     },
@@ -102,6 +122,16 @@ class MainLayout extends ConsumerWidget {
                     iconSize: Style.headerIconPixelSize,
                     onPressed: () {
                       // goSettings
+                      if (guiData.currentScreen == 'DomainScreen') {
+                        ref
+                                .read(actionRequestsProvider.notifier)
+                                .assetListAutoUpdate =
+                            false;
+                        ref
+                            .read(domainDataProvider.notifier)
+                            .assetItems
+                            .clear();
+                      }
                     },
                   ),
                   Expanded(

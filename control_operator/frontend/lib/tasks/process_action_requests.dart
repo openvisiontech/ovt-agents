@@ -68,8 +68,8 @@ void processActionRequests(dynamic message) async {
       }
     }
 
-    // Every 100ms
-    if (count % 100 == 0) {
+    // Every 250ms
+    if (count % 250 == 0) {
       if (actionRequests.assetListAutoUpdate) {
         webrtcClient.chatRequestQueue.add(
           jsonEncode({"action": "get_all_control_abstractions", "payload": {}}),

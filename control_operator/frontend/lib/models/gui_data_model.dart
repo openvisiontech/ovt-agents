@@ -84,8 +84,8 @@ class GuiDataModel extends Notifier<GuiDataModel> {
     state = this;
   }
 
-  void toggleAssetLeftSidebar() {
-    assetLeftSidebarVisible = !assetLeftSidebarVisible;
+  void showAssetLeftSidebar() {
+    assetLeftSidebarVisible = true;
     if (assetLeftSidebarVisible)
       _smallScreenBoxIndex = 0;
     else
@@ -99,8 +99,8 @@ class GuiDataModel extends Notifier<GuiDataModel> {
     state = this;
   }
 
-  void toggleDomainLeftSidebar() {
-    domainLeftSidebarVisible = !domainLeftSidebarVisible;
+  void showDomainLeftSidebar() {
+    domainLeftSidebarVisible = true;
     if (domainLeftSidebarVisible)
       _smallScreenBoxIndex = 0;
     else

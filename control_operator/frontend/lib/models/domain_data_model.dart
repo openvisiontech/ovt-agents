@@ -74,13 +74,11 @@ class DomainDataModel extends Notifier<DomainDataModel> {
     _subsystemControlAbstractions = val;
     assetItems = val.map((e) {
       if (e is Map) {
-        return "${e['Name'] ?? 'Unknown'} (${e['SubsystemType'] ?? ''}) - ${e['ControlStatus'] ?? ''}";
+        return "${e['Address']['SubsystemId'] ?? 0} ${e['Name'] ?? ''} (${e['SubsystemType'] ?? ''}) - ${e['ControlStatus'] ?? ''}";
       }
       return "Unknown Asset";
     }).toList();
-    if (assetItems.isEmpty) {
-      assetItems = List.generate(20, (index) => "Asset ${index + 1}");
-    }
+
     state = this;
   }
 }

@@ -10,6 +10,8 @@ class DomainScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final guiData = ref.watch(guiDataProvider);
+    final actionRequests = ref.watch(actionRequestsProvider);
+
     final isSmallScreen =
         MediaQuery.of(context).size.width < Style.smallDeviceBreakpoint;
 
@@ -22,9 +24,9 @@ class DomainScreen extends ConsumerWidget {
         backgroundColor: Style.navigatorBackgroundColor,
         hoverColor: Style.navigatorBtnHoverColor,
         iconSize: Style.navigatorBtnIconPixelSize,
-        highlight: guiData.domainLeftSidebarVisible,
+        highlight: actionRequests.assetListAutoUpdate,
         onPressed: () {
-          guiData.toggleDomainLeftSidebar();
+          actionRequests.toggleAssetListAutoUpdate();
         },
       ),
     ];
@@ -348,18 +350,6 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
                     _scrollToIndex(domainData.currentAssetIndex);
                   },
                 ),
-                const Expanded(
-                  child: Center(
-                    child: Text(
-                      "Assets",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
                 IconButton(
                   icon: const Icon(Icons.check, color: Colors.white),
                   onPressed: () {
@@ -408,6 +398,30 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
                       assetData.userParams = {};
                       assetData.agentCompletionTimeout = 0;
                     }
+                  },
+                ),
+                const Expanded(
+                  child: Center(
+                    child: Text(
+                      "Assets",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () {
+                    //hide the domain left sidebar
+                    //stop the asset list auto update
+                    ref.read(guiDataProvider.notifier).hideDomainLeftSidebar();
+                    ref
+                            .read(actionRequestsProvider.notifier)
+                            .assetListAutoUpdate =
+                        false;
                   },
                 ),
               ],
