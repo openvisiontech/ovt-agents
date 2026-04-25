@@ -27,13 +27,11 @@ void processChat(dynamic message) async {
         final payload = decoded['payload'] as Map<String, dynamic>? ?? {};
 
         switch (action) {
-          case 'all_control_abstractions':
+          case 'all_subsystem_abstractions':
             guiData.showDomainLeftSidebar();
-            domainData.subsystemControlAbstractions =
-                List<Map<String, dynamic>>.from(
-                  payload['subsystemcontrolabstractions'] ?? [],
-                );
-            print("processChat received all_control_abstractions");
+            domainData.subsystemAbstractions = List<Map<String, dynamic>>.from(
+              payload['subsystemabstractions'] ?? [],
+            );
             break;
           case 'asset_access_info':
             assetData.assetAccessInfo = payload['accessclient'] ?? {};

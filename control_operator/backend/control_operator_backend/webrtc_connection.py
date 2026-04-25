@@ -123,10 +123,10 @@ class WebRTCConnection:
                     payload = data.get("payload", {})
 
                     # Route based on action
-                    if action == "get_all_control_abstractions":
-                        res = await self.ocu_interface.get_all_control_abstractions()
-                        await self.send_chat("all_control_abstractions", json.loads(res))
-                        logger.info(f"[{self.id}] send all_control_abstractions {res}")
+                    if action == "get_all_subsystem_abstractions":
+                        res = await self.ocu_interface.get_all_subsystem_abstractions()
+                        await self.send_chat("all_subsystem_abstractions", json.loads(res))
+                        logger.info(f"[{self.id}] send all_subsystem_abstractions {res}")
                     elif action == "get_asset_access_info":
                         res = await self.ocu_interface.get_asset_access_info()
                         await self.send_chat("asset_access_info", json.loads(res))

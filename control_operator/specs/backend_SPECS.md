@@ -96,7 +96,7 @@ Ocu Interface encapsulates the python binding get_data and set_data methods of t
 
 The following methods are implemented in the `OcuInterface` class:
 
-1. get_all_control_abstractions() - retrieve the subsystem control abstractions of all the discovered assets.
+1. get_all_subsystem_abstractions() - retrieve the subsystem abstractions of all the discovered assets.
 2. get_asset_access_info() - retrieve the access client record of the selected subsystem.
 3. get_asset_control_info() - retrieve the control client record of the selected subsystem.
 4. get_asset_state_info() - retrieve the subsystem state client record of the selected subsystem.

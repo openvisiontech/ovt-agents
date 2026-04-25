@@ -20,7 +20,10 @@ void processActionRequests(dynamic message) async {
     if (count % 50 == 0) {
       if (actionRequests.assetListUpdate) {
         webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_all_control_abstractions", "payload": {}}),
+          jsonEncode({
+            "action": "get_all_subsystem_abstractions",
+            "payload": {},
+          }),
         );
         actionRequests.assetListUpdate = false;
       }
@@ -72,7 +75,10 @@ void processActionRequests(dynamic message) async {
     if (count % 250 == 0) {
       if (actionRequests.assetListAutoUpdate) {
         webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_all_control_abstractions", "payload": {}}),
+          jsonEncode({
+            "action": "get_all_subsystem_abstractions",
+            "payload": {},
+          }),
         );
       }
       webrtcClient.chatRequestQueue.add(

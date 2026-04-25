@@ -353,9 +353,9 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
                 IconButton(
                   icon: const Icon(Icons.check, color: Colors.white),
                   onPressed: () {
-                    if (domainData.subsystemControlAbstractions.isNotEmpty &&
+                    if (domainData.subsystemAbstractions.isNotEmpty &&
                         domainData.currentAssetIndex <
-                            domainData.subsystemControlAbstractions.length) {
+                            domainData.subsystemAbstractions.length) {
                       final assetData = ref.read(assetDataProvider.notifier);
                       assetData.assetName = domainData.currentAssetName;
                       assetData.subsystemId =
@@ -433,11 +433,35 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
               controller: _scrollController,
               itemCount: domainData.assetItems.length,
               itemBuilder: (context, index) {
+                Color statusColor = Colors.grey;
+                if (domainData.subsystemAbstractions.isNotEmpty &&
+                    index < domainData.subsystemAbstractions.length) {
+                  final asset = domainData.subsystemAbstractions[index];
+                  if (asset is Map) {
+                    final controlStatus =
+                        asset['ControlStatus']?.toString() ?? "UNKNOWN";
+                    switch (controlStatus) {
+                      case "NOT_AVAILABLE":
+                        statusColor = Colors.red;
+                        break;
+                      case "NOT_CONTROLLED":
+                        statusColor = Colors.green;
+                        break;
+                      case "UNDER_CONTROLLED":
+                        statusColor = Colors.yellow;
+                        break;
+                      default:
+                        statusColor = Colors.grey;
+                    }
+                  }
+                }
+
                 return Container(
                   color: index == domainData.currentAssetIndex
                       ? Colors.blue[100]
                       : null,
                   child: ListTile(
+                    leading: Icon(Icons.circle, color: statusColor, size: 16),
                     title: Text(domainData.assetItems[index]),
                     onTap: () {
                       domainData.setCurrentAssetIndex(index);

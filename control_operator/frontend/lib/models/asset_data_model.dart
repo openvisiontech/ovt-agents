@@ -32,10 +32,13 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     "SubsystemStateCmd": _subsystemStateCmd,
     "OperatingCategory": _operatingCategory,
     "OperatingMode": _operatingMode,
+  };
+  Map<String, dynamic> get _taskExecRec => {
     "AgentUri": _selectedAgentUri,
     "AgentConfiguration": json.encode(_agentConfiguration),
     "AgentRunningCmd": _agentRunningCmd,
     "AgentControlCmd": _agentControlCmd,
+    "ControlParameters": json.encode(_controlParameters),
     "UserParams": json.encode(_userParams),
     "AgentCompletionTimeout": _agentCompletionTimeout,
   };
@@ -68,6 +71,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   Map<String, dynamic> _agentConfiguration = {};
   String _agentRunningCmd = "UNKNOWN";
   String _agentControlCmd = "UNKNOWN";
+  Map<String, dynamic> _controlParameters = {};
   Map<String, dynamic> _userParams = {};
   int _agentCompletionTimeout = 0;
 
@@ -114,6 +118,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
       _agentConfiguration = {};
       _agentRunningCmd = "IDLE";
       _agentControlCmd = "UNKNOWN";
+      _controlParameters = {};
       _userParams = {};
       _agentCompletionTimeout = 0;
       state = this;
@@ -136,6 +141,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   List<Map<String, dynamic>> get transformClientList => _transformClientList;
 
   Map<String, dynamic> get guiRec => _guiRec;
+  Map<String, dynamic> get taskExecRec => _taskExecRec;
   Map<String, dynamic> get joystick1Rec => _joystick1Rec;
   Map<String, dynamic> get joystick2Rec => _joystick2Rec;
 

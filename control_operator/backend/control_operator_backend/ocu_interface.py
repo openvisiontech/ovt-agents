@@ -24,8 +24,8 @@ class OcuInterface:
 # The wrapper below is still marked as async def, whith ensures compatibility with the webrtc_connection.py.
 # so that no further cascading changes are required there.
 
-    async def get_all_control_abstractions(self):
-        url = f"data://{self.domain}/core_clients.DbDataStore?location=subsystemcontrolabstractions&id=0"
+    async def get_all_subsystem_abstractions(self):
+        url = f"data://{self.domain}/core_clients.DbDataStore?location=subsystemabstractions&id=0"
         return self.ocu.get_data(url)
 
     async def get_asset_access_info(self):
@@ -77,8 +77,13 @@ class OcuInterface:
         return self.ocu.get_data(url)
 
     async def set_gui_rec(self, gui_rec: dict):
-        url = f"data://{self.ocu_app_domain}/core_clients.DataStore?location=guirec"
+        url = f"data://{self.domain}/core_clients.DataStore?location=guirec"
         payload = {"guirec": gui_rec}
+        return self.ocu.set_data(url, json.dumps(payload))
+
+    async def set_task_exec_rec(self, task_exec_rec: dict):
+        url = f"data://{self.domain}/core_clients.DataStore?location=taskexecrec"
+        payload = {"taskexecrec": task_exec_rec}
         return self.ocu.set_data(url, json.dumps(payload))
 
     async def set_joystick(self, joystick1_rec: dict, joystick2_rec: dict):
