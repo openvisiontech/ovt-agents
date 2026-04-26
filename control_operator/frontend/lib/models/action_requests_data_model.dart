@@ -23,6 +23,34 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
   bool _agentDetailsUpdate = false;
   bool _serviceListAutoUpdate = false;
 
+  void toggleAssetListAutoUpdate() {
+    _assetListAutoUpdate = !_assetListAutoUpdate;
+    state = this;
+  }
+
+  void leavingDomainScreen() {
+    _assetListUpdate = false;
+    _assetListAutoUpdate = false;
+  }
+
+  void leavingAssetScreen() {
+    _serviceListUpdate = false;
+    _agentListUpdate = false;
+    _resourceListUpdate = false;
+    _dataTopicListUpdate = false;
+    _dataTopicClientListUpdate = false;
+    _transformReporterListUpdate = false;
+    _statusDetailsUpdate = false;
+    _resourceDetailsUpdate = false;
+    _agentStatusUpdate = false;
+    _agentDetailsUpdate = false;
+    _serviceListAutoUpdate = false;
+  }
+
+  void leavingAIAssistScreen() {
+    _serviceListAutoUpdate = false;
+  }
+
   bool get assetListUpdate => _assetListUpdate;
   bool get assetListAutoUpdate => _assetListAutoUpdate;
   bool get serviceListUpdate => _serviceListUpdate;
@@ -44,11 +72,6 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
 
   set assetListAutoUpdate(bool value) {
     _assetListAutoUpdate = value;
-    state = this;
-  }
-
-  void toggleAssetListAutoUpdate() {
-    _assetListAutoUpdate = !_assetListAutoUpdate;
     state = this;
   }
 

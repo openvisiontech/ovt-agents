@@ -55,6 +55,15 @@ class MainLayout extends ConsumerWidget {
                     highlight: guiData.currentScreen == 'DomainScreen',
                     onPressed: () {
                       if (guiData.currentScreen != 'DomainScreen') {
+                        if (guiData.currentScreen == 'AssetScreen') {
+                          ref
+                              .read(actionRequestsProvider.notifier)
+                              .leavingAssetScreen();
+                        } else if (guiData.currentScreen == 'AIAssistScreen') {
+                          ref
+                              .read(actionRequestsProvider.notifier)
+                              .leavingAIAssistScreen();
+                        }
                         guiData.goDomainScreen();
                       }
                     },
@@ -73,13 +82,9 @@ class MainLayout extends ConsumerWidget {
                       if (guiData.currentScreen != 'AssetScreen') {
                         if (guiData.currentScreen == 'DomainScreen') {
                           ref
-                                  .read(actionRequestsProvider.notifier)
-                                  .assetListAutoUpdate =
-                              false;
-                          ref
-                              .read(domainDataProvider.notifier)
-                              .assetItems
-                              .clear();
+                              .read(actionRequestsProvider.notifier)
+                              .leavingDomainScreen();
+                          ref.read(domainDataProvider.notifier).clear();
                         }
                         guiData.goAssetScreen();
                       }
@@ -99,13 +104,13 @@ class MainLayout extends ConsumerWidget {
                       if (guiData.currentScreen != 'AIAssistScreen') {
                         if (guiData.currentScreen == 'DomainScreen') {
                           ref
-                                  .read(actionRequestsProvider.notifier)
-                                  .assetListAutoUpdate =
-                              false;
+                              .read(actionRequestsProvider.notifier)
+                              .leavingDomainScreen();
+                          ref.read(domainDataProvider.notifier).clear();
+                        } else if (guiData.currentScreen == 'AssetScreen') {
                           ref
-                              .read(domainDataProvider.notifier)
-                              .assetItems
-                              .clear();
+                              .read(actionRequestsProvider.notifier)
+                              .leavingAssetScreen();
                         }
                         guiData.goAIAssistScreen();
                       }
@@ -124,13 +129,17 @@ class MainLayout extends ConsumerWidget {
                       // goSettings
                       if (guiData.currentScreen == 'DomainScreen') {
                         ref
-                                .read(actionRequestsProvider.notifier)
-                                .assetListAutoUpdate =
-                            false;
+                            .read(actionRequestsProvider.notifier)
+                            .leavingDomainScreen();
+                        ref.read(domainDataProvider.notifier).clear();
+                      } else if (guiData.currentScreen == 'AssetScreen') {
                         ref
-                            .read(domainDataProvider.notifier)
-                            .assetItems
-                            .clear();
+                            .read(actionRequestsProvider.notifier)
+                            .leavingAssetScreen();
+                      } else if (guiData.currentScreen == 'AIAssistScreen') {
+                        ref
+                            .read(actionRequestsProvider.notifier)
+                            .leavingAIAssistScreen();
                       }
                     },
                   ),
@@ -198,15 +207,14 @@ class MainLayout extends ConsumerWidget {
                     height: double.infinity,
                     highlightColor: Style.stopColor,
                     iconSize: Style.headerIconPixelSize,
-                    greyout:
-                        headerData.estop != 'SET' &&
-                        headerData.estop != 'CLEAR',
+                    greyout: headerData.assetSelected != true,
                     highlight: headerData.estop == 'SET',
                     onPressed: () {
                       if (headerData.estop == 'SET') {
                         headerData.estop = 'CLEAR';
-                      } else if (headerData.estop == 'CLEAR')
+                      } else if (headerData.estop == 'CLEAR') {
                         headerData.estop = 'SET';
+                      }
                     },
                   ),
                 ],

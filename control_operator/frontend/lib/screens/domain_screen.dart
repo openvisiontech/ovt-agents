@@ -27,6 +27,9 @@ class DomainScreen extends ConsumerWidget {
         highlight: actionRequests.assetListAutoUpdate,
         onPressed: () {
           actionRequests.toggleAssetListAutoUpdate();
+          if (actionRequests.assetListAutoUpdate) {
+            guiData.showDomainLeftSidebar();
+          }
         },
       ),
     ];
@@ -353,50 +356,12 @@ class _DomainSidebarState extends ConsumerState<DomainSidebar> {
                 IconButton(
                   icon: const Icon(Icons.check, color: Colors.white),
                   onPressed: () {
-                    if (domainData.subsystemAbstractions.isNotEmpty &&
-                        domainData.currentAssetIndex <
-                            domainData.subsystemAbstractions.length) {
-                      final assetData = ref.read(assetDataProvider.notifier);
-                      assetData.assetName = domainData.currentAssetName;
-                      assetData.subsystemId =
-                          int.tryParse(
-                            domainData.currentAssetSubsystemId.toString(),
-                          ) ??
-                          0;
-                      assetData.nodeId =
-                          int.tryParse(
-                            domainData.currentAssetNodeId.toString(),
-                          ) ??
-                          0;
-                      assetData.compId =
-                          int.tryParse(
-                            domainData.currentAssetCompId.toString(),
-                          ) ??
-                          0;
-
-                      assetData.controlStatus =
-                          domainData.currentAssetControlStatus;
-                      assetData.controlAvail =
-                          domainData.currentAssetControlAvail;
-
-                      assetData.haveAccess = "UNKNOWN";
-                      assetData.appAccessRight = "UNKNOWN";
-                      assetData.dataAccessRight = "UNKNOWN";
-                      assetData.haveControl = "UNKNOWN";
-                      assetData.subsystemStateCmd = "UNKNOWN";
-                      assetData.operatingCategory = "UNKNOWN";
-                      assetData.operatingMode = "UNKNOWN";
-
-                      assetData.interactionMode = "WATCH";
-                      assetData.subsystemStateCmd = "UNKNOWN";
-                      assetData.operatingCategory = "UNKNOWN";
-                      assetData.operatingMode = "UNKNOWN";
-                      assetData.selectedAgentName = "";
-                      assetData.selectedAgentUri = "";
-                      assetData.agentRunningCmd = "UNKNOWN";
-                      assetData.agentControlCmd = "UNKNOWN";
-                      assetData.userParams = {};
-                      assetData.agentCompletionTimeout = 0;
+                    final assetData = ref.read(assetDataProvider.notifier);
+                    if (domainData.currentAssetInfo.isNotEmpty) {
+                      assetData.clear();
+                      assetData.assetInfo = domainData.currentAssetInfo;
+                      ref.read(headerDataProvider.notifier).assetSelected =
+                          true;
                     }
                   },
                 ),

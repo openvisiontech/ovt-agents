@@ -204,11 +204,13 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                             backgroundColor: Style.commanderBtnBackgroundColor,
                             hoverColor: Style.commanderBtnHoverColor,
                             iconSize: Style.commanderBtnIconPixelSize,
+                            greyout: assetData.controlAvail == false,
                             onPressed: () {
-                              assetData.haveControl =
+                              if (assetData.controlAvail == false) return;
+                              assetData.interactionMode =
                                   (assetData.haveControl == "YES")
-                                  ? "NO"
-                                  : "YES";
+                                  ? "WATCH"
+                                  : "CONTROL";
                             },
                           ),
                           SizedBox(width: Style.commanderBtnSpacing),
@@ -454,7 +456,7 @@ class AssetHeaderWidget extends ConsumerWidget {
     final assetData = ref.watch(assetDataProvider);
     final address =
         "${assetData.subsystemId}.${assetData.nodeId}.${assetData.compId}";
-    final name = assetData.assetName.isNotEmpty ? assetData.assetName : "";
+    final name = assetData.assetName;
 
     return Row(
       children: [
@@ -465,42 +467,88 @@ class AssetHeaderWidget extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  "Asset: $name ($address)",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                const SizedBox(width: 20),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "$name ($address)",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Ctrl: ",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        Icon(
+                          Icons.sports_esports,
+                          color: assetData.haveControl == "YES"
+                              ? Colors.green
+                              : Colors.grey,
+                          size: 22,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 20),
                 if (assetData.haveAccess == "YES") ...[
-                  Text(
-                    "App: ${assetData.appAccessRight} | Data: ${assetData.dataAccessRight}",
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "App: ${assetData.appAccessRight}",
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      Text(
+                        "Data: ${assetData.dataAccessRight}",
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(width: 20),
                 ],
-                const Text(
-                  "Ctrl: ",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                Icon(
-                  Icons.sports_esports,
-                  color: assetData.haveControl == "YES"
-                      ? Colors.green
-                      : Colors.grey,
-                  size: 22,
-                ),
-                const SizedBox(width: 20),
-                Text(
-                  "State: ${assetData.subsystemStateCmd}",
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-                const SizedBox(width: 20),
-                Text(
-                  "Mode: ${assetData.operatingMode}",
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "State: ${assetData.subsystemState}",
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    Text(
+                      "Mode: ${assetData.operatingMode}",
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

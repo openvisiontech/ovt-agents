@@ -28,7 +28,6 @@ void processChat(dynamic message) async {
 
         switch (action) {
           case 'all_subsystem_abstractions':
-            guiData.showDomainLeftSidebar();
             domainData.subsystemAbstractions = List<Map<String, dynamic>>.from(
               payload['subsystemabstractions'] ?? [],
             );

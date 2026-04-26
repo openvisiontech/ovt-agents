@@ -7,6 +7,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   @override
   bool updateShouldNotify(AssetDataModel previous, AssetDataModel next) => true;
 
+  Map<String, dynamic> _assetInfo = {};
   Map<String, dynamic> _assetAccessInfo = {};
   Map<String, dynamic> _assetControlInfo = {};
   Map<String, dynamic> _stateInfo = {};
@@ -21,14 +22,14 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   List<Map<String, dynamic>> _transformClientList = [];
 
   Map<String, dynamic> get _guiRec => {
-    "UserPresent": "PRESENT",
+    "UserPresent": "UNKNOWN", //will be filled later
     "SubsystemManager": {
       "SubsystemId": _subsystemId,
       "NodeId": _nodeId,
       "CompId": _compId,
     },
     "InteractionMode": _interactionMode,
-    "EstopButton": _estopButton,
+    "EstopButton": "UNKNOWN", //will be filled later
     "SubsystemStateCmd": _subsystemStateCmd,
     "OperatingCategory": _operatingCategory,
     "OperatingMode": _operatingMode,
@@ -45,11 +46,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   Map<String, dynamic> _joystick1Rec = {"XAxisPosition": 0, "YAxisPosition": 0};
   Map<String, dynamic> _joystick2Rec = {"XAxisPosition": 0, "YAxisPosition": 0};
 
-  int _currentAgentIndex = 0;
-  String _currentAgentName = "UNKNOWN";
-  String _currentAgentUri = "";
-  String _userPresent = "UNKNOWN";
-
   String _assetName = "";
   int _subsystemId = 0;
   int _nodeId = 0;
@@ -61,11 +57,16 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   String _appAccessRight = "UNKNOWN";
   String _dataAccessRight = "UNKNOWN";
   String _haveControl = "UNKNOWN";
+  String _subsystemState = "UNKNOWN";
+
   String _interactionMode = "UNKNOWN";
-  String _estopButton = "UNKNOWN";
   String _subsystemStateCmd = "UNKNOWN";
   String _operatingCategory = "UNKNOWN";
   String _operatingMode = "UNKNOWN";
+
+  int _currentAgentIndex = 0;
+  String _currentAgentName = "UNKNOWN";
+  String _currentAgentUri = "";
   String _selectedAgentName = "";
   String _selectedAgentUri = "";
   Map<String, dynamic> _agentConfiguration = {};
@@ -76,6 +77,14 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   int _agentCompletionTimeout = 0;
 
   List<String> agentItems = [];
+
+  void _updateCurrentAgentInfo() {
+    if (_agentList.isNotEmpty && _currentAgentIndex < _agentList.length) {
+      final agent = _agentList[_currentAgentIndex];
+      _currentAgentName = agent['Name']?.toString() ?? "UNKNOWN";
+      _currentAgentUri = agent['Uri']?.toString() ?? "";
+    }
+  }
 
   void moveAgentUp() {
     if (_currentAgentIndex > 0) {
@@ -101,16 +110,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     }
   }
 
-  void _updateCurrentAgentInfo() {
-    if (_agentList.isNotEmpty && _currentAgentIndex < _agentList.length) {
-      final agent = _agentList[_currentAgentIndex];
-      if (agent is Map) {
-        _currentAgentName = agent['Name']?.toString() ?? "UNKNOWN";
-        _currentAgentUri = agent['Uri']?.toString() ?? "";
-      }
-    }
-  }
-
   void selectAgent() {
     if (_currentAgentIndex >= 0 && _currentAgentIndex < agentItems.length) {
       _selectedAgentName = _currentAgentName;
@@ -125,7 +124,57 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     }
   }
 
+  void clear() {
+    _assetInfo = {};
+    _assetAccessInfo = {};
+    _assetControlInfo = {};
+    _stateInfo = {};
+    _operatingModeInfo = {};
+    _statusDetails = [];
+    _agentList = [];
+    _agentStatus = [];
+    _agentDetails = {};
+    _dataTopicList = [];
+    _dataTopicClientList = [];
+    _transformReporterList = [];
+    _transformClientList = [];
+
+    _assetName = "";
+    _subsystemId = 0;
+    _nodeId = 0;
+    _compId = 0;
+    _controlStatus = "UNKNOWN";
+    _controlAvail = false;
+
+    _haveAccess = "UNKNOWN";
+    _appAccessRight = "UNKNOWN";
+    _dataAccessRight = "UNKNOWN";
+    _haveControl = "UNKNOWN";
+    _subsystemState = "UNKNOWN";
+
+    _interactionMode = "UNKNOWN";
+    _subsystemStateCmd = "UNKNOWN";
+    _operatingCategory = "UNKNOWN";
+    _operatingMode = "UNKNOWN";
+
+    _currentAgentIndex = 0;
+    _currentAgentName = "UNKNOWN";
+    _currentAgentUri = "";
+    _selectedAgentName = "UNKNOWN";
+    _selectedAgentUri = "";
+    _agentConfiguration = {};
+    _agentRunningCmd = "UNKNOWN";
+    _agentControlCmd = "UNKNOWN";
+    _controlParameters = {};
+    _userParams = {};
+    _agentCompletionTimeout = 0;
+    agentItems = [];
+
+    state = this;
+  }
+
   // Getters
+  Map<String, dynamic> get assetInfo => _assetInfo;
   Map<String, dynamic> get assetAccessInfo => _assetAccessInfo;
   Map<String, dynamic> get assetControlInfo => _assetControlInfo;
   Map<String, dynamic> get stateInfo => _stateInfo;
@@ -148,7 +197,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   int get currentAgentIndex => _currentAgentIndex;
   String get currentAgentName => _currentAgentName;
   String get currentAgentUri => _currentAgentUri;
-  String get userPresent => _userPresent;
 
   String get assetName => _assetName;
   int get subsystemId => _subsystemId;
@@ -161,19 +209,38 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   String get appAccessRight => _appAccessRight;
   String get dataAccessRight => _dataAccessRight;
   String get haveControl => _haveControl;
+  String get subsystemState => _subsystemState;
+
   String get interactionMode => _interactionMode;
-  String get estopButton => _estopButton;
   String get subsystemStateCmd => _subsystemStateCmd;
   String get operatingCategory => _operatingCategory;
   String get operatingMode => _operatingMode;
+
   String get selectedAgentName => _selectedAgentName;
   String get selectedAgentUri => _selectedAgentUri;
+  Map<String, dynamic> get agentConfiguration => _agentConfiguration;
   String get agentRunningCmd => _agentRunningCmd;
   String get agentControlCmd => _agentControlCmd;
+  Map<String, dynamic> get controlParameters => _controlParameters;
   Map<String, dynamic> get userParams => _userParams;
   int get agentCompletionTimeout => _agentCompletionTimeout;
 
   // Setters
+  set assetInfo(Map<String, dynamic> val) {
+    _assetInfo = val;
+
+    _assetName = val['Name']?.toString() ?? "UNKNOWN";
+    _subsystemId = val['Address']['SubsystemId'] ?? 0;
+    _nodeId = val['Address']['NodeId'] ?? 0;
+    _compId = val['Address']['CompId'] ?? 0;
+    _controlStatus = val['ControlStatus']?.toString() ?? "UNKNOWN";
+    _controlAvail =
+        !(_controlStatus == "UNKNOWN" || _controlStatus == "NOT_AVAILABLE");
+    _interactionMode = 'WATCH';
+
+    state = this;
+  }
+
   set assetAccessInfo(Map<String, dynamic> val) {
     _assetAccessInfo = val;
 
@@ -194,6 +261,8 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   set stateInfo(Map<String, dynamic> val) {
     _stateInfo = val;
+    _subsystemState = val['State']?.toString() ?? "UNKNOWN";
+
     state = this;
   }
 
@@ -263,68 +332,8 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     state = this;
   }
 
-  set userPresent(String val) {
-    _userPresent = val;
-    state = this;
-  }
-
-  set assetName(String val) {
-    _assetName = val;
-    state = this;
-  }
-
-  set subsystemId(int val) {
-    _subsystemId = val;
-    state = this;
-  }
-
-  set nodeId(int val) {
-    _nodeId = val;
-    state = this;
-  }
-
-  set compId(int val) {
-    _compId = val;
-    state = this;
-  }
-
-  set controlStatus(String val) {
-    _controlStatus = val;
-    state = this;
-  }
-
-  set controlAvail(bool val) {
-    _controlAvail = val;
-    state = this;
-  }
-
-  set haveAccess(String val) {
-    _haveAccess = val;
-    state = this;
-  }
-
-  set appAccessRight(String val) {
-    _appAccessRight = val;
-    state = this;
-  }
-
-  set dataAccessRight(String val) {
-    _dataAccessRight = val;
-    state = this;
-  }
-
-  set haveControl(String val) {
-    _haveControl = val;
-    state = this;
-  }
-
   set interactionMode(String val) {
     _interactionMode = val;
-    state = this;
-  }
-
-  set estopButton(String val) {
-    _estopButton = val;
     state = this;
   }
 
@@ -343,13 +352,8 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     state = this;
   }
 
-  set selectedAgentName(String val) {
-    _selectedAgentName = val;
-    state = this;
-  }
-
-  set selectedAgentUri(String val) {
-    _selectedAgentUri = val;
+  set agentConfiguration(Map<String, dynamic> val) {
+    _agentConfiguration = val;
     state = this;
   }
 
@@ -360,6 +364,11 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   set agentControlCmd(String val) {
     _agentControlCmd = val;
+    state = this;
+  }
+
+  set controlParameters(Map<String, dynamic> val) {
+    _controlParameters = val;
     state = this;
   }
 

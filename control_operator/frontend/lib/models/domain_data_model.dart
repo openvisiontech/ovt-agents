@@ -9,23 +9,20 @@ class DomainDataModel extends Notifier<DomainDataModel> {
 
   List<dynamic> _subsystemAbstractions = [];
   int _currentAssetIndex = -1;
-  dynamic _currentAssetSubsystemId;
-  dynamic _currentAssetNodeId;
-  dynamic _currentAssetCompId;
-  String _currentAssetName = "";
-  String _currentAssetControlStatus = "";
-  bool _currentAssetControlAvail = false;
+  Map<String, dynamic> _currentAssetInfo = {};
 
   List<String> assetItems = [];
 
   List<dynamic> get subsystemAbstractions => _subsystemAbstractions;
   int get currentAssetIndex => _currentAssetIndex;
-  dynamic get currentAssetSubsystemId => _currentAssetSubsystemId;
-  dynamic get currentAssetNodeId => _currentAssetNodeId;
-  dynamic get currentAssetCompId => _currentAssetCompId;
-  String get currentAssetName => _currentAssetName;
-  String get currentAssetControlStatus => _currentAssetControlStatus;
-  bool get currentAssetControlAvail => _currentAssetControlAvail;
+  Map<String, dynamic> get currentAssetInfo => _currentAssetInfo;
+
+  void _updateCurrentAssetInfo() {
+    if (_subsystemAbstractions.isNotEmpty &&
+        _currentAssetIndex < _subsystemAbstractions.length) {
+      _currentAssetInfo = _subsystemAbstractions[_currentAssetIndex];
+    }
+  }
 
   void moveAssetUp() {
     if (_currentAssetIndex > 0) {
@@ -51,24 +48,16 @@ class DomainDataModel extends Notifier<DomainDataModel> {
     }
   }
 
-  void _updateCurrentAssetInfo() {
-    if (_subsystemAbstractions.isNotEmpty &&
-        _currentAssetIndex < _subsystemAbstractions.length) {
-      final asset = _subsystemAbstractions[_currentAssetIndex];
-      if (asset is Map) {
-        _currentAssetSubsystemId = asset['Address']['SubsystemId'] ?? 0;
-        _currentAssetNodeId = asset['Address']['NodeId'] ?? 0;
-        _currentAssetCompId = asset['Address']['CompId'] ?? 0;
-        _currentAssetName = asset['Name']?.toString() ?? "UNKNOWN";
-        _currentAssetControlStatus =
-            asset['ControlStatus']?.toString() ?? "UNKNOWN";
-        _currentAssetControlAvail =
-            !(_currentAssetControlStatus == "UNKNOWN" ||
-                _currentAssetControlStatus == "NOT_AVAILABLE");
-      }
-    }
+  void clear() {
+    // Retain the current asset index and info
+    //_subsystemAbstractions = [];
+    //_currentAssetIndex = -1;
+    //_currentAssetInfo = {};
+    //assetItems = [];
+    //state = this;
   }
 
+  // Setters
   set subsystemAbstractions(List<dynamic> val) {
     _subsystemAbstractions = val;
     assetItems = val.map((e) {
@@ -77,6 +66,12 @@ class DomainDataModel extends Notifier<DomainDataModel> {
       }
       return "Unknown Asset";
     }).toList();
+    // keep current asset index if possible
+    if (_currentAssetIndex >= assetItems.length) {
+      _currentAssetIndex = assetItems.length - 1;
+    }
+    //list is updated, so update current asset info
+    _updateCurrentAssetInfo();
 
     state = this;
   }

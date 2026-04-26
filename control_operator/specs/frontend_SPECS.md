@@ -106,67 +106,34 @@ Data for the GUI is organized into three main data models. Each data model is a 
 
 #### 4.1.2**`HeaderDataModel`**: Data to be populated in the header of the GUI. 
 
-  Data displayed in the header of the GUI:
+- userPresent: boolean
+  Set to true when anyone of the trigger buttons on the gamepad are pressed. Set to false when both trigger buttons on the gamepad are released.
 
-  estop: "CLEAR | ESTOP"
+- assetSelected: boolean
+  Set to true when the check button in the asset list of the Domain Screen is pressed.
+
+- estop: "CLEAR | ESTOP"
+  Toggled by the estop button in the Header
 
 #### 4.1.3**`DomainDataModel`**: holds the states needed for the domain screen with user interactions of the frontend.
 
-  - subsystemControlAbstractions: 
+  - subsystemAbstractions: 
 
-  Updated by the chat message "all_control_abstractions" from the backend. It is a list of the control abstractions of all the discovered subsystems (assets). Refer to WebRTC_intf_SPECS.md for the payload structure.
+  Updated by the chat message "all_subsystem_abstractions" from the backend. It is a list of the abstractions of all the discovered subsystems (assets). Refer to WebRTC_intf_SPECS.md for the payload structure.
 
   - asset list:
   
-  Updated with each list item displaying the `Name`, `SubsystemType`, and `ControlStatus` of the subsystemControlAbstraction.
-  The left sidebar of the domain screen is updated with the asset list. When traversing the asset list, the following fields are updated with the corresponding fields of the current subsystemControlAbstraction:
+  Updated with each list item displaying the `SubsystemId`, `Name`, `SubsystemType`, and `ControlStatus` of the subsystemAbstraction. The `ControlStatus` is indicated by the color of the list item.
 
-  currentAssetIndex: index of the current asset in the asset list
-  currentAssetSubsystemId: subsystem id of the current asset
-  currentAssetNodeId: node id of the current asset
-  currentAssetCompId: comp id of the current asset
-  currentAssetName: name of the current asset
-  currentAssetControlStatus: control status of the current asset
-  currentAssetControlAvail: control availability of the current asset
+  The left sidebar of the domain screen is updated with the asset list. When traversing the asset list, the currentAssetInfo is updated.
 
-  When the "Check" button is pressed, the current asset is selected. The following actions are performed:
-  
-  1) The fields in the GuiDataModel related to selected asset are updated as below:
-   
-    subsystemId = subsystemControlAbstraction.subsystemId
-    nodeId = subsystemControlAbstraction.nodeId
-    compId = subsystemControlAbstraction.compId
-    name = subsystemControlAbstraction.name
-    controlStatus = "UNKNOWN"
-    controlAvail = "UNKNOWN"
-    haveAccess = "UNKNOWN"
-    appAccessRight = "UNKNOWN"
-    dataAccessRight = "UNKNOWN"
-    haveControl = "UNKNOWN"
-    subsystemState = "UNKNOWN"
-    operatingCategory = "UNKNOWN"
-    operatingMode = "UNKNOWN"
-
-  2) The fields in the AssetDataModel related to selected asset are updated as below:
-   
-    subsystemId = subsystemControlAbstraction.subsystemId
-    nodeId = subsystemControlAbstraction.nodeId
-    compId = subsystemControlAbstraction.compId
-    name = subsystemControlAbstraction.name
-    interactionMode = "WATCH"
-    estopButton = "CLEAR"
-    subsystemStateCmd = "UNKNOWN"
-    operatingCategory = "UNKNOWN"
-    operatingMode = "UNKNOWN"
-    agentName = ""
-    agentUri = ""
-    agentConfiguration = ""
-    agentRunningCmd = "UNKNOWN"
-    agentControlCmd = "UNKNOWN"
-    userParams = ""
-    agentCompletionTimeout = 0
+  When the "Check" button is pressed, the current asset is selected. The asset data model is cleared and the assetInfo of the asset data model is updated with the currentAssetInfo.
 
 #### 4.1.4 **`AssetDataModel`**: A data model that holds the states needed for the asset components interactions of the frontend. It is a `Notifier` that notifies its listeners of any changes.
+
+  - assetInfo:
+
+    Updated with the currentAssetInfo from the domain data model.
 
   - assetAccessInfo:
   
@@ -211,7 +178,8 @@ Data for the GUI is organized into three main data models. Each data model is a 
     selectedAgentUri: ""
     agentRunningCmd: "UNKNOWN | IDLE | RUN | STOP | ABORT"
     agentControlCmd: "UNKNOWN | RESUME | PAUSE | CANCEL"
-    userParams: "string"
+    controlParameters: "json string"
+    userParams: "json string"
     agentCompletionTimeout: number
 
     When traversing the agent list, the currentAgentIndex, currentAgentName and currentAgentUri are updated.
@@ -473,3 +441,31 @@ All the sub-screens have the same layout structure below. The difference is the 
 
 ### 6.4 Styling Elements (`Style`)
 To maintain consistency seamlessly, UI aesthetics (margins, exact breakpoints globally bounding elements, highlight hex parameters seamlessly) are statically constrained identically inside `lib/style.dart`.
+
+### 6.5 UI Operating Rules
+
+1) Application starts at the Domain Screen.
+2) When the check button in the asset list of the Domain Screen is pressed, the HeaderDataModel.assetSelected is set to true.
+3) The estop button in the Header is greyed out if the assetDataModel.controlAvailable == false.
+4) When the `List` button in the NavigatorBox of the Domain Screen is pressed, the ActionRequestsDataModel.assetListAutoUpdate is toggled. The button is highlighted and the leftSideBar is visible if ActionRequestsDataModel.assetListAutoUpdate is true.
+5) When leaving the Domain Screen, 
+   - the LeftSideBar and RightSideBar are hidden.
+   - the ActionRequestsDataModel.assetListAutoUpdate is set to false.
+   - the DomainDataModel.clear() is called.
+6) When entering the Asset Screen, 
+   - the LeftSideBar and RightSideBar are hidden.
+   - the `Control` button in the CommanderBox is greyed out if the assetDataModel.controlAvailable == false.
+   - the `Control` button in the CommanderBox should be set to "Release" if the assetDataModel.haveControl == "YES".
+   - the `Control` button in the CommanderBox should be set to "Control" if the assetDataModel.haveControl == "NO".
+7) When leaving the Asset Screen, 
+   - the LeftSideBar and RightSideBar are hidden.
+   - the ActionRequestsDataModel.agentListUpdate is set to false.
+   - the ActionRequestsDataModel.dataTopicListUpdate is set to false.
+   - the ActionRequestsDataModel.dataTopicClientListUpdate is set to false.
+   - the ActionRequestsDataModel.transformReporterListUpdate is set to false.
+   - the ActionRequestsDataModel.statusDetailsUpdate is set to false.
+   - the ActionRequestsDataModel.agentStatusUpdate is set to false.
+   - the ActionRequestsDataModel.agentDetailsUpdate is set to false.
+8) When entering the AIAssist Screen, the LeftSideBar and RightSideBar are hidden.
+9) When leaving the AIAssist Screen, the LeftSideBar and RightSideBar are hidden.
+
