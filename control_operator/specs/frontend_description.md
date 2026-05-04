@@ -9,7 +9,7 @@ The Control Operator frontend is a heavily modularized Flutter application tailo
 - `lib/providers/data_providers.dart`: Instantiates and serves the globally accessible Riverpod `NotifierProvider` wrappers for the models.
 - `lib/comms/web_rtc_client.dart`: A centralized Singleton governing WebSocket handshakes and RTC Datachannel connectivity completely independently from the UI stack.
 - `lib/tasks/`: Contains precise background polling loops executed natively onto the flutter primary thread ensuring non-blocking operations and full web runtime support.
-- `lib/screens/`: Maintains discrete presentation files for specific workflows: domains, assets, and AI assistance.
+- `lib/screens/`: Maintains discrete presentation files for specific workflows: domains, assets, and AI assistance. Note: The central list of assets, previously housed in the Domain screen, has been migrated to the Asset Screen to consolidate asset-management workflows.
 - `assets/config.json`: The core static configuration bundle utilized for injecting WebSockets and intervals variables dynamically.
 
 ## 3. Screen Layout Components
@@ -17,11 +17,19 @@ The core screens (Domain, Asset, and AI Assist) share a unified layout paradigm 
 ### 3.1 **Nav Box**: The contextual navigation bar handling primary routing or side-toggles.
 ### 3.2 **Content Box**: The primary layout wrapper bounding the active view's interior content.
 #### 3.2.1 **Center Box**: The main horizontal stretch occupying the bulk of the screen.
-#### 3.2.2 **Left Side Bar**: A togglable side panel utilized for lists, directories, or contextual options.
+#### 3.2.2 **Left Side Bar**: A togglable side panel utilized for lists, directories, or contextual options. In the Asset Screen, this sidebar dynamically shifts between displaying the `Assets` list (migrated from the Domain View), `Agents`, and `Data Topics` utilizing a unified layout component.
 #### 3.2.3 **Main Content**: The central interactive focal point rendering 3D environments, primary chat interfaces, or domain data graphs.
 #### 3.2.4 **Fractionally Sized Box (Popup)**: An overlaid dynamic container placed carefully within the main content area serving as an interactive popup data view, sized dynamically to a proportional fraction (e.g., 33%) of the parent box.
 #### 3.2.5 **Right Side Bar**: An additional conditional side panel offering extended configuration, insights, or history logs.
 ### 3.3 **Footer Box (Commander)**: A specialized, sticky bottom container housing actionable operational controls, macros, or gamepad mechanisms.
+
+### 3.4 Reusable Components
+#### 3.4.1 **SelectableList Component**
+A highly modular, state-agnostic generic widget (`lib/components/selectable_list.dart`) utilized to standardize lists across sidebars. Features include:
+- Complete decoupling from external models by relying on constructor-passed callbacks and parameters.
+- `statusColors` support for rendering inline colored indicator pips (useful for asset control states).
+- `trailingWidgets` support, allowing arbitrary widgets (like `IconButton` parameters or 36x36 dynamic `Image.network` structures) to sit on the trailing edge of list items.
+- A suite of documented visual examples resides at `lib/components/selectable_list_examples.dart` and can be rapidly viewed completely isolated from the main app tree via the `lib/selectable_list_example_main.dart` entrypoint.
 
 ## 4. Component Integrations
 ### 4.1 The Presentation Shell (`main_layout.dart`)

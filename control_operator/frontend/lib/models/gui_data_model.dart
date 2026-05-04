@@ -37,9 +37,16 @@ class GuiDataModel extends Notifier<GuiDataModel> {
   bool _estop = false;
   String _previousScreen = "None";
   String _currentScreen = "AssetScreen";
+  String _assetLeftSidebarState = "Assets"; // 'Assets', 'Agents', or 'Data'
 
   String get userPresent => _userPresent;
   bool get navigatorBoxOnoff => _navigatorBoxOnoff;
+  String get assetLeftSidebarState => _assetLeftSidebarState;
+
+  set assetLeftSidebarState(String val) {
+    _assetLeftSidebarState = val;
+    state = this;
+  }
 
   bool menuVisible = true;
 

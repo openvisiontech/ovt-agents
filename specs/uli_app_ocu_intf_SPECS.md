@@ -1,12 +1,12 @@
 # ULI SDK app ocu specs
 
-## overview
+## 1. overview
 
 ULI SDK app ocu is to discover the assets in the Uli SDK infrastructure, view the data obtained from the assets, and control the assets.
 
 This specs is to describe the interface provided by the uli app ocu through the get_data() and set_data() methods.
 
-## Interface implementation
+## 2. Interface implementation
 
 Reference implementation is in the `reference_implementations/uli_py/ocu.py` file.
 
@@ -18,7 +18,7 @@ The url string to the data is in the format of "data://<app_domain>/<service_uri
 - service_uri: the uri of the service, such as "core_clients.DashBoard".
 - query_string: contains the location key, which specifies the location of the data within the service specified by the service_uri. The query string may also include other (key, value) pairs to further specify the data to be retrieved.
 
-### get_data details
+### 2.1 get_data details
 
 Here describes the url string to the data and the meaning of the returned json string.
 
@@ -725,7 +725,7 @@ The transform client is a component that retrieves the transform from the transf
 
 The transform definition includes the parent frame and the child frame.
 
-### set_data details 
+### 2.2 set_data details 
 
 Here describes the url string to the data and the meaning of the json string.
 
@@ -807,3 +807,9 @@ Here describes the url string to the data and the meaning of the json string.
     - ControlParameters: The control parameters. The control parameters are the parameters that are set by the OCU. The Ocu will send the control parameters to the agent in the Control stage.
     - UserParams: The user parameters. The user parameters are the parameters that are set by the user. The Ocu will send the user parameters to the agent in the Control stage. For example, the joystick data is sent to the agent as user parameters.
     - AgentCompletionTimeout: The agent completion timeout is the timeout for the agent to complete the task. The time is started when the agent is in the Control stage. If the agent is not in the Control stage, the agent completion timeout is not set. If the AgentCompletionTimeout is set to zero, then there is no timeout constraint. If the AgentCompletionTimeout is reached, the agent will be stopped and the agent will be set to the Complete stage.
+
+### 2.3 receive_topics and snapshot_topics details
+
+Receive the topic streams published by the Data Topic Services of the selected subsystem. The received_topics() method returns a list of UliTopicReader objects, refer to the uli_py/uli_topic.py for the details of the UliTopicReader class.
+
+The snapshot_topics() method returns the latest snapshot of the topic data published by the Data Topic Services of the selected subsystem. The snapshot_topics() method returns a list of UliTopicReader objects, refer to the uli_py/uli_topic.py for the details of the UliTopicReader class.

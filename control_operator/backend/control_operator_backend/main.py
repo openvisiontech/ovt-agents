@@ -16,7 +16,7 @@ from contextlib import asynccontextmanager
 from typing import Dict
 import uuid
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from aiortc import RTCSessionDescription
 from aiortc.sdp import candidate_from_sdp
 
@@ -36,11 +36,15 @@ except ImportError:
         async def get_data(self, url): return "{}"
         async def set_data(self, url, data): return
         def receive_topics(self): return []
+        def snapshot_topics(self): return []
 
 from .config import load_config
 from .webrtc_connection import WebRTCConnection
 from .ocu_interface import OcuInterface
 from .agent_handler import DeepAgentHandler
+
+from mcp.server.sse import SseServerTransport
+from .mcp_server import mcp_server
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("backend_main")
@@ -56,6 +60,7 @@ async def ocu_topic_distribution_task(ocu: Ocu):
             topics = await loop.run_in_executor(None, ocu.receive_topics)
             
             if topics:
+                # put topics into the topic queue of each WebRTC connection
                 for conn in connections.values():
                     conn.topic_queue.put_nowait(topics)
             
@@ -129,6 +134,26 @@ async def lifespan(app: FastAPI):
     ocu.destroy()
 
 app = FastAPI(lifespan=lifespan)
+
+sse = SseServerTransport("/mcp/messages")
+
+@app.get("/mcp/sse")
+async def handle_sse(request: Request):
+    async with sse.connect_sse(
+        request.scope, request.receive, request._send
+    ) as (read_stream, write_stream):
+        await mcp_server.run(
+            read_stream,
+            write_stream,
+            mcp_server.create_initialization_options(),
+        )
+
+@app.post("/mcp/messages")
+async def handle_messages(request: Request):
+    await sse.handle_post_message(
+        request.scope, request.receive, request._send
+    )
+
 
 @app.websocket("/ws/rtc")
 async def websocket_endpoint(websocket: WebSocket):

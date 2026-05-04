@@ -33,6 +33,11 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   @override
   bool updateShouldNotify(AssetDataModel previous, AssetDataModel next) => true;
 
+  List<dynamic> _subsystemAbstractions = [];
+  int _currentAssetIndex = -1;
+  Map<String, dynamic> _currentAssetInfo = {};
+
+  List<String> assetItems = [];
   Map<String, dynamic> _assetInfo = {};
   Map<String, dynamic> _assetAccessInfo = {};
   Map<String, dynamic> _assetControlInfo = {};
@@ -104,6 +109,37 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   List<String> agentItems = [];
 
+  void _updateCurrentAssetInfo() {
+    if (_subsystemAbstractions.isNotEmpty &&
+        _currentAssetIndex < _subsystemAbstractions.length) {
+      _currentAssetInfo = _subsystemAbstractions[_currentAssetIndex];
+    }
+  }
+
+  void moveAssetUp() {
+    if (_currentAssetIndex > 0) {
+      _currentAssetIndex--;
+      _updateCurrentAssetInfo();
+      state = this;
+    }
+  }
+
+  void moveAssetDown() {
+    if (_currentAssetIndex < assetItems.length - 1) {
+      _currentAssetIndex++;
+      _updateCurrentAssetInfo();
+      state = this;
+    }
+  }
+
+  void setCurrentAssetIndex(int index) {
+    if (index >= 0 && index < assetItems.length) {
+      _currentAssetIndex = index;
+      _updateCurrentAssetInfo();
+      state = this;
+    }
+  }
+
   void _updateCurrentAgentInfo() {
     if (_agentList.isNotEmpty && _currentAgentIndex < _agentList.length) {
       final agent = _agentList[_currentAgentIndex];
@@ -165,6 +201,10 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _transformReporterList = [];
     _transformClientList = [];
 
+    _subsystemAbstractions = [];
+    _currentAssetIndex = -1;
+    _currentAssetInfo = {};
+
     _assetName = "";
     _subsystemId = 0;
     _nodeId = 0;
@@ -195,11 +235,16 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _userParams = {};
     _agentCompletionTimeout = 0;
     agentItems = [];
+    assetItems = [];
 
     state = this;
   }
 
   // Getters
+  List<dynamic> get subsystemAbstractions => _subsystemAbstractions;
+  int get currentAssetIndex => _currentAssetIndex;
+  Map<String, dynamic> get currentAssetInfo => _currentAssetInfo;
+
   Map<String, dynamic> get assetInfo => _assetInfo;
   Map<String, dynamic> get assetAccessInfo => _assetAccessInfo;
   Map<String, dynamic> get assetControlInfo => _assetControlInfo;
@@ -252,6 +297,22 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   int get agentCompletionTimeout => _agentCompletionTimeout;
 
   // Setters
+  set subsystemAbstractions(List<dynamic> val) {
+    _subsystemAbstractions = val;
+    assetItems = val.map((e) {
+      if (e is Map) {
+        return "${e['Address']['SubsystemId'] ?? 0} ${e['Name'] ?? ''} (${e['SubsystemType'] ?? ''})";
+      }
+      return "Unknown Asset";
+    }).toList();
+    if (_currentAssetIndex >= assetItems.length) {
+      _currentAssetIndex = assetItems.length - 1;
+    }
+    _updateCurrentAssetInfo();
+
+    state = this;
+  }
+
   set assetInfo(Map<String, dynamic> val) {
     _assetInfo = val;
 
@@ -302,9 +363,12 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     agentItems = val.map((e) {
       return "${e['Name']} (${e['Uri']})";
     }).toList();
-    if (agentItems.isEmpty) {
-      agentItems = List.generate(20, (index) => "Agent Item ${index + 1}");
+
+    if (_currentAgentIndex >= agentItems.length) {
+      _currentAgentIndex = agentItems.length - 1;
     }
+    _updateCurrentAgentInfo();
+
     state = this;
   }
 

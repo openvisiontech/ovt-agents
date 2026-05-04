@@ -41,7 +41,6 @@ void processChat(dynamic message) async {
 
     final webrtcClient = WebRTCClient();
 
-    final domainData = container.read(domainDataProvider.notifier);
     final assetData = container.read(assetDataProvider.notifier);
     final guiData = container.read(guiDataProvider.notifier);
 
@@ -54,7 +53,7 @@ void processChat(dynamic message) async {
 
         switch (action) {
           case 'all_subsystem_abstractions':
-            domainData.subsystemAbstractions = List<Map<String, dynamic>>.from(
+            assetData.subsystemAbstractions = List<Map<String, dynamic>>.from(
               payload['subsystemabstractions'] ?? [],
             );
             break;

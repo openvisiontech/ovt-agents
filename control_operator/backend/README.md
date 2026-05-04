@@ -14,6 +14,8 @@ The backend is modularized into several core specialized Python files:
     A singleton layer that interfaces directly with the `Ocu` wrapper class via `get_data` and `set_data` URL payloads. It masks ULI SDK complexities by providing descriptive async abstraction endpoints (e.g., `get_all_control_abstractions`, `get_status_details`).
 -   **`agent_handler.py`**:
     Scaffolds the architecture for executing prompts processed via the LangChain DeepAgent framework.
+-   **`mcp_server.py`**:
+    Exposes the system capabilities of the `OcuInterface` securely via the Model Context Protocol (MCP). Features mappings for getter and setter operations to integrate directly with external AI agents.
 -   **`config.json` & `config.py`**:
     Serves and validates default behavioral constants inside the application environment.
 
@@ -24,8 +26,6 @@ The backend is modularized into several core specialized Python files:
 ```json
 {
   "working_dir": ".",
-  "expiration_time": 10.0,
-  "render_interval": 0.1,
   "agent_config": {
     "model": "default",
     "claude_api_key": "YOUR_CLAUDE_API_KEY",
@@ -36,8 +36,6 @@ The backend is modularized into several core specialized Python files:
 ```
 
 -   **`working_dir`**: Default system working directory targeting DataViewer implementations. Relative paths (like `.`) indicate the current process directory.
--   **`expiration_time`**: Defines (in seconds) the expiration window for cached system data topics.
--   **`render_interval`**: Modifies the visual loop tick latency configurations rendering assets downstream.
 -   **`agent_config.model`**: Specifies the initial target AI model configurations for DeepAgent integration logic.
 -   **`agent_config.claude_api_key`**: API key to authenticate with Anthropic services for Claude models.
 -   **`agent_config.gemini_api_key`**: API key to authenticate with Google services for Gemini models.
@@ -90,3 +88,19 @@ cd /home/ovt/develop/ovt-agents/control_operator
 
 The WebRTC Signalling Server will become available at:
 `ws://localhost:8080/ws/rtc`
+
+## 6. MCP Server Integration
+
+The backend features a fully integrated [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server. This exposes the native `OcuInterface` capabilities directly to connected AI Agents via HTTP SSE transport. 
+
+### Connecting an MCP Client
+
+When the backend runs on port `8080`, the MCP SSE endpoint becomes automatically available.
+
+To connect an AI Agent (e.g., Claude Desktop, or a custom agent SDK):
+1. Configure your agent's MCP client to establish an SSE (Server-Sent Events) connection over HTTP.
+2. Direct the agent to the base SSE URL: `http://localhost:8080/mcp/sse`
+
+The MCP endpoints natively mounted onto the backend are:
+- `GET /mcp/sse`: The primary streaming endpoint for Server-Sent Events.
+- `POST /mcp/messages`: The HTTP transport endpoint where the client posts JSON-RPC messages to the server.

@@ -117,6 +117,9 @@ Data for the GUI is organized into three main data models. Each data model is a 
 
 #### 4.1.3**`DomainDataModel`**: holds the states needed for the domain screen with user interactions of the frontend.
 
+
+#### 4.1.4 **`AssetDataModel`**: A data model that holds the states needed for the asset components interactions of the frontend. It is a `Notifier` that notifies its listeners of any changes.
+
   - subsystemAbstractions: 
 
   Updated by the chat message "all_subsystem_abstractions" from the backend. It is a list of the abstractions of all the discovered subsystems (assets). Refer to WebRTC_intf_SPECS.md for the payload structure.
@@ -128,9 +131,7 @@ Data for the GUI is organized into three main data models. Each data model is a 
   The left sidebar of the domain screen is updated with the asset list. When traversing the asset list, the currentAssetInfo is updated.
 
   When the "Check" button is pressed, the current asset is selected. The asset data model is cleared and the assetInfo of the asset data model is updated with the currentAssetInfo.
-
-#### 4.1.4 **`AssetDataModel`**: A data model that holds the states needed for the asset components interactions of the frontend. It is a `Notifier` that notifies its listeners of any changes.
-
+  
   - assetInfo:
 
     Updated with the currentAssetInfo from the domain data model.

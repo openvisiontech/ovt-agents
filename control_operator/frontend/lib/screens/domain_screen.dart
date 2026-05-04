@@ -36,29 +36,11 @@ class DomainScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final guiData = ref.watch(guiDataProvider);
-    final actionRequests = ref.watch(actionRequestsProvider);
 
     final isSmallScreen =
         MediaQuery.of(context).size.width < Style.smallDeviceBreakpoint;
 
-    final List<Widget> navButtons = [
-      IconTextBtn(
-        icon: Icons.list, // List (Asset List)
-        description: "List",
-        width: Style.navigatorBtnWidth,
-        height: Style.navigatorBtnHeight,
-        backgroundColor: Style.navigatorBackgroundColor,
-        hoverColor: Style.navigatorBtnHoverColor,
-        iconSize: Style.navigatorBtnIconPixelSize,
-        highlight: actionRequests.assetListAutoUpdate,
-        onPressed: () {
-          actionRequests.toggleAssetListAutoUpdate();
-          if (actionRequests.assetListAutoUpdate) {
-            guiData.showDomainLeftSidebar();
-          }
-        },
-      ),
-    ];
+    final List<Widget> navButtons = [];
 
     Widget? navBox = guiData.navigatorBoxOnoff
         ? Container(
@@ -133,7 +115,7 @@ class DomainScreen extends ConsumerWidget {
                     ? IndexedStack(
                         index: guiData.smallScreenBoxIndex,
                         children: [
-                          const DomainSidebar(),
+                          const SizedBox.shrink(), // Removed DomainSidebar
                           mainContent,
                           const Center(
                             child: Text(
@@ -145,8 +127,6 @@ class DomainScreen extends ConsumerWidget {
                       )
                     : Row(
                         children: [
-                          if (guiData.domainLeftSidebarVisible)
-                            const Expanded(flex: 2, child: DomainSidebar()),
                           Expanded(flex: 7, child: mainContent),
                           if (guiData.domainRightSidebarVisible)
                             const Expanded(
@@ -302,169 +282,6 @@ class DomainScreen extends ConsumerWidget {
     } else {
       return Row(children: [if (navBox != null) navBox, contentBox]);
     }
-  }
-}
-
-class DomainSidebar extends ConsumerStatefulWidget {
-  const DomainSidebar({super.key});
-
-  @override
-  ConsumerState<DomainSidebar> createState() => _DomainSidebarState();
-}
-
-class _DomainSidebarState extends ConsumerState<DomainSidebar> {
-  final ScrollController _scrollController = ScrollController();
-  final double _itemHeight = 56.0; // Approximate height of a ListTile
-
-  void _scrollToIndex(int index) {
-    if (!_scrollController.hasClients) return;
-
-    final double targetTop = index * _itemHeight;
-    final double targetBottom = targetTop + _itemHeight;
-    final double viewportHeight = _scrollController.position.viewportDimension;
-    final double currentOffset = _scrollController.offset;
-
-    if (targetTop < currentOffset) {
-      _scrollController.animateTo(
-        targetTop,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-      );
-    } else if (targetBottom > currentOffset + viewportHeight) {
-      _scrollController.animateTo(
-        targetBottom - viewportHeight,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final domainData = ref.watch(domainDataProvider);
-
-    return Container(
-      decoration: ShapeDecoration(
-        color: Colors.white,
-        shape: BeveledRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: Colors.black, width: 1),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Sidebar Header
-          Container(
-            height: 50,
-            color: Style.headerBackgroundColor,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_upward, color: Colors.white),
-                  onPressed: () {
-                    domainData.moveAssetUp();
-                    _scrollToIndex(domainData.currentAssetIndex);
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_downward, color: Colors.white),
-                  onPressed: () {
-                    domainData.moveAssetDown();
-                    _scrollToIndex(domainData.currentAssetIndex);
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.check, color: Colors.white),
-                  onPressed: () {
-                    final assetData = ref.read(assetDataProvider.notifier);
-                    if (domainData.currentAssetInfo.isNotEmpty) {
-                      assetData.clear();
-                      assetData.assetInfo = domainData.currentAssetInfo;
-                      ref.read(headerDataProvider.notifier).assetSelected =
-                          true;
-                    }
-                  },
-                ),
-                const Expanded(
-                  child: Center(
-                    child: Text(
-                      "Assets",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () {
-                    //hide the domain left sidebar
-                    //stop the asset list auto update
-                    ref.read(guiDataProvider.notifier).hideDomainLeftSidebar();
-                    ref
-                            .read(actionRequestsProvider.notifier)
-                            .assetListAutoUpdate =
-                        false;
-                  },
-                ),
-              ],
-            ),
-          ),
-          // Sidebar List
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: domainData.assetItems.length,
-              itemBuilder: (context, index) {
-                Color statusColor = Colors.grey;
-                if (domainData.subsystemAbstractions.isNotEmpty &&
-                    index < domainData.subsystemAbstractions.length) {
-                  final asset = domainData.subsystemAbstractions[index];
-                  if (asset is Map) {
-                    final controlStatus =
-                        asset['ControlStatus']?.toString() ?? "UNKNOWN";
-                    switch (controlStatus) {
-                      case "NOT_AVAILABLE":
-                        statusColor = Colors.red;
-                        break;
-                      case "NOT_CONTROLLED":
-                        statusColor = Colors.green;
-                        break;
-                      case "UNDER_CONTROLLED":
-                        statusColor = Colors.yellow;
-                        break;
-                      default:
-                        statusColor = Colors.grey;
-                    }
-                  }
-                }
-
-                return Container(
-                  color: index == domainData.currentAssetIndex
-                      ? Colors.blue[100]
-                      : null,
-                  child: ListTile(
-                    leading: Icon(Icons.circle, color: statusColor, size: 16),
-                    title: Text(domainData.assetItems[index]),
-                    onTap: () {
-                      domainData.setCurrentAssetIndex(index);
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 

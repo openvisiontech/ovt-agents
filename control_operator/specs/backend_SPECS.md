@@ -1,21 +1,21 @@
 # Backend Implementation Specifications
 
-This document describes the backend implementation over the FastAPI framework, refer to the implementation in the `reference_implementations/ocu_webrtc/ocu_webrtc.py` file.
+This document describes the backend implementation over the FastAPI framework. The backend provides WebRTC Server signaling, MCP server and data topics distribution.
 
-## Overview
+## 1. Overview
 
 The backend is a FastAPI application. In its lifespan, it will read the configuration from `config.json`, start up the uli apps and the DeepAgent, and shut them down when the backend is shut down. The backend also implements the websocket endpoint, `/ws/rtc` for the WebRTC Server signaling.
 
 The backend creates a async task to handle the data topics from uli apps and send them to the WebRTC Server. The backend creates a async task to handle the agent responses from DeepAgent and send them to the WebRTC Server.
 
-## Core Stacks
+## 2. Core Stacks
 - **framework:** Python, FastAPI.
 - **Dependency management:** uv
 - **WebRTC:** aiortc
 - **uli SDK:** uli SDK
 - **DeepAgent:** LangChain DeepAgent framework
 
-## Implementation Notes
+## 3. Implementation Notes
 
 1. The backend is implemented in the `backend` folder.
 2. The backend should be implemented modularly.
@@ -23,7 +23,7 @@ The backend creates a async task to handle the data topics from uli apps and sen
 4. The backend is implemented using the uli apps classes: Ocu and DataViewer in the `reference_implementations/uli_py` folder.
 5. The backend is implemented using the LangChain DeepAgent framework.
 
-## Coding Style
+## 4. Coding Style
 
 1. The Python class name should be in PascalCase.
 2. The Python method name should be in snake_case.
@@ -34,7 +34,7 @@ The backend creates a async task to handle the data topics from uli apps and sen
 7. The Python module name should be in snake_case.
 8. The Python package name should be in snake_case.
 
-## Core Components
+## 5. Core Components
 
 1. **lifespan**
    - Reads configurations from `config.json`.
@@ -68,14 +68,14 @@ The backend creates a async task to handle the data topics from uli apps and sen
 7. **WebRTC interface**
    - Interface to the frontend.
 
-## lifespan detailed
+## 6. lifespan detailed
 
 The `lifespan` is a FastAPI lifespan context manager. It is responsible for:
 1. Instantiating, starting up and shutting down uli apps and the DeepAgent.
 2. Creating background task, `ocu_topic_distribution_task`, for receiving topics from ULI SDK application Ocu and sending them to the WebRTC Server over the stream channel.
 3. Creating background task, `agent_response_distribution_task`, for receiving agent responses from DeepAgent and sending them to the WebRTC Server over the chat channel.
 
-## uli app Ocu detailed
+## 7. uli app Ocu detailed
 
 1. It is a python class that wraps the C++ interface of the ULI SDK application Ocu.
 2. A global instance of uli app Ocu is created in the lifespan.
@@ -90,7 +90,7 @@ The `lifespan` is a FastAPI lifespan context manager. It is responsible for:
    - shutdown()
    - destroy()
 
-### Ocu Interface
+### 7.1 Ocu Interface
 
 Ocu Interface encapsulates the python binding get_data and set_data methods of the uli app Ocu. It is implemented as a singleton class and is used by the chat channel handler of the WebRTC Connection to get and set data to the uli app Ocu. They should also be tools called by the LangChain DeepAgent. Refer to the `specs/uli_app_ocu_intf_SPECS.md` file for the detailed interface description.
 
@@ -110,18 +110,20 @@ The following methods are implemented in the `OcuInterface` class:
 12.  get_asset_transform_reporters() - retrieve the list of the transform reporters of the selected subsystem.
 13.  get_asset_transform_reporters_clients() - retrieve the list of the clients who subscribe the transform reporters of the selected subsystem.
 14.  set_gui_rec(gui_rec: str) - set the gui record.
-15.  set_joystick(joystick1: str, joystick2: str) - set the joystick record.
 
-### Ocu topic distribution
+### 7.2 MCP Server
+
+MCP server is to have the tool calls available to the AI agents for the Ocu Interface.
+
+### 7.3 Ocu topic distribution
 
 The background task, `ocu_topic_distribution_task`, for receiving topics from ULI SDK application Ocu and sending them to all the WebRTC Connections over the stream channel. Refer to the `ocu_topic_distribution_task` method in the `reference_implementations/ocu_webrtc/ocu_webrtc.py`.
 
 The `ocu_topic_distribution_task` continuously polls for topics using the `receive_topics` method of the ULI SDK application Ocu. The `receive_topics` method returns a list of the PybindUliTopic objects. The `ocu_topic_distribution_task` enters the received topics into the topic queue of each connection.
 
-
  The PybindUliTopic object can be converted to a JsonTopic object using the `create_json_topic()` method implemented in the `reference_implementations/uli_py/json_topic.py`. The StreamTopicWriter class can be used to convert the JsonTopic object to a bytes and write it to the stream_channel.
 
-### Data Topic detailed
+### 7.4 Data Topic detailed
 
 1. It is to pack audio, video, 3-D objects(such as point cloud, mesh, etc.), and other multi-dimensional data (tensors, etc.).
 2. It is to be sent over the stream_channel of the WebRTC Server.
@@ -133,20 +135,20 @@ The `ocu_topic_distribution_task` continuously polls for topics using the `recei
 8. The create_topic_builder_from_json_topic() method is to be used by the backend to convert the JsonTopic object to a UliTopicBuilder object.
 9. The publish_topic() method of the Ocu class is to be used by the backend to publish topics to the uli SDK. The methods of the UliTopicBuilder class are to be used to set the arguments of the publish_topic() method.
 
-## DeepAgent detailed
+## 8. DeepAgent detailed
 
-## WebRTC Server detailed
+## 9. WebRTC Server detailed
 
 Refer to the `specs/WebRTC_server_SPECS.md` for the WebRTC server specs.
 
 Each client connection has its own async tasks: `process_chat_queue` and `process_topic_queue` to process the received chat messages and json topics. This is to ensure that the processing of one client connection does not affect the processing of other client connections. Refer to the `reference_implementations/ocu_webrtc/ocu_webrtc.py` file for the implementation details.
 
-### process_chat_queue detailed
+### 9.1 process_chat_queue detailed
 
 The `process_chat_queue` is an async task that processes the received chat messages from the client connection. It calls the method of the OcuInterface class to get and set data to the uli app Ocu.
 
 Refer to the `control_operator/specs/WebRTC_intf_SPECS.md` for the messaging protocol of the chat_channel of the WebRTC connection.
 
-### process_topic_queue detailed
+### 9.2 process_topic_queue detailed
 
 The `process_topic_queue` is an async task that processes the received PybindUliTopic objects for the client connection. It converts the PybindUliTopic objects to JsonTopic objects using the `create_json_topic()` method implemented in the `reference_implementations/uli_py/json_topic.py`. The StreamTopicWriter class in the same json_topic.py file is to be used by the backend to convert the JsonTopic object to a bytes object and send it over the stream_channel.
