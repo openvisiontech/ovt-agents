@@ -422,6 +422,7 @@ class AssetLeftSidebar extends ConsumerWidget {
         items: assetData.assetItems,
         selectedIndex: assetData.currentAssetIndex,
         statusColors: statusColors,
+        profileImages: assetData.assetProfileImages,
         onUpPressed: () => ref.read(assetDataProvider.notifier).moveAssetUp(),
         onDownPressed: () =>
             ref.read(assetDataProvider.notifier).moveAssetDown(),

@@ -38,6 +38,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   Map<String, dynamic> _currentAssetInfo = {};
 
   List<String> assetItems = [];
+  List<String> assetProfileImages = [];
   Map<String, dynamic> _assetInfo = {};
   Map<String, dynamic> _assetAccessInfo = {};
   Map<String, dynamic> _assetControlInfo = {};
@@ -236,6 +237,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _agentCompletionTimeout = 0;
     agentItems = [];
     assetItems = [];
+    assetProfileImages = [];
 
     state = this;
   }
@@ -304,6 +306,12 @@ class AssetDataModel extends Notifier<AssetDataModel> {
         return "${e['Address']['SubsystemId'] ?? 0} ${e['Name'] ?? ''} (${e['SubsystemType'] ?? ''})";
       }
       return "Unknown Asset";
+    }).toList();
+    assetProfileImages = val.map((e) {
+      if (e is Map && e['ProfileImage'] != null) {
+        return e['ProfileImage'].toString();
+      }
+      return "";
     }).toList();
     if (_currentAssetIndex >= assetItems.length) {
       _currentAssetIndex = assetItems.length - 1;

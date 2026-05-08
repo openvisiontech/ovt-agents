@@ -12,6 +12,9 @@ class _SelectableListExamplesState extends State<SelectableListExamples> {
   int _selectedIndex1 = 0;
   int _selectedIndex2 = 0;
   int _selectedIndex3 = 0;
+  int _selectedIndex4 = 0;
+
+  final String _dummyImageBase64 = "data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +163,41 @@ class _SelectableListExamplesState extends State<SelectableListExamples> {
                 },
                 onItemTapped: (index) {
                   setState(() => _selectedIndex3 = index);
+                },
+              ),
+            ),
+          ),
+
+          // Example 4: Using Profile Images
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SelectableList(
+                title: 'Profile Images Example',
+                items: const ['User Alpha', 'User Beta'],
+                selectedIndex: _selectedIndex4,
+                profileImages: [
+                  _dummyImageBase64,
+                  _dummyImageBase64,
+                ],
+                onUpPressed: () {
+                  if (_selectedIndex4 > 0) {
+                    setState(() => _selectedIndex4--);
+                  }
+                },
+                onDownPressed: () {
+                  if (_selectedIndex4 < 1) {
+                    setState(() => _selectedIndex4++);
+                  }
+                },
+                onCheckPressed: () {
+                  debugPrint('Checked Profile Images: $_selectedIndex4');
+                },
+                onClosePressed: () {
+                  debugPrint('Closed Profile Images');
+                },
+                onItemTapped: (index) {
+                  setState(() => _selectedIndex4 = index);
                 },
               ),
             ),

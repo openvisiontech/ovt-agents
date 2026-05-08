@@ -3,8 +3,9 @@
 ## 1. overview
 
 ULI SDK app ocu is to discover the assets in the Uli SDK infrastructure, view the data obtained from the assets, and control the assets.
-
 This specs is to describe the interface provided by the uli app ocu through the get_data() and set_data() methods.
+
+Refer to the `specs/json_structure_notation.md` for the json structure notation.
 
 ## 2. Interface implementation
 
@@ -22,68 +23,86 @@ The url string to the data is in the format of "data://<app_domain>/<service_uri
 
 Here describes the url string to the data and the meaning of the returned json string.
 
-1. Retrieve the subsystem abstractions of all the discovered assets
+#### 2.1.1 Retrieve the subsystem abstractions of all the discovered assets
     - url string: "data://any/core_clients.DbDataStore?location=subsystemabstractions&id=0"
     - returned json string in the format of:
       ```json
       {
         "subsystemabstractions": [
           {
-            "Address": {
-                "SubsystemId": "number",
-                "NodeId": "number",
-                "CompId": "number"
+            "Address": { //subsystem address
+              "SubsystemId": "number",
+              "NodeId": "number",
+              "CompId": "number"
+            }, // the string notation of the subsystem address is "<SubsystemId>.<NodeId>.<CompId>"
+            "SubsystemType": "UNKNOWN | UNMANNED | AI_AGENT | CONTROLLER | META_HUMAN | PROCESS_TOOL", //subsystem type
+            "Name": "string", //subsystem name
+            "ControlStatus": "UNKNOWN | NOT_AVAILABLE | NOT_CONTROLLED | UNDER_CONTROLLED", //control status. NOT_AVAILABLE means the subsystem can not be controlled. NOT_CONTROLLED means the subsystem is ready to be controlled. UNDER_CONTROLLED means the subsystem is controlled.
+            "Client": "string", //client's compoent address in the string format: "<SubsystemId>.<NodeId>.<CompId>". The client address is "0.0.0" if no client.
+            "Pose": { //Pose of the subsystem's main component in the coordinate frame
+              "TimeStamp": "number", //timestamp in nanosecond
+              "Frame": "string", //coordinate frame
+              "Latitude": "number", //latitude in the GNSS WGS84 
+              "Longitude": "number", //longitude
+              "XPosition": "number", //x position FRD in the reference frame (usually IMU)
+              "YPosition": "number", //y position FRD in the reference frame (usually IMU)
+              "ZPositionType": "UNKNOWN | ALTITUDE_AGL | ALTITUDE_MSL | ALTITUDE_ASL | DEPTH", //type of the zPosition value, it can be Above Ground Level | Above Mean Sea Level | Above Sea Level | Depth | Unknown.
+              "ZPosition": "number", //z position
+              "HorizontalRms": "number", //horizontal root mean square
+              "VerticalRms": "number", //vertical root mean square
+              "Roll": "number", //roll
+              "Pitch": "number", //pitch
+              "Heading": "number", //heading
+              "AltitudeRms": "number" //altitude root mean square
             },
-            "SubsystemType": "UNKNOWN | HOSPITALITY | AGV | UNMANNED | SENSOR | AI | CONTROLLER | META_HUMAN",
-            "Name": "string",
-            "ControlStatus": "UNKNOWN | NOT_AVAILABLE | NOT_CONTROLLED | UNDER_CONTROLLED",
-            "Client": "string"
+            "Context": "string", //context
+            "ProfileImage": "string" //profile image in base64 encoded string of the profile image of the asset. The format of the image is JPEG. This string begins with "data:image/jpeg;base64,".
           }
         ]
       }
       ```
 
-2. Retrieve the services hosted by all the discovered assets
+#### 2.1.2 Retrieve the services hosted by all the discovered assets
     - url string: "data://any/core_clients.DbDataStore?location=subsystemservices&id=0"
     - returned json string in the format of:
       ```json
       {
         "subsystemservices": [
           {
-            "Address": {
+            "Address": { //subsystem address
                 "SubsystemId": "number",
                 "NodeId": "number",
                 "CompId": "number"
-            },
-            "SubsystemType": "UNKNOWN | HOSPITALITY | AGV | UNMANNED | SENSOR | AI | CONTROLLER | META_HUMAN",
-            "Name": "string",
-            "CompServicesRecList": [
+            }, // the string notation of the subsystem address is "<SubsystemId>.<NodeId>.<CompId>"
+            "SubsystemType": "UNKNOWN | UNMANNED | AI_AGENT | CONTROLLER | META_HUMAN | PROCESS_TOOL", //subsystem type
+            "Name": "string", //subsystem name
+            "CompServicesRecList": [  // list of component record and the services hosted by the component
               {
-                "CompRec": {
-                    "Address": {
+                "CompRec": { //component record
+                    "Address": { //component address
                         "SubsystemId": "number",
                         "NodeId": "number",
                         "CompId": "number"
-                    },
-                    "CompType": "UNKNOWN | REGULAR | MISSION_CRITICAL",
-                    "Name": "string",
-                    "Descriptor": "string"
+                    }, // the string notation of the component address is "<SubsystemId>.<NodeId>.<CompId>"
+                    "CompType": "UNKNOWN | REGULAR | MISSION_CRITICAL", //component type
+                    "Name": "string", //component name
+                    "Descriptor": "string" //component descriptor
                 },
-                "ServiceRecList": [
+                "ServiceRecList": [ //list of service records
                     {
-                        "ServiceUri": "string",
-                        "MajorVersion": "number",
-                        "MinorVersion": "number"
+                        "ServiceUri": "string", //service uri in the format of "<service_category>.<service_name>". For example: "core.Discovery".
+                        "MajorVersion": "number", //service major version.
+                        "MinorVersion": "number" //service minor version.
                     }
                 ]   
               }
             ]
-          }
+          }  // end of the subsystem service record
         ]
       }
       ```
 
-3. Retrieve the status details of all the discovered assets
+#### 2.1.3 Retrieve the status details of all the discovered assets
     - url string: "data://any/core_clients.DbDataStore?location=subsystemstatusdetails&id=0"
     - returned json string in the format of:
       ```json
@@ -95,7 +114,7 @@ Here describes the url string to the data and the meaning of the returned json s
                 "NodeId": "number",
                 "CompId": "number"
             },
-            "SubsystemType": "UNKNOWN | HOSPITALITY | AGV | UNMANNED | SENSOR | AI | CONTROLLER | META_HUMAN",
+            "SubsystemType": "UNKNOWN | UNMANNED | AI_AGENT | CONTROLLER | META_HUMAN | PROCESS_TOOL", //subsystem type
             "Name": "string",
             "CompStatusDetailsRecList": [
               {
@@ -175,7 +194,7 @@ Here describes the url string to the data and the meaning of the returned json s
       }
       ```
 
-4. Retrieve the resources of all the discovered assets
+#### 2.1.4 Retrieve the resources of all the discovered assets
     - url string: "data://any/core_clients.DbDataStore?location=subsystemresources&id=0"
     - returned json string in the format of:
       ```json
@@ -187,7 +206,7 @@ Here describes the url string to the data and the meaning of the returned json s
                 "NodeId": "number",
                 "CompId": "number"
             },
-            "SubsystemType": "UNKNOWN | HOSPITALITY | AGV | UNMANNED | SENSOR | AI | CONTROLLER | META_HUMAN",
+            "SubsystemType": "UNKNOWN | UNMANNED | AI_AGENT | CONTROLLER | META_HUMAN | PROCESS_TOOL", //subsystem type
             "Name": "string",
             "CompResourcesRecList": [
               {
@@ -225,7 +244,7 @@ Here describes the url string to the data and the meaning of the returned json s
       }
       ```   
 
-5. Retrieve the available agents from all the discovered assets
+#### 2.1.5 Retrieve the available agents from all the discovered assets
     - url string: "data://any/core_clients.DbDataStore?location=subsystemagents&id=0"
     - returned json string in the format of:
       ```json
@@ -237,22 +256,22 @@ Here describes the url string to the data and the meaning of the returned json s
                 "NodeId": "number",
                 "CompId": "number"
             },
-            "SubsystemType": "UNKNOWN | HOSPITALITY | AGV | UNMANNED | SENSOR | AI | CONTROLLER | META_HUMAN",
-            "Name": "string",
+            "SubsystemType": "UNKNOWN | UNMANNED | AI_AGENT | CONTROLLER | META_HUMAN | PROCESS_TOOL", //subsystem type
+            "Name": "string", //subsystem name
             "AgentRecList": [
                 {
-                    "name": "string",
-                    "Uri": "string",
-                    "User": "string",
+                    "name": "string", //agent name
+                    "Uri": "string", //agent uri
+                    "User": "string", //agent user
                     "Comp": {
-                        "SubsystemId": "number",
-                        "NodeId": "number",
-                        "CompId": "number"
+                        "SubsystemId": "number", //subsystem id
+                        "NodeId": "number", //node id
+                        "CompId": "number" //component id
                     },
-                    "Configuration": "string",
-                    "RequiredAppAccessRight": "UNKNOWN | NOT_ALLOWED | OPERATOR | MAINTAINER | ADMINISTRATOR",
-                    "Context": "string",
-                    "Widget": "string"
+                    "Configuration": "string", //agent configuration
+                    "RequiredAppAccessRight": "UNKNOWN | NOT_ALLOWED | OPERATOR | MAINTAINER | ADMINISTRATOR", //required app access right
+                    "Context": "string", //agent context
+                    "Widget": "string" //agent widget
                 }
             ]
           }
@@ -260,7 +279,7 @@ Here describes the url string to the data and the meaning of the returned json s
       }      
       ```
 
-6.  Retrieve the access client record of the selected subsystem
+#### 2.1.6 Retrieve the access client record of the selected subsystem
     - url string: "data://any/core_clients.DataStore?location=accessclient"
     - returned json string in the format of:
       ```json
@@ -286,7 +305,7 @@ Here describes the url string to the data and the meaning of the returned json s
 
       The subsystem access service returns the session id and the access right to the access client. The application can use the session id to subscribe the data topoics of the subsystem.
 
-7.  Retrieve the control client record of the selected subsystem
+#### 2.1.7 Retrieve the control client record of the selected subsystem
     - url string: "data://any/core_clients.DataStore?location=controlclient"
     - returned json string in the format of:
       ```json
@@ -314,7 +333,7 @@ Here describes the url string to the data and the meaning of the returned json s
 
       The subsystem control client service will send the Release Subsystem Control message to the subsystem control service when it releases the control of the subsystem.
 
-8.  Retrieve the subsystem state client record of the selected subsystem
+#### 2.1.8 Retrieve the subsystem state client record of the selected subsystem
     - url string: "data://any/core_clients.DataStore?location=stateclient"
     - returned json string in the format of:
       ```json
@@ -345,7 +364,7 @@ Here describes the url string to the data and the meaning of the returned json s
       RENDER_USELESS | RENDER_USELESS 
       ```
 
-9. Retrieve the operating mode client record of the selected subsystem
+#### 2.1.9 Retrieve the operating mode client record of the selected subsystem
     - url string: "data://any/core_clients.DataStore?location=operatingmodeclient"
     - returned json string in the format of:
       ```json
@@ -365,7 +384,7 @@ Here describes the url string to the data and the meaning of the returned json s
 
       The operating mode client is used to set the operating mode of the subsystem. The operating mode is set by the subsystem operating mode service.
 
-10. Retrieve the status details of the selected subsystem
+#### 2.1.10 Retrieve the status details of the selected subsystem
     - url string: "data://any/core_clients.DataStore?location=statusdetails"
     - returned json string in the format of:
       ```json
@@ -446,7 +465,7 @@ Here describes the url string to the data and the meaning of the returned json s
 
       The status details is a list of the status detail of all the components in the subsystem. The status detail includes the descriptions of the component, the operating mode of the component, the management state of the component, the number of seconds the component has been running, the time the link test was last performed, the round trip time of the link test, the time the link test was last performed, the subscription records of the component, the health summary of the component, and the service health records of the component. 
 
-11. Retrieve the list of the availabel agents of the selected subsystem
+#### 2.1.11 Retrieve the list of the availabel agents of the selected subsystem
     - url string: "data://any/core_clients.DataStore?location=agentlist"
     - returned json string in the format of:
       ```json
@@ -472,7 +491,7 @@ Here describes the url string to the data and the meaning of the returned json s
 
       The agent list is a list of the agent records of all the agents in the subsystem. The agent record includes the name of the agent, the uri of the agent, whether the agent needs the user parameters, the component where the agent is located, the configuration of the agent in JSON string format, the required access right of the agent, the context of the agent in markdown string format, and the widget of the agent. 
 
-12. Retrieve the list of the status of all the agents of the selected subsystem
+#### 2.1.12 Retrieve the list of the status of all the agents of the selected subsystem
     - url string: "data://any/core_clients.DataStore?location=agentstatuslist"
     - returned json string in the format of:
       ```json
@@ -508,7 +527,9 @@ Here describes the url string to the data and the meaning of the returned json s
 
       The agent status is a list of the status of all the agents in the subsystem. The agent status includes the name of the agent, the uri of the agent, the requestor of the agent, the configuration and the completion timeoutthat requestor set, number of seconds the agent has been running, the time the agent entered the current state, the current state, the completion code, and the result of the execution of the agent.  
 
-13. Retrieve the details of the agents of the selected subsystem. The details includes list of the agents, the clients of the agents, and the control states of the agent clients.
+#### 2.1.13 Retrieve the details of the agents of the selected subsystem.
+
+    - The details includes list of the agents, the clients of the agents, and the control states of the agent clients.
     - url string: "data://any/core_clients.DataStore?location=agentdetails"
     - returned json string in the format of:
       ```json
@@ -545,7 +566,7 @@ Here describes the url string to the data and the meaning of the returned json s
       }
       ```
 
-14. Retrieve the list of the data topics the selected subsystem is publishing
+#### 2.1.14 Retrieve the list of the data topics the selected subsystem is publishing
     - url string: "data://any/core_clients.DataStore?location=compdatatopiclist"
     - returned json string in the format of:
       ```json
@@ -593,7 +614,7 @@ The data topics is a list of the data topics the selected subsystem is publishin
 
  The data topic record list includes the uri of the data topic, the description of the data topic, the component which is publishing the data topic, the channel id of the data topic, the schema version of the data topic, the schema of the data topic, the required data access right of the data topic, the context file that the context is stored in, the context of the data topic, and the widget that is used to display the data topic.
 
-15. Retrieve the list of the clients who are subscribing to the data topics the selected subsystem is publishing.
+#### 2.1.15 Retrieve the list of the clients who are subscribing to the data topics the selected subsystem is publishing.
     - url string: "data://any/core_clients.DataStore?location=datatopicclientlist"
     - returned json string in the format of:
       ```json
@@ -665,7 +686,9 @@ The data topics is a list of the data topics the selected subsystem is publishin
 
 The SubscribeDataTopics is a list of the data topics the client is subscribing from the data topic service of the component of the selected subsystem. The count indicates the number of times the client has sent the subscribe request messages to the data topic service.
 
-16. Retrieve the list of the transform reporters of the selected subsystem. The transform reporter is a component that reports the transform between the coordinate frames of the selected subsystem.
+#### 2.1.16 Retrieve the list of the transform reporters of the selected subsystem.
+
+    - The transform reporter is a component that reports the transform between the coordinate frames of the selected subsystem.
     - url string: "data://any/core_clients.DataStore?location=transformreporterlist"
     - returned json string in the format of:
       ```json
@@ -695,7 +718,9 @@ The transform reporter is a component that reports the transform between the coo
 
 The transform definition is the pair of the parent frame and the child frame.
 
-18. Retrieve the list of the transform reporter clients of the selected subsystem. The transform reporter client is a component that subscribes to the reports of transforms from the transform reporter.
+#### 2.1.17 Retrieve the list of the transform reporter clients of the selected subsystem.
+
+    - The transform reporter client is a component that subscribes to the reports of transforms from the transform reporter.
     - url string: "data://any/core_clients.DataStore?location=transformclientlist"
     - returned json string in the format of:
       ```json
@@ -729,7 +754,7 @@ The transform definition includes the parent frame and the child frame.
 
 Here describes the url string to the data and the meaning of the json string.
 
-1. Set the joystick1 record. The joystick1 record is to set joystick1 data during driving.
+#### 2.2.1 Set the joystick1 record. The joystick1 record is to set joystick1 data during driving.
     - url string: "data://ocu.apps.uli_sdk/core_clients.DataStore?location=joystick1rec"
     - json string in the format of:
       ```json
@@ -742,7 +767,7 @@ Here describes the url string to the data and the meaning of the json string.
       ```
       Both the XAxisPosition and YAxisPosition are in the range of -1 to 1.
 
-2. Set the joystick2 record. The joystick2 record is to set joystick2 data during driving.
+#### 2.2.2 Set the joystick2 record. The joystick2 record is to set joystick2 data during driving.
     - url string: "data://ocu.apps.uli_sdk/core_clients.DataStore?location=joystick2rec"
     - json string in the format of:
       ```json
@@ -755,7 +780,7 @@ Here describes the url string to the data and the meaning of the json string.
       ```
       Both the XAxisPosition and YAxisPosition are in the range of -1 to 1.
 
-3. Set the gui record. The gui record is to set gui data that is used to control the vehicle.
+#### 2.2.3 Set the gui record. The gui record is to set gui data that is used to control the vehicle.
     - url string: "data://ocu.apps.uli_sdk/core_clients.DataStore?location=guirec"
     - json string in the format of:
       ```json
@@ -785,7 +810,7 @@ Here describes the url string to the data and the meaning of the json string.
     - OperatingCategory: The operating category. It can be STANDARD or ADMINISTRATIVE.
     - OperatingMode: The operating mode. It can be STANDARD_OPERATING, REDUCED, RIGOROUS, SILENT, HIBERNATED, TRAINING, or MAINTENANCE. All of the components in the subsystem will be notified of the operating mode.
   
-  4. Set the task exec record. The task exec record is to set the task exec data that is used to interact with the agent.
+#### 2.2.4 Set the task exec record. The task exec record is to set the task exec data that is used to interact with the agent.
     - url string: "data://ocu.apps.uli_sdk/core_clients.DataStore?location=taskexecrec"
     - json string in the format of:
       ```json

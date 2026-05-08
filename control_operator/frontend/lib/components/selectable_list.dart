@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../style.dart';
 
@@ -7,6 +8,7 @@ class SelectableList extends StatefulWidget {
   final int selectedIndex;
   final List<Color>? statusColors;
   final List<Widget>? trailingWidgets;
+  final List<String>? profileImages;
   final VoidCallback onUpPressed;
   final VoidCallback onDownPressed;
   final VoidCallback onCheckPressed;
@@ -20,6 +22,7 @@ class SelectableList extends StatefulWidget {
     required this.selectedIndex,
     this.statusColors,
     this.trailingWidgets,
+    this.profileImages,
     required this.onUpPressed,
     required this.onDownPressed,
     required this.onCheckPressed,
@@ -137,10 +140,10 @@ class _SelectableListState extends State<SelectableList> {
               controller: _scrollController,
               itemCount: widget.items.length,
               itemBuilder: (context, index) {
-                Widget? leadingIcon;
+                Widget? statusIcon;
                 if (widget.statusColors != null &&
                     index < widget.statusColors!.length) {
-                  leadingIcon = Icon(
+                  statusIcon = Icon(
                     Icons.circle,
                     color: widget.statusColors![index],
                     size: 16,
@@ -153,14 +156,45 @@ class _SelectableListState extends State<SelectableList> {
                   trailingWidget = widget.trailingWidgets![index];
                 }
 
+                Widget? combinedTrailing;
+                if (statusIcon != null && trailingWidget != null) {
+                  combinedTrailing = Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [statusIcon, const SizedBox(width: 8), trailingWidget],
+                  );
+                } else {
+                  combinedTrailing = statusIcon ?? trailingWidget;
+                }
+
+                Widget? leadingWidget;
+                if (widget.profileImages != null &&
+                    index < widget.profileImages!.length) {
+                  String profileStr = widget.profileImages![index];
+                  if (profileStr.startsWith("data:image/jpeg;base64,")) {
+                    try {
+                      String base64Data = profileStr.substring("data:image/jpeg;base64,".length);
+                      leadingWidget = ClipOval(
+                        child: Image.memory(
+                          base64Decode(base64Data),
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    } catch (e) {
+                      // ignore error
+                    }
+                  }
+                }
+
                 return Container(
                   color: index == widget.selectedIndex
                       ? Colors.blue[100]
                       : null,
                   child: ListTile(
-                    leading: leadingIcon,
                     title: Text(widget.items[index]),
-                    trailing: trailingWidget,
+                    leading: leadingWidget,
+                    trailing: combinedTrailing,
                     onTap: () {
                       widget.onItemTapped(index);
                     },
