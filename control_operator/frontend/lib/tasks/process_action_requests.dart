@@ -46,16 +46,13 @@ void processActionRequests(dynamic message) async {
     if (count % 50 == 0) {
       if (actionRequests.assetListUpdate) {
         webrtcClient.chatRequestQueue.add(
-          jsonEncode({
-            "action": "get_all_subsystem_abstractions",
-            "payload": {},
-          }),
+          jsonEncode({"action": "get_all_abstractions", "payload": {}}),
         );
         actionRequests.assetListUpdate = false;
       }
       if (actionRequests.agentListUpdate) {
         webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_available_agents", "payload": {}}),
+          jsonEncode({"action": "get_agent_list", "payload": {}}),
         );
         actionRequests.agentListUpdate = false;
       }
@@ -64,6 +61,12 @@ void processActionRequests(dynamic message) async {
           jsonEncode({"action": "get_data_topic_list", "payload": {}}),
         );
         actionRequests.dataTopicListUpdate = false;
+      }
+      if (actionRequests.schemaListUpdate) {
+        webrtcClient.chatRequestQueue.add(
+          jsonEncode({"action": "get_schema_list", "payload": {}}),
+        );
+        actionRequests.schemaListUpdate = false;
       }
       if (actionRequests.dataTopicClientListUpdate) {
         webrtcClient.chatRequestQueue.add(
@@ -101,17 +104,14 @@ void processActionRequests(dynamic message) async {
     if (count % 250 == 0) {
       if (actionRequests.assetListAutoUpdate) {
         webrtcClient.chatRequestQueue.add(
-          jsonEncode({
-            "action": "get_all_subsystem_abstractions",
-            "payload": {},
-          }),
+          jsonEncode({"action": "get_all_abstractions", "payload": {}}),
         );
       }
       webrtcClient.chatRequestQueue.add(
-        jsonEncode({"action": "get_asset_access_info", "payload": {}}),
+        jsonEncode({"action": "get_access_info", "payload": {}}),
       );
       webrtcClient.chatRequestQueue.add(
-        jsonEncode({"action": "get_asset_control_info", "payload": {}}),
+        jsonEncode({"action": "get_control_info", "payload": {}}),
       );
       webrtcClient.chatRequestQueue.add(
         jsonEncode({"action": "get_state_info", "payload": {}}),

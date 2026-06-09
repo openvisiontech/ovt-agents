@@ -46,9 +46,9 @@ On the other hand, it also receives Json Topics from the backend over the stream
 
 The WebRTC client is responsible for sending messages to the backend and receiving messages from the backend. It is a singleton and should be accessed through the `WebRTCClient` class.
 
-The WebRTC client is specified in the `specs/WebRTC_client_SPECS.md` file. Also Refer to `reference_implementation/ocu_ui/lib/providers/web_rtc_provider.dart` for the reference implementation.
+The WebRTC client is specified in the `docs/specs/webRTC_client.md` file. Also Refer to `reference_implementation/ocu_ui/lib/providers/web_rtc_provider.dart` for the reference implementation.
 
-The messaging protocol is specified in the `control_operator/specs/WebRTC_intf_SPECS.md` file.
+The messaging protocol is specified in the `control_operator/specs/webRTC_intf.md` file.
 
 The WebRTC client maintains the following async queues to send messages to the backend:
 
@@ -122,7 +122,7 @@ Data for the GUI is organized into three main data models. Each data model is a 
 
   - subsystemAbstractions: 
 
-  Updated by the chat message "all_subsystem_abstractions" from the backend. It is a list of the abstractions of all the discovered subsystems (assets). Refer to WebRTC_intf_SPECS.md for the payload structure.
+  Updated by the chat message "all_subsystem_abstractions" from the backend. It is a list of the abstractions of all the discovered subsystems (assets). Refer to webRTC_intf.md for the payload structure.
 
   - asset list:
   
@@ -138,27 +138,27 @@ Data for the GUI is organized into three main data models. Each data model is a 
 
   - assetAccessInfo:
   
-    Updated by the chat message "asset_access_info" from the backend. It is the info of access client to the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure.
+    Updated by the chat message "asset_access_info" from the backend. It is the info of access client to the selected asset. Refer to webRTC_intf.md for the payload structure.
 
   - assetControlInfo:
 
-    Updated by the chat message "asset_control_info" from the backend. It is the info of control client to the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure.
+    Updated by the chat message "asset_control_info" from the backend. It is the info of control client to the selected asset. Refer to webRTC_intf.md for the payload structure.
 
   - stateInfo:
   
-    Updated by the chat message "state_info" from the backend. It is the info of state client to the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure.
+    Updated by the chat message "state_info" from the backend. It is the info of state client to the selected asset. Refer to webRTC_intf.md for the payload structure.
   
   - operatingModeInfo:
 
-    Updated by the chat message "operating_mode_info" from the backend. It is the info of operating mode client to the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure.
+    Updated by the chat message "operating_mode_info" from the backend. It is the info of operating mode client to the selected asset. Refer to webRTC_intf.md for the payload structure.
     
   - statusDetails:
 
-    Updated by the chat message "status_details" from the backend. It is the status details of the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure.
+    Updated by the chat message "status_details" from the backend. It is the status details of the selected asset. Refer to webRTC_intf.md for the payload structure.
       
   - agentList:
 
-    Updated with each list item displaying the `Name` and `Uri` of the agent by the chat message "available_agents" from the backend. It is the list of agents of the selected asset. Refer to WebRTC_intf_SPECS.md for the payload structure. The agent list is displayed in the left sidebar of the asset screen.
+    Updated with each list item displaying the `Name` and `Uri` of the agent by the chat message "available_agents" from the backend. It is the list of agents of the selected asset. Refer to webRTC_intf.md for the payload structure. The agent list is displayed in the left sidebar of the asset screen.
 
   - fields updated by UI operations
 
@@ -254,34 +254,34 @@ It periodically goes through the action requests and puts the corresponding chat
 
 Perform the following actions every 50ms:
 
-  1) if `assetListUpdate` is true, put to the chatRequestQueue the chat message for get_all_control_abstractions action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `assetListUpdate` to false.
+  1) if `assetListUpdate` is true, put to the chatRequestQueue the chat message for get_all_subsystem_abstractions action, refer to webRTC_intf.md for the chat message structure. Then set `assetListUpdate` to false.
 
-  2) if `agentListUpdate` is true, put to the chatRequestQueue the chat message for get_available_agents action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `agentListUpdate` to false.
+  2) if `agentListUpdate` is true, put to the chatRequestQueue the chat message for get_available_agents action, refer to webRTC_intf.md for the chat message structure. Then set `agentListUpdate` to false.
 
-  3) if `dataTopicListUpdate` is true, put to the chatRequestQueue the chat message for get_data_topic_list action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `dataTopicListUpdate` to false.
+  3) if `dataTopicListUpdate` is true, put to the chatRequestQueue the chat message for get_data_topic_list action, refer to webRTC_intf.md for the chat message structure. Then set `dataTopicListUpdate` to false.
 
-  4) if `dataTopicClientListUpdate` is true, put to the chatRequestQueue the chat message for get_data_topic_clients action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `dataTopicClientListUpdate` to false.
+  4) if `dataTopicClientListUpdate` is true, put to the chatRequestQueue the chat message for get_data_topic_clients action, refer to webRTC_intf.md for the chat message structure. Then set `dataTopicClientListUpdate` to false.
 
-  5) if `transformReporterListUpdate` is true, put to the chatRequestQueue the chat message for get_transform_reporters action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `transformReporterListUpdate` to false.
+  5) if `transformReporterListUpdate` is true, put to the chatRequestQueue the chat message for get_transform_reporters action, refer to webRTC_intf.md for the chat message structure. Then set `transformReporterListUpdate` to false.
 
-  6) if `statusDetailsUpdate` is true, put to the chatRequestQueue the chat message for get_status_details action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `statusDetailsUpdate` to false.
+  6) if `statusDetailsUpdate` is true, put to the chatRequestQueue the chat message for get_status_details action, refer to webRTC_intf.md for the chat message structure. Then set `statusDetailsUpdate` to false.
 
-  7) if `agentStatusUpdate` is true, put to the chatRequestQueue the chat message for get_agent_status action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `agentStatusUpdate` to false.
+  7) if `agentStatusUpdate` is true, put to the chatRequestQueue the chat message for get_agent_status action, refer to webRTC_intf.md for the chat message structure. Then set `agentStatusUpdate` to false.
 
-  8) if `agentDetailsUpdate` is true, put to the chatRequestQueue the chat message for get_agent_details action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then set `agentDetailsUpdate` to false.
+  8) if `agentDetailsUpdate` is true, put to the chatRequestQueue the chat message for get_agent_details action, refer to webRTC_intf.md for the chat message structure. Then set `agentDetailsUpdate` to false.
 
 
 Perform the following actions every 100ms:
 
-  1) if `assetListAutoUpdate` is true, put to the chatRequestQueue the chat message for get_all_control_abstractions action, refer to WebRTC_intf_SPECS.md for the chat message structure. Then keep the assetListAutoUpdate as true.
+  1) if `assetListAutoUpdate` is true, put to the chatRequestQueue the chat message for get_all_subsystem_abstractions action, refer to webRTC_intf.md for the chat message structure. Then keep the assetListAutoUpdate as true.
 
-  2) put to the chatRequestQueue the chat message for get_asset_access_info action, refer to WebRTC_intf_SPECS.md for the chat message structure.
+  2) put to the chatRequestQueue the chat message for get_asset_access_info action, refer to webRTC_intf.md for the chat message structure.
 
-  3) Put to the chatRequestQueue the chat message for get_asset_control_info action, refer to WebRTC_intf_SPCS.md for the chat message structure.
+  3) Put to the chatRequestQueue the chat message for get_asset_control_info action, refer to webRTC_intf.md for the chat message structure.
 
-  4) Put to the chatRequestQueue the chat message for get_state_info action, refer to WebRTC_intf_SPCS.md for the chat message structure.
+  4) Put to the chatRequestQueue the chat message for get_state_info action, refer to webRTC_intf.md for the chat message structure.
 
-  5) Put to the chatRequestQueue the chat message for get_operating_mode_info action, refer to WebRTC_intf_SPCS.md for the chat message structure.
+  5) Put to the chatRequestQueue the chat message for get_operating_mode_info action, refer to webRTC_intf.md for the chat message structure.
 
 ### 5.2 **`processMediaRequests()`**
 
@@ -289,11 +289,11 @@ It periodically goes through the media requests and puts the corresponding Json 
 
 ### 5.3 **`processChat()`**
 
-It waits for the chat messages from the Chat Queue of the WebRTC client and updates the corresponding data models. Refer to Section 2.1.2 `Backend to Frontend messages` in the WebRTC_intf_SPECS.md for the chat message structure.
+It waits for the chat messages from the Chat Queue of the WebRTC client and updates the corresponding data models. Refer to Section 2.1.2 `Backend to Frontend messages` in the webRTC_intf.md for the chat message structure.
 
-1) Receive action `all_control_abstractions`
+1) Receive action `all_subsystem_abstractions`
 
-   - Update the subsystemControlAbstractions list in the `DomainDataModel` with the received "subsystemcontrolabstractions" list.
+   - Update the subsystemAbstractions list in the `AssetDataModel` with the received "subsystemabstractions" list.
 
 2) Receive action `asset_access_info`
 

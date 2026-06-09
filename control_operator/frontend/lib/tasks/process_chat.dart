@@ -52,16 +52,16 @@ void processChat(dynamic message) async {
         final payload = decoded['payload'] as Map<String, dynamic>? ?? {};
 
         switch (action) {
-          case 'all_subsystem_abstractions':
-            assetData.subsystemAbstractions = List<Map<String, dynamic>>.from(
+          case 'all_abstractions':
+            assetData.assetAbstractions = List<Map<String, dynamic>>.from(
               payload['subsystemabstractions'] ?? [],
             );
             break;
-          case 'asset_access_info':
-            assetData.assetAccessInfo = payload['accessclient'] ?? {};
+          case 'access_info':
+            assetData.accessInfo = payload['accessclient'] ?? {};
             break;
-          case 'asset_control_info':
-            assetData.assetControlInfo = payload['controlclient'] ?? {};
+          case 'control_info':
+            assetData.controlInfo = payload['controlclient'] ?? {};
             break;
           case 'state_info':
             assetData.stateInfo = payload['stateclient'] ?? {};
@@ -74,8 +74,7 @@ void processChat(dynamic message) async {
               payload['statusdetails'] ?? [],
             );
             break;
-          case 'available_agents':
-            guiData.showAssetLeftSidebar();
+          case 'agent_list':
             assetData.agentList = List<Map<String, dynamic>>.from(
               payload['agentlist'] ?? [],
             );
@@ -90,7 +89,12 @@ void processChat(dynamic message) async {
             break;
           case 'data_topic_list':
             assetData.dataTopicList = List<Map<String, dynamic>>.from(
-              payload['datatopiclist'] ?? [],
+              payload['compdatatopiclist'] ?? [],
+            );
+            break;
+          case 'schema_list':
+            assetData.schemaList = List<Map<String, dynamic>>.from(
+              payload['compdatatopicschemalist'] ?? [],
             );
             break;
           case 'data_topic_clients':
@@ -103,7 +107,7 @@ void processChat(dynamic message) async {
               payload['transformreporterlist'] ?? [],
             );
             break;
-          case 'transform_reporters_clients':
+          case 'transform_clients':
             assetData.transformClientList = List<Map<String, dynamic>>.from(
               payload['transformclientlist'] ?? [],
             );

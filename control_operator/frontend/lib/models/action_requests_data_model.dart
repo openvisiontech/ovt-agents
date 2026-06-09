@@ -41,6 +41,7 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
   bool _agentListUpdate = false;
   bool _resourceListUpdate = false;
   bool _dataTopicListUpdate = false;
+  bool _schemaListUpdate = false;
   bool _dataTopicClientListUpdate = false;
   bool _transformReporterListUpdate = false;
   bool _statusDetailsUpdate = false;
@@ -48,11 +49,6 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
   bool _agentStatusUpdate = false;
   bool _agentDetailsUpdate = false;
   bool _serviceListAutoUpdate = false;
-
-  void toggleAssetListAutoUpdate() {
-    _assetListAutoUpdate = !_assetListAutoUpdate;
-    state = this;
-  }
 
   void leavingDomainScreen() {
     _assetListUpdate = false;
@@ -64,6 +60,7 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
     _agentListUpdate = false;
     _resourceListUpdate = false;
     _dataTopicListUpdate = false;
+    _schemaListUpdate = false;
     _dataTopicClientListUpdate = false;
     _transformReporterListUpdate = false;
     _statusDetailsUpdate = false;
@@ -77,12 +74,18 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
     _serviceListAutoUpdate = false;
   }
 
+  void toggleAssetListAutoUpdate() {
+    _assetListAutoUpdate = !_assetListAutoUpdate;
+    state = this;
+  }
+
   bool get assetListUpdate => _assetListUpdate;
   bool get assetListAutoUpdate => _assetListAutoUpdate;
   bool get serviceListUpdate => _serviceListUpdate;
   bool get agentListUpdate => _agentListUpdate;
   bool get resourceListUpdate => _resourceListUpdate;
   bool get dataTopicListUpdate => _dataTopicListUpdate;
+  bool get schemaListUpdate => _schemaListUpdate;
   bool get dataTopicClientListUpdate => _dataTopicClientListUpdate;
   bool get transformReporterListUpdate => _transformReporterListUpdate;
   bool get statusDetailsUpdate => _statusDetailsUpdate;
@@ -118,6 +121,11 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
 
   set dataTopicListUpdate(bool value) {
     _dataTopicListUpdate = value;
+    state = this;
+  }
+
+  set schemaListUpdate(bool value) {
+    _schemaListUpdate = value;
     state = this;
   }
 

@@ -72,11 +72,11 @@ The frontend leverages a discrete, multi-layered execution architecture ensuring
 
 ### 5.2 Background Task Loops Integration
 To strictly ensure Flutter Web cross-platform compatibility, execution loops avoid heavy `dart:isolate` threading computations. Instead, they exploit continuous `while(true)` Future sequences at varied intervals:
-- **`processActionRequests`**: Iterates on a pure 10ms loop, but groups logic into 50ms and 100ms staggered checkpoints. It listens to UI-triggered boolean flags mapped in `actionRequestsProvider` (such as `assetListUpdate`). Upon a flag being true, it instantly constructs and appends standard JSON payloads (like `{"action": "get_all_control_abstractions"}`) natively into the `webrtcClient.chatRequestQueue` for transmission. 
+- **`processActionRequests`**: Iterates on a pure 10ms loop, but groups logic into 50ms and 100ms staggered checkpoints. It listens to UI-triggered boolean flags mapped in `actionRequestsProvider` (such as `assetListUpdate`). Upon a flag being true, it instantly constructs and appends standard JSON payloads (like `{"action": "get_all_subsystem_abstractions"}`) natively into the `webrtcClient.chatRequestQueue` for transmission. 
 - **`processChat`**: Rapidly polling every 10ms, it empties text-based packets arriving inside `webrtcClient.chatQueue`. It parses the exact JSON strings and maps the resulting data (e.g., parsing the `agent_status` block) deeply into the `assetDataProvider` state structures effortlessly bridging the internal network logic back up to the frontend UI layer safely.
 - **`processGamepad` & `expireStreamData`**: Operating on relaxed 100ms delays, these sequences handle continuous hardware input tracking decoupled from frame paints, alongside sweeping algorithms meant to actively garbage-collect stale node parameters preventing memory ballooning.
 - **`processStream` & `processMediaRequests`**: Specialized loops capturing pure binary ingestion blocks or media blob requests.
 
 ### 5.3 Interface Reactivity & Rendering
-1. **Inbound Consumption**: The moment background tasks like `processChat` append values into model repositories (like updating `domainData.subsystemControlAbstractions`), `Riverpod` triggers cascaded hooks locally.
+1. **Inbound Consumption**: The moment background tasks like `processChat` append values into model repositories (like updating `assetData.subsystemAbstractions`), `Riverpod` triggers cascaded hooks locally.
 2. **Interface Inflation**: The internal Flutter rendering engine registers those modifications natively across active `ConsumerWidgets`, bypassing monolithic refreshes and independently rebuilding only the dynamic elements (at up to 120Hz).

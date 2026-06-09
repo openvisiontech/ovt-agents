@@ -11,7 +11,7 @@ The backend is modularized into several core specialized Python files:
 -   **`webrtc_connection.py`**:
     Handles multiplexed data channels per active client connection, ensuring segregated async queues and tasks for incoming streams (`stream_channel` for telemetry or media data) and text JSON logic (`chat_channel` for WebRTC JSON instructions). 
 -   **`ocu_interface.py`**:
-    A singleton layer that interfaces directly with the `Ocu` wrapper class via `get_data` and `set_data` URL payloads. It masks ULI SDK complexities by providing descriptive async abstraction endpoints (e.g., `get_all_control_abstractions`, `get_status_details`).
+    A singleton layer that interfaces directly with the `Ocu` wrapper class via `get_data` and `set_data` URL payloads. It masks ULI SDK complexities by providing descriptive async abstraction endpoints (e.g., `get_all_asset_abstractions`, `get_status_details`).
 -   **`agent_handler.py`**:
     Scaffolds the architecture for executing prompts processed via the LangChain DeepAgent framework.
 -   **`mcp_server.py`**:

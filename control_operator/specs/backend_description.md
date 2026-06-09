@@ -36,7 +36,7 @@ Every WebSocket client establishing an SDP offer spawns a new instance of `WebRT
 Provides an asynchronous Singleton interface over the `Ocu` bindings. 
 Instead of clients needing to know the complex specific `data://` URI taxonomy of typical ULI operations, the class dynamically formats payloads:
 - Dynamically assigns context like `cls.domain` avoiding magic strings.
-- Implements async request handlers (e.g., `set_joystick`, `set_gui_rec`, `get_all_control_abstractions`) ensuring the FastAPI async loop remains unblocked during heavy SDK queries.
+- Implements async request handlers (e.g., `set_joystick`, `set_gui_rec`, `get_all_asset_abstractions`) ensuring the FastAPI async loop remains unblocked during heavy SDK queries.
 
 ### 4. Agent Handler (`agent_handler.py`)
 Serves as the foundation for the DeepAgent ecosystem.

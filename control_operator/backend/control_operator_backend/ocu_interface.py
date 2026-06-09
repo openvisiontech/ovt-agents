@@ -37,17 +37,17 @@ class OcuInterface:
 # The wrapper below is still marked as async def, whith ensures compatibility with the webrtc_connection.py.
 # so that no further cascading changes are required there.
 
-    async def get_all_subsystem_abstractions(self):
+    async def get_all_abstractions(self):
         url = f"data://{self.domain}/core_clients.DbDataStore?location=subsystemabstractions&id=0"
         async with self._lock:
             return self.ocu.get_data(url)
 
-    async def get_asset_access_info(self):
+    async def get_access_info(self):
         url = f"data://{self.domain}/core_clients.DataStore?location=accessclient"
         async with self._lock:
             return self.ocu.get_data(url)
 
-    async def get_asset_control_info(self):
+    async def get_control_info(self):
         url = f"data://{self.domain}/core_clients.DataStore?location=controlclient"
         async with self._lock:
             return self.ocu.get_data(url)
@@ -67,7 +67,7 @@ class OcuInterface:
         async with self._lock:
             return self.ocu.get_data(url)
 
-    async def get_available_agents(self):
+    async def get_agent_list(self):
         url = f"data://{self.domain}/core_clients.DataStore?location=agentlist"
         async with self._lock:
             return self.ocu.get_data(url)
@@ -87,17 +87,22 @@ class OcuInterface:
         async with self._lock:
             return self.ocu.get_data(url)
 
+    async def get_schema_list(self):
+        url = f"data://{self.domain}/core_clients.DataStore?location=compdatatopicschemalist"
+        async with self._lock:
+            return self.ocu.get_data(url)
+        
     async def get_data_topic_clients(self):
         url = f"data://{self.domain}/core_clients.DataStore?location=datatopicclientlist"
         async with self._lock:
             return self.ocu.get_data(url)
-
+        
     async def get_transform_reporters(self):
         url = f"data://{self.domain}/core_clients.DataStore?location=transformreporterlist"
         async with self._lock:
             return self.ocu.get_data(url)
 
-    async def get_transform_reporters_clients(self):
+    async def get_transform_clients(self):
         url = f"data://{self.domain}/core_clients.DataStore?location=transformclientlist"
         async with self._lock:
             return self.ocu.get_data(url)
@@ -114,8 +119,9 @@ class OcuInterface:
         async with self._lock:
             return self.ocu.set_data(url, json.dumps(payload))
 
-    async def snapshot_topics(self):
+    async def set_task_control_rec(self, task_control_rec: dict):
+        url = f"data://{self.domain}/core_clients.DataStore?location=taskcontrolrec"
+        payload = {"taskcontrolrec": task_control_rec}
         async with self._lock:
-            return self.ocu.snapshot_topics()
-
+            return self.ocu.set_data(url, json.dumps(payload))
 

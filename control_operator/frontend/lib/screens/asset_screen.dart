@@ -60,10 +60,15 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
         iconSize: Style.navigatorBtnIconPixelSize,
         highlight:
             guiData.assetLeftSidebarVisible &&
-            guiData.assetLeftSidebarState == 'Assets',
+            guiData.assetLeftSidebarState == 'Assets' &&
+            actionRequests.assetListAutoUpdate,
         onPressed: () {
-          actionRequests.assetListAutoUpdate = true;
-          guiData.assetLeftSidebarState = 'Assets';
+          if (guiData.assetLeftSidebarState == 'Assets') {
+            actionRequests.toggleAssetListAutoUpdate();
+          } else {
+            guiData.assetLeftSidebarState = 'Assets';
+            actionRequests.assetListAutoUpdate = true;
+          }
           guiData.showAssetLeftSidebar();
         },
       ),
@@ -393,26 +398,19 @@ class AssetLeftSidebar extends ConsumerWidget {
 
     if (state == 'Assets') {
       List<Color> statusColors = [];
-      for (int i = 0; i < assetData.assetItems.length; i++) {
+      for (int i = 0; i < assetData.assetControlStatuses.length; i++) {
         Color color = Colors.grey;
-        if (assetData.subsystemAbstractions.isNotEmpty &&
-            i < assetData.subsystemAbstractions.length) {
-          final asset = assetData.subsystemAbstractions[i];
-          if (asset is Map) {
-            final controlStatus =
-                asset['ControlStatus']?.toString() ?? "UNKNOWN";
-            switch (controlStatus) {
-              case "NOT_AVAILABLE":
-                color = Colors.red;
-                break;
-              case "NOT_CONTROLLED":
-                color = Colors.green;
-                break;
-              case "UNDER_CONTROLLED":
-                color = Colors.yellow;
-                break;
-            }
-          }
+        final controlStatus = assetData.assetControlStatuses[i].toString();
+        switch (controlStatus) {
+          case "NOT_AVAILABLE":
+            color = Colors.red;
+            break;
+          case "NOT_CONTROLLED":
+            color = Colors.green;
+            break;
+          case "UNDER_CONTROLLED":
+            color = Colors.yellow;
+            break;
         }
         statusColors.add(color);
       }
@@ -427,17 +425,11 @@ class AssetLeftSidebar extends ConsumerWidget {
         onDownPressed: () =>
             ref.read(assetDataProvider.notifier).moveAssetDown(),
         onCheckPressed: () {
-          final assetDataNotifier = ref.read(assetDataProvider.notifier);
-          if (assetDataNotifier.currentAssetInfo.isNotEmpty) {
-            final info = assetDataNotifier.currentAssetInfo;
-            assetDataNotifier.clear();
-            assetDataNotifier.assetInfo = info;
-            ref.read(headerDataProvider.notifier).assetSelected = true;
-          }
+          ref.read(assetDataProvider.notifier).selectAsset();
         },
         onClosePressed: () {
-          ref.read(guiDataProvider.notifier).hideAssetLeftSidebar();
           ref.read(actionRequestsProvider.notifier).assetListAutoUpdate = false;
+          ref.read(guiDataProvider.notifier).hideAssetLeftSidebar();
         },
         onItemTapped: (index) {
           ref.read(assetDataProvider.notifier).setCurrentAssetIndex(index);

@@ -1,6 +1,11 @@
+---
+name: webRTC_client
+description: Specification for the WebRTC client.
+---
+
 # WebRTC Client Specification
 
-This document provides the specification for the WebRTC client implemented in `WebRtcProvider` (`reference_implementations/ocu_ui/lib/providers/web_rtc_provider.dart`).
+This document provides the specification for the WebRTC client.
 
 ## Overview
 The WebRTC client extends `GuiDataProvider` and uses `flutter_webrtc` to manage real-time peer-to-peer connections. It handles connection signaling through WebSockets, establishes an audio/video stream (receive-only video), and multiplexes control data and streaming data over two distinct RTC data channels.
@@ -26,14 +31,14 @@ The WebRTC client extends `GuiDataProvider` and uses `flutter_webrtc` to manage 
 ## RTC Data Channels
 The client creates two active, ordered data channels:
 
-### 1. `chat` Channel
+### `chat` Channel
 - **Purpose**: Exchanging text-based action commands and control messages.
 - **Characteristics**: Ordered channel.
 - **Initialization**: Sends a greeting message (`"Flutter client says hello!"`) when the channel opens.
 - **Receiving**: Text messages are passed to `handleAction(message.text)`. Logs a warning if binary data is incorrectly received.
 - **Sending**: Uses the `sendAction(action, payload)` method to send JSON-encoded strings containing `action` and `payload`.
 
-### 2. `stream` Channel
+### `stream` Channel
 - **Purpose**: Receiving high-throughput binary data updates.
 - **Characteristics**: Ordered channel.
 - **Receiving**: Listens specifically for binary data. 
