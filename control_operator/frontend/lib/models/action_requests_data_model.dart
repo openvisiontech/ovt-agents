@@ -37,7 +37,6 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
 
   bool _assetListUpdate = false;
   bool _assetListAutoUpdate = false;
-  bool _serviceListUpdate = false;
   bool _agentListUpdate = false;
   bool _resourceListUpdate = false;
   bool _dataTopicListUpdate = false;
@@ -48,7 +47,11 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
   bool _resourceDetailsUpdate = false;
   bool _agentStatusUpdate = false;
   bool _agentDetailsUpdate = false;
-  bool _serviceListAutoUpdate = false;
+
+  void toggleAssetListAutoUpdate() {
+    _assetListAutoUpdate = !_assetListAutoUpdate;
+    state = this;
+  }
 
   void leavingDomainScreen() {
     _assetListUpdate = false;
@@ -56,7 +59,8 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
   }
 
   void leavingAssetScreen() {
-    _serviceListUpdate = false;
+    _assetListUpdate = false;
+    _assetListAutoUpdate = false;
     _agentListUpdate = false;
     _resourceListUpdate = false;
     _dataTopicListUpdate = false;
@@ -67,21 +71,12 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
     _resourceDetailsUpdate = false;
     _agentStatusUpdate = false;
     _agentDetailsUpdate = false;
-    _serviceListAutoUpdate = false;
   }
 
-  void leavingAIAssistScreen() {
-    _serviceListAutoUpdate = false;
-  }
-
-  void toggleAssetListAutoUpdate() {
-    _assetListAutoUpdate = !_assetListAutoUpdate;
-    state = this;
-  }
+  void leavingAIAssistScreen() {}
 
   bool get assetListUpdate => _assetListUpdate;
   bool get assetListAutoUpdate => _assetListAutoUpdate;
-  bool get serviceListUpdate => _serviceListUpdate;
   bool get agentListUpdate => _agentListUpdate;
   bool get resourceListUpdate => _resourceListUpdate;
   bool get dataTopicListUpdate => _dataTopicListUpdate;
@@ -92,7 +87,6 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
   bool get resourceDetailsUpdate => _resourceDetailsUpdate;
   bool get agentStatusUpdate => _agentStatusUpdate;
   bool get agentDetailsUpdate => _agentDetailsUpdate;
-  bool get serviceListAutoUpdate => _serviceListAutoUpdate;
 
   set assetListUpdate(bool value) {
     _assetListUpdate = value;
@@ -101,11 +95,6 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
 
   set assetListAutoUpdate(bool value) {
     _assetListAutoUpdate = value;
-    state = this;
-  }
-
-  set serviceListUpdate(bool value) {
-    _serviceListUpdate = value;
     state = this;
   }
 
@@ -156,11 +145,6 @@ class ActionRequestsDataModel extends Notifier<ActionRequestsDataModel> {
 
   set agentDetailsUpdate(bool value) {
     _agentDetailsUpdate = value;
-    state = this;
-  }
-
-  set serviceListAutoUpdate(bool value) {
-    _serviceListAutoUpdate = value;
     state = this;
   }
 }

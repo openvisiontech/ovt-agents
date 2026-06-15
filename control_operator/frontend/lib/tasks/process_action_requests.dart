@@ -40,6 +40,7 @@ void processActionRequests(dynamic message) async {
     count += 10;
 
     final actionRequests = container.read(actionRequestsProvider.notifier);
+    final assetData = container.read(assetDataProvider.notifier);
     final webrtcClient = WebRTCClient();
 
     // Every 50ms
@@ -78,6 +79,9 @@ void processActionRequests(dynamic message) async {
         webrtcClient.chatRequestQueue.add(
           jsonEncode({"action": "get_transform_reporters", "payload": {}}),
         );
+        webrtcClient.chatRequestQueue.add(
+          jsonEncode({"action": "get_transform_clients", "payload": {}}),
+        );
         actionRequests.transformReporterListUpdate = false;
       }
       if (actionRequests.statusDetailsUpdate) {
@@ -98,6 +102,25 @@ void processActionRequests(dynamic message) async {
         );
         actionRequests.agentDetailsUpdate = false;
       }
+    }
+
+    // Every 100ms
+    if (count % 100 == 0) {
+      webrtcClient.chatRequestQueue.add(
+        jsonEncode({"action": "set_gui_rec", "payload": assetData.guiRec}),
+      );
+      webrtcClient.chatRequestQueue.add(
+        jsonEncode({
+          "action": "set_task_exec_rec",
+          "payload": assetData.taskExecRec,
+        }),
+      );
+      webrtcClient.chatRequestQueue.add(
+        jsonEncode({
+          "action": "set_task_control_rec",
+          "payload": assetData.taskControlRec,
+        }),
+      );
     }
 
     // Every 250ms

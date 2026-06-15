@@ -52,40 +52,28 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   int _currentAgentIndex = -1;
   List<String> _agentItems = [];
   Map<String, dynamic> _agentInfo = {};
-
   List<Map<String, dynamic>> _agentStatus = [];
   Map<String, dynamic> _agentDetails = {};
+
   List<Map<String, dynamic>> _dataTopicList = [];
   List<Map<String, dynamic>> _schemaList = [];
+  List<String> _dataTopicItems = [];
+  int _currentDataTopicIndex = -1;
+  Map<String, dynamic> _dataTopicInfo = {};
   List<Map<String, dynamic>> _dataTopicClientList = [];
+  final Set<String> _selectedTopicUris = {};
+
   List<Map<String, dynamic>> _transformReporterList = [];
   List<Map<String, dynamic>> _transformClientList = [];
 
-  Map<String, dynamic> get _guiRec => {
-    "UserPresent": "UNKNOWN", //will be filled later
-    "SubsystemManager": {
-      "SubsystemId": _subsystemId,
-      "NodeId": _nodeId,
-      "CompId": _compId,
-    },
-    "InteractionMode": _interactionMode,
-    "EstopButton": "UNKNOWN", //will be filled later
-    "SubsystemStateCmd": _subsystemStateCmd,
-    "OperatingCategory": _operatingCategory,
-    "OperatingMode": _operatingMode,
-  };
-  Map<String, dynamic> get _taskExecRec => {
-    "AgentUri": _agentInfo['Uri'] ?? "",
-    "Configuration": json.encode(_agentConfiguration),
-    "RunningCmd": _agentRunningCmd,
-    "AgentCompletionTimeout": _agentCompletionTimeout,
-  };
-  Map<String, dynamic> get _taskControlRec => {
-    "AgentUri": _agentInfo['Uri'] ?? "",
-    "ControlCmd": _agentControlCmd,
-    "ControlParams": json.encode(_agentControlParams),
-    "UserParams": json.encode(_agentUserParams),
-  };
+  List<String> _insightMenuItems = [
+    "Comp Status",
+    "Agent Status",
+    "Data Topics Clients",
+    "Transform Reporters",
+  ];
+  int _currentInsightMenuItemIndex = -1;
+  String _selectedInsightMenuItem = "";
 
   String _assetName = "";
   int _subsystemId = 0;
@@ -147,19 +135,26 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _controlStatus = _assetInfo['ControlStatus']?.toString() ?? "UNKNOWN";
     _controlAvail =
         !(_controlStatus == "UNKNOWN" || _controlStatus == "NOT_AVAILABLE");
-    _interactionMode = 'WATCH';
+    _interactionMode = "WATCH";
+    _subsystemStateCmd = "UNKNOWN";
+    _operatingCategory = "UNKNOWN";
+    _operatingMode = "UNKNOWN";
 
     _accessInfo = {};
     _controlInfo = {};
     _stateInfo = {};
     _operatingModeInfo = {};
     _statusDetails = [];
+
     _agentList = [];
     _agentStatus = [];
     _agentDetails = {};
+
     _dataTopicList = [];
     _schemaList = [];
     _dataTopicClientList = [];
+    _selectedTopicUris.clear();
+
     _transformReporterList = [];
     _transformClientList = [];
 
@@ -168,11 +163,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _dataAccessRight = "UNKNOWN";
     _haveControl = "UNKNOWN";
     _subsystemState = "UNKNOWN";
-
-    _interactionMode = "UNKNOWN";
-    _subsystemStateCmd = "UNKNOWN";
-    _operatingCategory = "UNKNOWN";
-    _operatingMode = "UNKNOWN";
 
     _currentAgentIndex = -1;
     _agentInfo = {};
@@ -221,6 +211,45 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     }
   }
 
+  void toggleTopicSelected(String uri) {
+    if (_selectedTopicUris.contains(uri)) {
+      _selectedTopicUris.remove(uri);
+    } else {
+      _selectedTopicUris.add(uri);
+    }
+    state = this;
+  }
+
+  void moveInsightMenuItemUp() {
+    if (_currentInsightMenuItemIndex > 0) {
+      _currentInsightMenuItemIndex--;
+      state = this;
+    }
+  }
+
+  void moveInsightMenuItemDown() {
+    if (_currentInsightMenuItemIndex < _insightMenuItems.length - 1) {
+      _currentInsightMenuItemIndex++;
+      state = this;
+    }
+  }
+
+  void setCurrentInsightMenuItemIndex(int index) {
+    if (index >= 0 && index < _insightMenuItems.length) {
+      _currentInsightMenuItemIndex = index;
+      state = this;
+    }
+  }
+
+  void selectInsightMenuItem() {
+    if (_currentInsightMenuItemIndex >= 0 &&
+        _currentInsightMenuItemIndex < _insightMenuItems.length) {
+      _selectedInsightMenuItem =
+          _insightMenuItems[_currentInsightMenuItemIndex];
+      state = this;
+    }
+  }
+
   void clear() {
     _assetAbstractions = [];
     _currentAssetIndex = -1;
@@ -240,6 +269,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _dataTopicList = [];
     _schemaList = [];
     _dataTopicClientList = [];
+    _selectedTopicUris.clear();
     _transformReporterList = [];
     _transformClientList = [];
 
@@ -277,14 +307,37 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   }
 
   // Getters
+  Map<String, dynamic> get _guiRec => {
+    "UserPresent": "UNKNOWN", //will be filled later
+    "SubsystemManager": {
+      "SubsystemId": _subsystemId,
+      "NodeId": _nodeId,
+      "CompId": _compId,
+    },
+    "InteractionMode": _interactionMode,
+    "EstopButton": "UNKNOWN", //will be filled later
+    "SubsystemStateCmd": _subsystemStateCmd,
+    "OperatingCategory": _operatingCategory,
+    "OperatingMode": _operatingMode,
+  };
+  Map<String, dynamic> get _taskExecRec => {
+    "AgentUri": _agentInfo['Uri'] ?? "",
+    "Configuration": json.encode(_agentConfiguration),
+    "RunningCmd": _agentRunningCmd,
+    "AgentCompletionTimeout": _agentCompletionTimeout,
+  };
+  Map<String, dynamic> get _taskControlRec => {
+    "AgentUri": _agentInfo['Uri'] ?? "",
+    "ControlCmd": _agentControlCmd,
+    "ControlParams": json.encode(_agentControlParams),
+    "UserParams": json.encode(_agentUserParams),
+  };
   int get currentAssetIndex => _currentAssetIndex;
   List<String> get assetItems => _assetItems;
   List<String> get assetControlStatuses => _assetControlStatuses;
   List<String> get assetProfileImages => _assetProfileImages;
   List<String> get assetContexts => _assetContexts;
-
-  int get currentAgentIndex => _currentAgentIndex;
-  List<String> get agentItems => _agentItems;
+  List<Map<String, dynamic>> get assetAbstractions => _assetAbstractions;
 
   Map<String, dynamic> get assetInfo => _assetInfo;
   Map<String, dynamic> get accessInfo => _accessInfo;
@@ -293,12 +346,23 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   Map<String, dynamic> get operatingModeInfo => _operatingModeInfo;
   List<Map<String, dynamic>> get statusDetails => _statusDetails;
 
+  int get currentAgentIndex => _currentAgentIndex;
+  List<String> get agentItems => _agentItems;
+
+  Map<String, dynamic> get agentInfo => _agentInfo;
   List<Map<String, dynamic>> get agentStatus => _agentStatus;
   Map<String, dynamic> get agentDetails => _agentDetails;
 
+  int get currentDataTopicIndex => _currentDataTopicIndex;
+  List<String> get dataTopicItems => _dataTopicItems;
+  Map<String, dynamic> get dataTopicInfo => _dataTopicInfo;
   List<Map<String, dynamic>> get dataTopicList => _dataTopicList;
-  List<Map<String, dynamic>> get schemaList => _schemaList;
   List<Map<String, dynamic>> get dataTopicClientList => _dataTopicClientList;
+  Set<String> get selectedTopicUris => _selectedTopicUris;
+
+  int get currentInsightMenuItemIndex => _currentInsightMenuItemIndex;
+  List<String> get insightMenuItems => _insightMenuItems;
+  String get selectedInsightMenuItem => _selectedInsightMenuItem;
 
   List<Map<String, dynamic>> get transformReporterList =>
       _transformReporterList;
@@ -409,6 +473,12 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   set dataTopicList(List<Map<String, dynamic>> val) {
     _dataTopicList = val;
+    _dataTopicItems = val.map((e) {
+      return "${e['CompDataTopic']}";
+    }).toList();
+    if (_currentDataTopicIndex >= _dataTopicItems.length) {
+      _currentDataTopicIndex = _dataTopicItems.length - 1;
+    }
     state = this;
   }
 
@@ -485,5 +555,18 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   set agentCompletionTimeout(int val) {
     _agentCompletionTimeout = val;
     state = this;
+  }
+
+  String? getSchemaContext(String schemaName) {
+    for (var schemaObj in _schemaList) {
+      final schemaRecList =
+          schemaObj['DataTopicSchemaRecList'] as List<dynamic>? ?? [];
+      for (var rec in schemaRecList) {
+        if (rec['Schema']?.toString() == schemaName) {
+          return rec['Context']?.toString();
+        }
+      }
+    }
+    return null;
   }
 }

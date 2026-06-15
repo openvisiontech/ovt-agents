@@ -24,6 +24,8 @@
  **********************************************************************************
  */
 
+import 'dart:html' as html;
+
 String getCurrentDirectory() {
   // Web doesn't have a file system current directory
   return '/';
@@ -32,4 +34,8 @@ String getCurrentDirectory() {
 void exitApplication(int code) {
   // Web apps don't restart/exit usually
   print('Application exit requested with code $code');
+}
+
+String? getWebLocationHostname() {
+  return html.window.location.hostname;
 }

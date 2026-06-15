@@ -42,7 +42,6 @@ void processChat(dynamic message) async {
     final webrtcClient = WebRTCClient();
 
     final assetData = container.read(assetDataProvider.notifier);
-    final guiData = container.read(guiDataProvider.notifier);
 
     while (webrtcClient.chatQueue.isNotEmpty) {
       final msgStr = webrtcClient.chatQueue.removeAt(0);

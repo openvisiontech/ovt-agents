@@ -30,4 +30,5 @@ import 'platform_utils_io.dart'
 abstract class PlatformUtils {
   static String get currentDirectory => getCurrentDirectory();
   static void exitApp(int code) => exitApplication(code);
+  static String? get webLocationHostname => getWebLocationHostname();
 }

@@ -145,7 +145,7 @@ class WebRTCConnection:
                     elif action == "get_control_info":
                         res = await self.ocu_interface.get_control_info()
                         await self.send_chat("control_info", json.loads(res))
-                        logger.debug(f"[{self.id}] send control_info {res}")
+                        logger.debug(f"[{self.id}] send control_info")
                     elif action == "get_state_info":
                         res = await self.ocu_interface.get_state_info()
                         await self.send_chat("state_info", json.loads(res))
@@ -157,7 +157,7 @@ class WebRTCConnection:
                     elif action == "get_status_details":
                         res = await self.ocu_interface.get_status_details()
                         await self.send_chat("status_details", json.loads(res))
-                        logger.debug(f"[{self.id}] send status_details {res}")
+                        logger.info(f"[{self.id}] send status_details {res}")
                     elif action == "get_agent_list":
                         res = await self.ocu_interface.get_agent_list()
                         await self.send_chat("agent_list", json.loads(res))
@@ -191,20 +191,14 @@ class WebRTCConnection:
                         await self.send_chat("transform_clients", json.loads(res))
                         logger.debug(f"[{self.id}] send transform_clients {res}")
                     elif action == "set_gui_rec":
-                        guirec = payload.get("guirec")
-                        if guirec:
-                            await self.ocu_interface.set_gui_rec(guirec)
-                            logger.debug(f"[{self.id}] set_gui_rec {guirec}")
+                        await self.ocu_interface.set_gui_rec(payload)
+                        logger.info(f"[{self.id}] set_gui_rec {payload}")
                     elif action == "set_task_exec_rec":
-                        task_exec_rec = payload.get("task_exec_rec")
-                        if task_exec_rec:
-                            await self.ocu_interface.set_task_exec_rec(task_exec_rec)
-                            logger.debug(f"[{self.id}] set_task_exec_rec {task_exec_rec}")
+                        await self.ocu_interface.set_task_exec_rec(payload)
+                        logger.debug(f"[{self.id}] set_task_exec_rec {payload}")
                     elif action == "set_task_control_rec":
-                        task_control_rec = payload.get("task_control_rec")
-                        if task_control_rec:
-                            await self.ocu_interface.set_task_control_rec(task_control_rec)
-                            logger.debug(f"[{self.id}] set_task_control_rec {task_control_rec}")
+                        await self.ocu_interface.set_task_control_rec(payload)
+                        logger.debug(f"[{self.id}] set_task_control_rec {payload}")
                     else:
                         logger.warning(f"Unknown action received: {action}")
 

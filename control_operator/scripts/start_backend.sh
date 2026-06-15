@@ -34,6 +34,6 @@ echo "Starting backend, listening on local IP address on port 8080..."
 
 export PYTHONPATH=/home/ovt/uli_deploy/pybinds:$PYTHONPATH
 cd backend
-uv run --python 3.10 uvicorn control_operator_backend.main:app --host 0.0.0.0 --port 8080 &
+uv run --python 3.10 uvicorn control_operator_backend.main:app --host 0.0.0.0 --port 8080 > backend.log 2>&1 &
 
 echo "Backend started successfully."

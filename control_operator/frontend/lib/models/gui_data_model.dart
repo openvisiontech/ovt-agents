@@ -108,6 +108,34 @@ class GuiDataModel extends Notifier<GuiDataModel> {
   bool assetPopupVisible = false;
   bool assetCommanderVisible = true;
 
+  String popupTitle = "";
+  dynamic popupJson;
+  String? popupMarkdown;
+  String? popupInsightType;
+
+  void showPopup({
+    required String title,
+    dynamic json,
+    String? markdown,
+    String? insightType,
+  }) {
+    popupTitle = title;
+    popupJson = json;
+    popupMarkdown = markdown;
+    popupInsightType = insightType;
+    assetPopupVisible = true;
+    state = this;
+  }
+
+  void hideAssetPopup() {
+    assetPopupVisible = false;
+    popupTitle = "";
+    popupJson = null;
+    popupMarkdown = null;
+    popupInsightType = null;
+    state = this;
+  }
+
   bool aiAssistLeftSidebarVisible = false;
   bool aiAssistRightSidebarVisible = false;
   bool aiAssistPopupVisible = false;

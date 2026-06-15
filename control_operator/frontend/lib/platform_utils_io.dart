@@ -33,3 +33,7 @@ String getCurrentDirectory() {
 void exitApplication(int code) {
   exit(code);
 }
+
+String? getWebLocationHostname() {
+  return null;
+}

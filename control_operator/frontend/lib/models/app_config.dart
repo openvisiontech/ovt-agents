@@ -24,6 +24,8 @@
  **********************************************************************************
  */
 
+import '../platform_utils.dart';
+
 class AppConfig {
   final String workingDirectory;
   final String webRtcUrl;
@@ -40,10 +42,21 @@ class AppConfig {
   });
 
   factory AppConfig.fromJson(Map<String, dynamic> json) {
+    String webRtcUrl = json['webRtcUrl'] as String? ?? 'ws://127.0.0.1:8080/ws/rtc';
+    final hostname = PlatformUtils.webLocationHostname;
+    if (hostname != null && hostname.isNotEmpty) {
+      try {
+        final uri = Uri.parse(webRtcUrl);
+        if (uri.host == '127.0.0.1' || uri.host == 'localhost') {
+          webRtcUrl = uri.replace(host: hostname).toString();
+        }
+      } catch (_) {}
+    }
+
     return AppConfig(
       workingDirectory:
           json['workingDirectory'] as String? ?? '/home/ovt/uli_deploy',
-      webRtcUrl: json['webRtcUrl'] as String? ?? 'ws://127.0.0.1:8080/ws/rtc',
+      webRtcUrl: webRtcUrl,
       retryWebRTCConnect: json['retryWebRTCConnect'] as int? ?? 5000,
       logLevel: json['logLevel'] as String? ?? 'INFO',
       defaultProvider: json['defaultProvider'] as bool? ?? false,
