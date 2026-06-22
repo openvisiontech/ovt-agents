@@ -17,18 +17,18 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
 
 ### **Front end to back end messages**
 
-- Retrieve the subsystem abstractions of all the discovered assets.
+- Retrieve the abstractions of all the discovered assets.
    message:
 
    ```json
        {
-         "action": "get_all_abstractions",
+         "action": "get_asset_abstractions",
          "payload": {
          }
       }
    ```
 
-- Retrieve the access client record of the selected subsystem.
+- Retrieve the access client record of the selected asset.
    message:
 
    ```json
@@ -39,7 +39,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-- Retrieve the control client record of the selected subsystem.
+- Retrieve the control client record of the selected asset.
    message:
 
    ```json
@@ -50,7 +50,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-- Retieve the subsystem state client record of the selected subsystem.
+- Retieve the subsystem state client record of the selected asset.
    message:
 
    ```json
@@ -61,7 +61,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-- Retieve the operating mode client record of the selected subsystem.
+- Retieve the operating mode client record of the selected asset.
    message:
 
    ```json
@@ -71,7 +71,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
          }
       }
 
-- Retrieve the status details of the selected subsystem.
+- Retrieve the status details of the selected asset.
    message:
 
    ```json
@@ -82,18 +82,18 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-- Retrieve the list of agents of the selected subsystem.
+- Retrieve the abstractions of agents of the selected asset.
    message:
 
    ```json
        {
-         "action": "get_agent_list",
+         "action": "get_agent_abstractions",
          "payload": {
          }
       }
    ```
 
-- Retrieve the list of the status of all the agents of the selected subsystem.
+- Retrieve the list of the status of all the agents of the selected asset.
    message:
 
    ```json
@@ -104,7 +104,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-- Retrieve the details of the agents of the selected subsystem.
+- Retrieve the details of the agents of the selected asset.
    message:
 
    ```json
@@ -115,7 +115,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
       }
    ```
 
-- Retrieve the list of the data topics the selected subsystem is publishing.
+- Retrieve the list of the data topics the selected asset is publishing.
     message:
 
     ```json
@@ -126,7 +126,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-- Retrieve the list of the schemas of the selected subsystem is publishing.
+- Retrieve the list of the schemas of the selected asset is publishing.
     message:
 
     ```json
@@ -137,7 +137,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-- Retrieve the list of the clients who subscribe the data topics of the selected subsystem.
+- Retrieve the list of the clients who subscribe the data topics of the selected asset.
     message:
 
     ```json
@@ -148,7 +148,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-- Retrieve the list of the transform reporters of the selected subsystem.
+- Retrieve the list of the transform reporters of the selected asset.
     message:
 
     ```json
@@ -159,7 +159,7 @@ The Chat Channel is a two-way channel. It uses json string messages for the comm
        }
     ```
 
-- Retrieve the list of the clients who subscribe the transform reporters of the selected subsystem.
+- Retrieve the list of the clients who subscribe the transform reporters of the selected asset.
     message:
 
     ```json
@@ -235,7 +235,7 @@ message:
 
   ```json
     {
-      "action": "all_abstractions",
+      "action": "asset_abstractions",
       "payload": {
         "subsystemabstractions": [
             {
@@ -443,14 +443,14 @@ message:
     }
   ```
 
-- Response with the available agents of the selected subsystem.
+- Response with the available agents of the selected asset.
    message:
 
   ```json
     {
-      "action": "agent_list",
+      "action": "agent_abstractions",
       "payload": {
-        "agentlist": [
+        "agentabstractions": [
           {
             "Name": "string",
             "Uri": "string",
@@ -469,7 +469,7 @@ message:
     }
   ```
 
-- Response with the list of the status of all the agents of the selected subsystem.
+- Response with the list of the status of all the agents of the selected asset.
    message:
 
   ```json
@@ -506,7 +506,7 @@ message:
     }
   ```
 
-- Response with the details of the agents of the selected subsystem.
+- Response with the details of the agents of the selected asset.
    message:
 
   ```json
@@ -546,7 +546,7 @@ message:
     }
   ```
 
-- Response with the list of the data topics the selected subsystem is publishing.
+- Response with the list of the data topics the selected asset is publishing.
     message:
 
   ```json
@@ -593,7 +593,7 @@ message:
     }
   ```
 
-- Response with the list of the schemas of the data topics the selected subsystem is publishing.
+- Response with the list of the schemas of the data topics the selected asset is publishing.
     message:
 
   ```json
@@ -627,7 +627,7 @@ message:
     }
   ```
 
-- Response with the list of the clients who subscribe the data topics of the selected subsystem.
+- Response with the list of the clients who subscribe the data topics of the selected asset.
     message:
 
   ```json
@@ -700,7 +700,7 @@ message:
     }
   ```
 
-- Response with the list of the transform reporters of the selected subsystem.
+- Response with the list of the transform reporters of the selected asset.
     message:
 
   ```json
@@ -729,7 +729,7 @@ message:
     }
   ```
 
-- Reponse with the list of the clients who subscribe the transform reporters of the selected subsystem.
+- Reponse with the list of the clients who subscribe the transform reporters of the selected asset.
     message:
 
   ```json
@@ -770,1459 +770,4 @@ Subscribed data topics.
 
 ## Common Definitions
 
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "CommonDefinitions",
-  "definitions": {
-    "Address": {
-      "type": "object",
-      "properties": {
-        "SubsystemId": {
-          "type": "integer"
-        },
-        "NodeId": {
-          "type": "integer"
-        },
-        "CompId": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "SubsystemId",
-        "NodeId",
-        "CompId"
-      ],
-      "additionalProperties": false
-    },
-    "Pose": {
-      "type": "object",
-      "properties": {
-        "TimeStamp": {
-          "type": "integer"
-        },
-        "Frame": {
-          "type": "string"
-        },
-        "Latitude": {
-          "type": "number"
-        },
-        "Longitude": {
-          "type": "number"
-        },
-        "XPosition": {
-          "type": "number"
-        },
-        "YPosition": {
-          "type": "number"
-        },
-        "ZPositionType": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "ALTITUDE_AGL",
-            "ALTITUDE_MSL",
-            "ALTITUDE_ASL",
-            "DEPTH"
-          ]
-        },
-        "ZPosition": {
-          "type": "number"
-        },
-        "HorizontalRms": {
-          "type": "number"
-        },
-        "VerticalRms": {
-          "type": "number"
-        },
-        "Roll": {
-          "type": "number"
-        },
-        "Pitch": {
-          "type": "number"
-        },
-        "Heading": {
-          "type": "number"
-        },
-        "AltitudeRms": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "TimeStamp",
-        "Frame",
-        "Latitude",
-        "Longitude",
-        "XPosition",
-        "YPosition",
-        "ZPositionType",
-        "ZPosition",
-        "HorizontalRms",
-        "VerticalRms",
-        "Roll",
-        "Pitch",
-        "Heading",
-        "AltitudeRms"
-      ],
-      "additionalProperties": false
-    },
-    "SubsystemAbstraction": {
-      "type": "object",
-      "properties": {
-        "Address": {
-          "$ref": "#/definitions/Address"
-        },
-        "SubsystemType": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "UNMANNED",
-            "AI_AGENT",
-            "CONTROLLER",
-            "META_HUMAN",
-            "PROCESS_TOOL"
-          ]
-        },
-        "Name": {
-          "type": "string"
-        },
-        "ControlStatus": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NOT_AVAILABLE",
-            "NOT_CONTROLLED",
-            "UNDER_CONTROLLED"
-          ]
-        },
-        "Client": {
-          "type": "string"
-        },
-        "Pose": {
-          "$ref": "#/definitions/Pose"
-        },
-        "Context": {
-          "type": "string"
-        },
-        "ProfileImage": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Address",
-        "SubsystemType",
-        "Name",
-        "ControlStatus",
-        "Client",
-        "Pose",
-        "Context",
-        "ProfileImage"
-      ],
-      "additionalProperties": false
-    },
-    "CompRec": {
-      "type": "object",
-      "properties": {
-        "Address": {
-          "$ref": "#/definitions/Address"
-        },
-        "CompType": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "REGULAR",
-            "MISSION_CRITICAL"
-          ]
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Descriptor": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Address",
-        "CompType",
-        "Name",
-        "Descriptor"
-      ],
-      "additionalProperties": false
-    },
-    "ServiceRec": {
-      "type": "object",
-      "properties": {
-        "ServiceUri": {
-          "type": "string"
-        },
-        "MajorVersion": {
-          "type": "integer"
-        },
-        "MinorVersion": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "ServiceUri",
-        "MajorVersion",
-        "MinorVersion"
-      ],
-      "additionalProperties": false
-    },
-    "CompServicesRec": {
-      "type": "object",
-      "properties": {
-        "CompRec": {
-          "$ref": "#/definitions/CompRec"
-        },
-        "ServiceRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ServiceRec"
-          }
-        }
-      },
-      "required": [
-        "CompRec",
-        "ServiceRecList"
-      ],
-      "additionalProperties": false
-    },
-    "SubsystemService": {
-      "type": "object",
-      "properties": {
-        "Address": {
-          "$ref": "#/definitions/Address"
-        },
-        "SubsystemType": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "UNMANNED",
-            "AI_AGENT",
-            "CONTROLLER",
-            "META_HUMAN",
-            "PROCESS_TOOL"
-          ]
-        },
-        "Name": {
-          "type": "string"
-        },
-        "CompServicesRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/CompServicesRec"
-          }
-        }
-      },
-      "required": [
-        "Address",
-        "SubsystemType",
-        "Name",
-        "CompServicesRecList"
-      ],
-      "additionalProperties": false
-    },
-    "LinkRec": {
-      "type": "object",
-      "properties": {
-        "Destination": {
-          "$ref": "#/definitions/Address"
-        },
-        "RoundTripTime": {
-          "type": "number"
-        },
-        "LastQuery": {
-          "type": "number"
-        },
-        "LastReply": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "Destination",
-        "RoundTripTime",
-        "LastQuery",
-        "LastReply"
-      ],
-      "additionalProperties": false
-    },
-    "SubscriberRec": {
-      "type": "object",
-      "properties": {
-        "CompRec": {
-          "$ref": "#/definitions/CompRec"
-        },
-        "Seconds": {
-          "type": "number"
-        },
-        "Count": {
-          "type": "number"
-        },
-        "LastUpdate": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "CompRec",
-        "Seconds",
-        "Count",
-        "LastUpdate"
-      ],
-      "additionalProperties": false
-    },
-    "SubscriptionRec": {
-      "type": "object",
-      "properties": {
-        "DataTopicUri": {
-          "type": "string"
-        },
-        "Subscribers": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SubscriberRec"
-          }
-        }
-      },
-      "required": [
-        "DataTopicUri",
-        "Subscribers"
-      ],
-      "additionalProperties": false
-    },
-    "HealthRec": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "integer"
-        },
-        "Severity": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NONE",
-            "INFO",
-            "WARN",
-            "ERROR",
-            "FATAL"
-          ]
-        },
-        "Descriptor": {
-          "type": "string"
-        },
-        "LastUpdate": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "code",
-        "Severity",
-        "Descriptor",
-        "LastUpdate"
-      ],
-      "additionalProperties": false
-    },
-    "ServiceHealthRec": {
-      "type": "object",
-      "properties": {
-        "ServiceRec": {
-          "$ref": "#/definitions/ServiceRec"
-        },
-        "HealthRec": {
-          "$ref": "#/definitions/HealthRec"
-        }
-      },
-      "required": [
-        "ServiceRec",
-        "HealthRec"
-      ],
-      "additionalProperties": false
-    },
-    "CompStatusDetailsRec": {
-      "type": "object",
-      "properties": {
-        "CompRec": {
-          "$ref": "#/definitions/CompRec"
-        },
-        "MajorVersion": {
-          "type": "integer"
-        },
-        "MinorVersion": {
-          "type": "integer"
-        },
-        "BuildNumber": {
-          "type": "integer"
-        },
-        "CompControl": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NOT_CONTROLLED",
-            "CONTROLLED",
-            "NOT_AVAIL"
-          ]
-        },
-        "ManagementState": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "INITIALIZE",
-            "STAND_BY",
-            "READY",
-            "EMERGENCY",
-            "PAUSE",
-            "CONTINUE",
-            "FATAL",
-            "SHUTDOWN",
-            "RENDER_USELESS"
-          ]
-        },
-        "OperatingCategory": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "STANDARD",
-            "ADMINISTRATIVE"
-          ]
-        },
-        "OperatingMode": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "STANDARD_OPERATING",
-            "REDUCED",
-            "RIGOROUS",
-            "SILENT",
-            "HIBERNATED",
-            "TRAINING",
-            "MAINTENANCE"
-          ]
-        },
-        "Seconds": {
-          "type": "number"
-        },
-        "LinkUpdateTime": {
-          "type": "string"
-        },
-        "LinkRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/LinkRec"
-          }
-        },
-        "SubscriptionRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SubscriptionRec"
-          }
-        },
-        "HealthSummary": {
-          "type": "string"
-        },
-        "ServiceHealthRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ServiceHealthRec"
-          }
-        }
-      },
-      "required": [
-        "CompRec",
-        "MajorVersion",
-        "MinorVersion",
-        "BuildNumber",
-        "CompControl",
-        "ManagementState",
-        "OperatingCategory",
-        "OperatingMode",
-        "Seconds",
-        "LinkUpdateTime",
-        "LinkRecList",
-        "SubscriptionRecList",
-        "HealthSummary",
-        "ServiceHealthRecList"
-      ],
-      "additionalProperties": false
-    },
-    "SubsystemStatusDetails": {
-      "type": "object",
-      "properties": {
-        "Address": {
-          "$ref": "#/definitions/Address"
-        },
-        "SubsystemType": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "UNMANNED",
-            "AI_AGENT",
-            "CONTROLLER",
-            "META_HUMAN",
-            "PROCESS_TOOL"
-          ]
-        },
-        "Name": {
-          "type": "string"
-        },
-        "CompStatusDetailsRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/CompStatusDetailsRec"
-          }
-        }
-      },
-      "required": [
-        "Address",
-        "SubsystemType",
-        "Name",
-        "CompStatusDetailsRecList"
-      ],
-      "additionalProperties": false
-    },
-    "ResourceRec": {
-      "type": "object",
-      "properties": {
-        "ResourceType": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "VIDEO",
-            "AUDIO",
-            "WEB",
-            "INTERACTION",
-            "MECHANISM",
-            "MOBILITY",
-            "MANIPULATION"
-          ]
-        },
-        "RequiredDataAccessRight": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NOT_ALLOWED",
-            "UNCLASSIFIED",
-            "CONTROLLED",
-            "CLASSIFIED"
-          ]
-        },
-        "Name": {
-          "type": "string"
-        },
-        "ContextFile": {
-          "type": "string"
-        },
-        "Context": {
-          "type": "string"
-        },
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "Intf": {
-          "type": "string"
-        },
-        "Url": {
-          "type": "string"
-        },
-        "Forwarded": {
-          "type": "boolean"
-        },
-        "ForwardedUrl": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "ResourceType",
-        "RequiredDataAccessRight",
-        "Name",
-        "ContextFile",
-        "Context",
-        "Comp",
-        "Intf",
-        "Url",
-        "Forwarded",
-        "ForwardedUrl"
-      ],
-      "additionalProperties": false
-    },
-    "CompResourcesRec": {
-      "type": "object",
-      "properties": {
-        "CompRec": {
-          "$ref": "#/definitions/CompRec"
-        },
-        "ResourceRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ResourceRec"
-          }
-        }
-      },
-      "required": [
-        "CompRec",
-        "ResourceRecList"
-      ],
-      "additionalProperties": false
-    },
-    "SubsystemResources": {
-      "type": "object",
-      "properties": {
-        "Address": {
-          "$ref": "#/definitions/Address"
-        },
-        "SubsystemType": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "UNMANNED",
-            "AI_AGENT",
-            "CONTROLLER",
-            "META_HUMAN",
-            "PROCESS_TOOL"
-          ]
-        },
-        "Name": {
-          "type": "string"
-        },
-        "CompResourcesRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/CompResourcesRec"
-          }
-        }
-      },
-      "required": [
-        "Address",
-        "SubsystemType",
-        "Name",
-        "CompResourcesRecList"
-      ],
-      "additionalProperties": false
-    },
-    "AgentRec": {
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string"
-        },
-        "Uri": {
-          "type": "string"
-        },
-        "User": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "YES",
-            "NO"
-          ]
-        },
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "Configuration": {
-          "type": "string"
-        },
-        "RequiredAppAccessRight": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NOT_ALLOWED",
-            "OPERATOR",
-            "MAINTAINER",
-            "ADMINISTRATOR"
-          ]
-        },
-        "Context": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Name",
-        "Uri",
-        "User",
-        "Comp",
-        "Configuration",
-        "RequiredAppAccessRight",
-        "Context"
-      ],
-      "additionalProperties": false
-    },
-    "SubsystemAgents": {
-      "type": "object",
-      "properties": {
-        "Address": {
-          "$ref": "#/definitions/Address"
-        },
-        "SubsystemType": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "UNMANNED",
-            "AI_AGENT",
-            "CONTROLLER",
-            "META_HUMAN",
-            "PROCESS_TOOL"
-          ]
-        },
-        "Name": {
-          "type": "string"
-        },
-        "AgentRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AgentRec"
-          }
-        }
-      },
-      "required": [
-        "Address",
-        "SubsystemType",
-        "Name",
-        "AgentRecList"
-      ],
-      "additionalProperties": false
-    },
-    "AccessClient": {
-      "type": "object",
-      "properties": {
-        "Address": {
-          "$ref": "#/definitions/Address"
-        },
-        "HaveAccess": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NO",
-            "YES"
-          ]
-        },
-        "SessionId": {
-          "type": "string"
-        },
-        "AppAccessRight": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NOT_ALLOWED",
-            "OPERATOR",
-            "MAINTAINER",
-            "ADMINISTRATOR"
-          ]
-        },
-        "DataAccessRight": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NOT_ALLOWED",
-            "UNCLASSIFIED",
-            "CONTROLLED",
-            "CLASSIFIED"
-          ]
-        }
-      },
-      "required": [
-        "Address",
-        "HaveAccess",
-        "SessionId",
-        "AppAccessRight",
-        "DataAccessRight"
-      ],
-      "additionalProperties": false
-    },
-    "ControlClient": {
-      "type": "object",
-      "properties": {
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "HaveControl": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NO",
-            "YES"
-          ]
-        },
-        "SessionId": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Comp",
-        "HaveControl",
-        "SessionId"
-      ],
-      "additionalProperties": false
-    },
-    "StateClient": {
-      "type": "object",
-      "properties": {
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "HaveState": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NO",
-            "YES"
-          ]
-        },
-        "ClientState": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "WAITING",
-            "READY",
-            "RESET",
-            "SHUTDOWN",
-            "RENDER_USELESS"
-          ]
-        },
-        "State": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "INITIALIZING",
-            "INITIALIZE",
-            "OPERATIONAL",
-            "EMERGENCY",
-            "PAUSE",
-            "SHUTDOWN",
-            "RENDER_USELESS"
-          ]
-        }
-      },
-      "required": [
-        "Comp",
-        "HaveState",
-        "ClientState",
-        "State"
-      ],
-      "additionalProperties": false
-    },
-    "OperatingModeClient": {
-      "type": "object",
-      "properties": {
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "OperatingCategory": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "STANDARD",
-            "ADMINISTRATIVE"
-          ]
-        },
-        "OperatingMode": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "STANDARD_OPERATING",
-            "REDUCED",
-            "RIGOROUS",
-            "SILENT",
-            "HIBERNATED",
-            "TRAINING",
-            "MAINTENANCE"
-          ]
-        }
-      },
-      "required": [
-        "Comp",
-        "OperatingCategory",
-        "OperatingMode"
-      ],
-      "additionalProperties": false
-    },
-    "AgentStatus": {
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string"
-        },
-        "Uri": {
-          "type": "string"
-        },
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "Readiness": {
-          "type": "string"
-        },
-        "RequestUuid": {
-          "type": "string"
-        },
-        "Requestor": {
-          "$ref": "#/definitions/Address"
-        },
-        "Configuration": {
-          "type": "string"
-        },
-        "CompletionTimeout": {
-          "type": "number"
-        },
-        "RunTime": {
-          "type": "number"
-        },
-        "EnterStateTime": {
-          "type": "number"
-        },
-        "State": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "REQUEST_WAIT",
-            "CONTROL_WAIT",
-            "RUNNING",
-            "PAUSED",
-            "COMPLETE_WAIT",
-            "COMPLETE"
-          ]
-        },
-        "FeedbackData": {
-          "type": "string"
-        },
-        "CompletionCode": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "SUCCESS",
-            "FAIL"
-          ]
-        },
-        "Result": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Name",
-        "Uri",
-        "Comp",
-        "Readiness",
-        "RequestUuid",
-        "Requestor",
-        "Configuration",
-        "CompletionTimeout",
-        "RunTime",
-        "EnterStateTime",
-        "State",
-        "FeedbackData",
-        "CompletionCode",
-        "Result"
-      ],
-      "additionalProperties": false
-    },
-    "AgentCtrlCli": {
-      "type": "object",
-      "properties": {
-        "Uri": {
-          "type": "string"
-        },
-        "ControlCmd": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "OBTAIN",
-            "RELEASE",
-            "UNCHANGE"
-          ]
-        }
-      },
-      "required": [
-        "Uri",
-        "ControlCmd"
-      ],
-      "additionalProperties": false
-    },
-    "AgentCtrlCliStatus": {
-      "type": "object",
-      "properties": {
-        "AgentUri": {
-          "type": "string"
-        },
-        "HaveControl": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NO",
-            "YES"
-          ]
-        }
-      },
-      "required": [
-        "AgentUri",
-        "HaveControl"
-      ],
-      "additionalProperties": false
-    },
-    "AgentDetails": {
-      "type": "object",
-      "properties": {
-        "agentlist": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AgentRec"
-          }
-        },
-        "agentctrlclilist": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AgentCtrlCli"
-          }
-        },
-        "agentctrlclistalist": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AgentCtrlCliStatus"
-          }
-        }
-      },
-      "required": [
-        "agentlist",
-        "agentctrlclilist",
-        "agentctrlclistalist"
-      ],
-      "additionalProperties": false
-    },
-    "DataTopicRec": {
-      "type": "object",
-      "properties": {
-        "Uri": {
-          "type": "string"
-        },
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "ChannelId": {
-          "type": "integer"
-        },
-        "SchemaVersion": {
-          "type": "integer"
-        },
-        "Schema": {
-          "type": "string"
-        },
-        "RequiredDataAccessRight": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NOT_ALLOWED",
-            "UNCLASSIFIED",
-            "CONTROLLED",
-            "CLASSIFIED"
-          ]
-        },
-        "ContextFile": {
-          "type": "string"
-        },
-        "Context": {
-          "type": "string"
-        },
-        "HistoryDepth": {
-          "type": "integer"
-        },
-        "DisplayDuration": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "Uri",
-        "Comp",
-        "ChannelId",
-        "SchemaVersion",
-        "Schema",
-        "RequiredDataAccessRight",
-        "ContextFile",
-        "Context",
-        "HistoryDepth",
-        "DisplayDuration"
-      ],
-      "additionalProperties": false
-    },
-    "CompDataTopic": {
-      "type": "object",
-      "properties": {
-        "CompRec": {
-          "$ref": "#/definitions/CompRec"
-        },
-        "Url": {
-          "type": "string"
-        },
-        "Forwarded": {
-          "type": "boolean"
-        },
-        "ForwardedUrl": {
-          "type": "string"
-        },
-        "Status": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "INACTIVE",
-            "ACTIVE",
-            "NO_RIGHT"
-          ]
-        },
-        "DataTopicRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/DataTopicRec"
-          }
-        }
-      },
-      "required": [
-        "CompRec",
-        "Url",
-        "Forwarded",
-        "ForwardedUrl",
-        "Status",
-        "DataTopicRecList"
-      ],
-      "additionalProperties": false
-    },
-    "DataTopicClient": {
-      "type": "object",
-      "properties": {
-        "ClientAddress": {
-          "$ref": "#/definitions/Address"
-        },
-        "CompDataTopic": {
-          "$ref": "#/definitions/CompDataTopic"
-        },
-        "SubscribeDataTopics": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/DataTopicRec"
-          }
-        },
-        "Count": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "ClientAddress",
-        "CompDataTopic",
-        "SubscribeDataTopics",
-        "Count"
-      ],
-      "additionalProperties": false
-    },
-    "DataTopicSchemaRec": {
-      "type": "object",
-      "properties": {
-        "Schema": {
-          "type": "string"
-        },
-        "Version": {
-          "type": "number"
-        },
-        "RequiredDataAccessRight": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NOT_ALLOWED",
-            "UNCLASSIFIED",
-            "CONTROLLED",
-            "CLASSIFIED"
-          ]
-        },
-        "ContextFile": {
-          "type": "string"
-        },
-        "Context": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Schema",
-        "Version",
-        "RequiredDataAccessRight",
-        "ContextFile",
-        "Context"
-      ],
-      "additionalProperties": false
-    },
-    "CompDataTopicSchema": {
-      "type": "object",
-      "properties": {
-        "CompRec": {
-          "$ref": "#/definitions/CompRec"
-        },
-        "DataTopicSchemaRecList": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/DataTopicSchemaRec"
-          }
-        }
-      },
-      "required": [
-        "CompRec",
-        "DataTopicSchemaRecList"
-      ],
-      "additionalProperties": false
-    },
-    "TransformDef": {
-      "type": "object",
-      "properties": {
-        "Parent": {
-          "type": "string"
-        },
-        "Child": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Parent",
-        "Child"
-      ],
-      "additionalProperties": false
-    },
-    "Transform": {
-      "type": "object",
-      "properties": {
-        "Valid": {
-          "type": "boolean"
-        },
-        "Time": {
-          "type": "number"
-        },
-        "Parent": {
-          "type": "string"
-        },
-        "Child": {
-          "type": "string"
-        },
-        "X": {
-          "type": "number"
-        },
-        "Y": {
-          "type": "number"
-        },
-        "Z": {
-          "type": "number"
-        },
-        "Roll": {
-          "type": "number"
-        },
-        "Pitch": {
-          "type": "number"
-        },
-        "Yaw": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "Valid",
-        "Time",
-        "Parent",
-        "Child",
-        "X",
-        "Y",
-        "Z",
-        "Roll",
-        "Pitch",
-        "Yaw"
-      ],
-      "additionalProperties": false
-    },
-    "TransformReporter": {
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string"
-        },
-        "Description": {
-          "type": "string"
-        },
-        "Uri": {
-          "type": "string"
-        },
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "TransformDefs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TransformDef"
-          }
-        }
-      },
-      "required": [
-        "Name",
-        "Description",
-        "Uri",
-        "Comp",
-        "TransformDefs"
-      ],
-      "additionalProperties": false
-    },
-    "TransformClient": {
-      "type": "object",
-      "properties": {
-        "Name": {
-          "type": "string"
-        },
-        "Description": {
-          "type": "string"
-        },
-        "Uri": {
-          "type": "string"
-        },
-        "Comp": {
-          "$ref": "#/definitions/Address"
-        },
-        "TransformDefs": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TransformDef"
-          }
-        }
-      },
-      "required": [
-        "Name",
-        "Description",
-        "Uri",
-        "Comp",
-        "TransformDefs"
-      ],
-      "additionalProperties": false
-    },
-    "GuiRec": {
-      "type": "object",
-      "properties": {
-        "UserPresent": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "PRESENT",
-            "NOT_PRESENT"
-          ]
-        },
-        "Subsystemmanager": {
-          "$ref": "#/definitions/Address"
-        },
-        "InteractionMode": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "NONE",
-            "WATCH",
-            "CONTROL"
-          ]
-        },
-        "EstopButton": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "CLEAR",
-            "SET",
-            "UNCHANGE"
-          ]
-        },
-        "SubsystemStateCmd": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "RESET",
-            "SHUTDOWN",
-            "RENDER_USELESS",
-            "OPERATIONAL",
-            "UNCHANGE"
-          ]
-        },
-        "OperatingCategory": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "STANDARD",
-            "ADMINISTRATIVE"
-          ]
-        },
-        "OperatingMode": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "STANDARD_OPERATING",
-            "REDUCED",
-            "RIGOROUS",
-            "SILENT",
-            "HIBERNATED",
-            "TRAINING",
-            "MAINTENANCE"
-          ]
-        }
-      },
-      "required": [
-        "UserPresent",
-        "Subsystemmanager",
-        "InteractionMode",
-        "EstopButton",
-        "SubsystemStateCmd",
-        "OperatingCategory",
-        "OperatingMode"
-      ],
-      "additionalProperties": false
-    },
-    "TaskExecRec": {
-      "type": "object",
-      "properties": {
-        "AgentUri": {
-          "type": "string"
-        },
-        "Configuration": {
-          "type": "string"
-        },
-        "RunningCmd": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "IDLE",
-            "RUN"
-          ]
-        },
-        "CompletionTimeout": {
-          "type": "number"
-        }
-      },
-      "required": [
-        "AgentUri",
-        "Configuration",
-        "RunningCmd",
-        "CompletionTimeout"
-      ],
-      "additionalProperties": false
-    },
-    "TaskControlRec": {
-      "type": "object",
-      "properties": {
-        "AgentUri": {
-          "type": "string"
-        },
-        "ControlCmd": {
-          "type": "string",
-          "enum": [
-            "UNKNOWN",
-            "RESUME",
-            "PAUSE",
-            "CANCEL"
-          ]
-        },
-        "ControlParams": {
-          "type": "string"
-        },
-        "UserParams": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "AgentUri",
-        "ControlCmd",
-        "ControlParams",
-        "UserParams"
-      ],
-      "additionalProperties": false
-    }
-  }
-}
-```
+Refer to `**ocu_intf.md**` for common definitions of the JSON objects used in this document.

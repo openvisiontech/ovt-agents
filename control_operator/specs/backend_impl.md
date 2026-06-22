@@ -95,13 +95,13 @@ The `lifespan` is a FastAPI lifespan context manager. It is responsible for:
 Ocu Interface encapsulates the python binding get_data and set_data methods of the uli app Ocu. It is implemented as a singleton class and is used by the chat channel handler of the WebRTC Connection to get and set data to the uli app Ocu. They should also be tools called by the LangChain DeepAgent. Refer to the `docs/specs/ocu_intf.md` file for the detailed interface description.
 
 Implemented methods:
-- get_all_assets_abstractions() - retrieve the subsystem abstractions of all the discovered assets.
+- get_asset_abstractions() - retrieve the subsystem abstractions of all the discovered assets.
 - get_asset_access_info() - retrieve the access client record of the selected subsystem.
 - get_asset_control_info() - retrieve the control client record of the selected subsystem.
 - get_asset_state_info() - retrieve the subsystem state client record of the selected subsystem.
 - get_asset_operating_mode_info() - retrieve the operating mode client record of the selected subsystem.
 - get_asset_status_details() - retrieve the status details of the selected subsystem.
-- get_asset_available_agents() - retrieve the agent details of the selected subsystem.
+- get_asset_agent_abstractions() - retrieve the abstractions of the agents  of the selected subsystem.
 - get_asset_agent_status() - retrieve the list of the status of all the agents of the selected subsystem.
 - get_asset_agent_details() - retrieve the details of the agents of the selected subsystem.
 - get_asset_data_topic_list() - retrieve the list of the data topics the selected subsystem is publishing.

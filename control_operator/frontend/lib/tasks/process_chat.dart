@@ -51,7 +51,7 @@ void processChat(dynamic message) async {
         final payload = decoded['payload'] as Map<String, dynamic>? ?? {};
 
         switch (action) {
-          case 'all_abstractions':
+          case 'asset_abstractions':
             assetData.assetAbstractions = List<Map<String, dynamic>>.from(
               payload['subsystemabstractions'] ?? [],
             );
@@ -73,9 +73,9 @@ void processChat(dynamic message) async {
               payload['statusdetails'] ?? [],
             );
             break;
-          case 'agent_list':
-            assetData.agentList = List<Map<String, dynamic>>.from(
-              payload['agentlist'] ?? [],
+          case 'agent_abstractions':
+            assetData.agentAbstractions = List<Map<String, dynamic>>.from(
+              payload['agentabstractions'] ?? [],
             );
             break;
           case 'agent_status':

@@ -30,10 +30,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/data_providers.dart';
 import '../style.dart';
 import '../components/icon_text_btn.dart';
-import '../components/selectable_list.dart';
 import '../components/comp_data_topic_list.dart';
 import '../components/comp_popup_viewer.dart';
 import '../components/asset_list.dart';
+import '../components/agent_list.dart';
+import '../components/insight_list.dart';
 import '../3d/scene_widget.dart';
 
 class AssetScreen extends ConsumerStatefulWidget {
@@ -46,6 +47,7 @@ class AssetScreen extends ConsumerStatefulWidget {
 class _AssetScreenState extends ConsumerState<AssetScreen> {
   @override
   Widget build(BuildContext context) {
+    final headerData = ref.watch(headerDataProvider);
     final guiData = ref.watch(guiDataProvider);
     final assetData = ref.watch(assetDataProvider);
     final actionRequests = ref.watch(actionRequestsProvider);
@@ -201,7 +203,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                             "agentstatuslist": assetData.agentStatus,
                           };
                           break;
-                        case "Data Topics Clients":
+                        case "Data Topic Clients":
                           popupJson = {
                             "datatopicclientlist":
                                 assetData.dataTopicClientList,
@@ -432,6 +434,7 @@ class AssetLeftSidebar extends ConsumerWidget {
             ref.read(assetDataProvider.notifier).moveAssetDown(),
         onCheckPressed: () {
           ref.read(assetDataProvider.notifier).selectAsset();
+          ref.read(headerDataProvider.notifier).assetSelected = true;
         },
         onClosePressed: () {
           ref.read(guiDataProvider.notifier).hideAssetLeftSidebar();
@@ -442,7 +445,9 @@ class AssetLeftSidebar extends ConsumerWidget {
         onInfoPressed: (asset) {
           final name = asset['Name']?.toString() ?? 'Asset';
           final contextStr = asset['Context']?.toString() ?? '';
-          ref.read(guiDataProvider.notifier).showPopup(
+          ref
+              .read(guiDataProvider.notifier)
+              .showPopup(
                 title: "$name Context",
                 markdown: contextStr.isNotEmpty
                     ? contextStr
@@ -451,9 +456,8 @@ class AssetLeftSidebar extends ConsumerWidget {
         },
       );
     } else if (state == 'Agents') {
-      return SelectableList(
-        title: "Agents",
-        items: assetData.agentItems,
+      return AgentList(
+        agents: assetData.agentAbstractions,
         selectedIndex: assetData.currentAgentIndex,
         onUpPressed: () => ref.read(assetDataProvider.notifier).moveAgentUp(),
         onDownPressed: () =>
@@ -466,6 +470,18 @@ class AssetLeftSidebar extends ConsumerWidget {
         },
         onItemTapped: (index) {
           ref.read(assetDataProvider.notifier).setCurrentAgentIndex(index);
+        },
+        onInfoPressed: (agent) {
+          final name = agent['Name']?.toString() ?? 'Agent';
+          final contextStr = agent['Context']?.toString() ?? '';
+          ref
+              .read(guiDataProvider.notifier)
+              .showPopup(
+                title: "$name Context",
+                markdown: contextStr.isNotEmpty
+                    ? contextStr
+                    : "No context available for this agent.",
+              );
         },
       );
     } else if (state == 'Data') {
@@ -498,10 +514,15 @@ class AssetLeftSidebar extends ConsumerWidget {
         },
       );
     } else if (state == 'Insights') {
-      return SelectableList(
-        title: "Insights",
+      return InsightList(
         items: assetData.insightMenuItems,
         selectedIndex: assetData.currentInsightMenuItemIndex,
+        compStatusCount: assetData.statusDetails.length,
+        agentStatusCount: assetData.agentStatus.length,
+        dataTopicClientsCount: assetData.dataTopicClientList.length,
+        transformReportersCount:
+            assetData.transformReporterList.length +
+            assetData.transformClientList.length,
         onUpPressed: () =>
             ref.read(assetDataProvider.notifier).moveInsightMenuItemUp(),
         onDownPressed: () =>
@@ -534,7 +555,7 @@ class AssetLeftSidebar extends ConsumerWidget {
                     insightType: "Agent Status",
                   );
               break;
-            case "Data Topics Clients":
+            case "Data Topic Clients":
               ref.read(actionRequestsProvider.notifier).leavingAssetScreen();
               ref
                       .read(actionRequestsProvider.notifier)
@@ -544,7 +565,7 @@ class AssetLeftSidebar extends ConsumerWidget {
                   .read(guiDataProvider.notifier)
                   .showPopup(
                     title: "Data Topic Clients",
-                    insightType: "Data Topics Clients",
+                    insightType: "Data Topic Clients",
                   );
               break;
             case "Transform Reporters":

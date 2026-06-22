@@ -134,10 +134,10 @@ class WebRTCConnection:
                     payload = data.get("payload", {})
 
                     # Route based on action
-                    if action == "get_all_abstractions":
-                        res = await self.ocu_interface.get_all_abstractions()
-                        await self.send_chat("all_abstractions", json.loads(res))
-                        logger.debug(f"[{self.id}] send all_abstractions {res}")
+                    if action == "get_asset_abstractions":
+                        res = await self.ocu_interface.get_asset_abstractions()
+                        await self.send_chat("asset_abstractions", json.loads(res))
+                        logger.debug(f"[{self.id}] send asset_abstractions")
                     elif action == "get_access_info":
                         res = await self.ocu_interface.get_access_info()
                         await self.send_chat("access_info", json.loads(res))
@@ -157,11 +157,11 @@ class WebRTCConnection:
                     elif action == "get_status_details":
                         res = await self.ocu_interface.get_status_details()
                         await self.send_chat("status_details", json.loads(res))
-                        logger.info(f"[{self.id}] send status_details {res}")
-                    elif action == "get_agent_list":
-                        res = await self.ocu_interface.get_agent_list()
-                        await self.send_chat("agent_list", json.loads(res))
-                        logger.debug(f"[{self.id}] send agent_list {res}")
+                        logger.debug(f"[{self.id}] send status_details {res}")
+                    elif action == "get_agent_abstractions":
+                        res = await self.ocu_interface.get_agent_abstractions()
+                        await self.send_chat("agent_abstractions", json.loads(res))
+                        logger.debug(f"[{self.id}] send agent_abstractions {res}")
                     elif action == "get_agent_status":
                         res = await self.ocu_interface.get_agent_status()
                         await self.send_chat("agent_status", json.loads(res))
@@ -192,7 +192,7 @@ class WebRTCConnection:
                         logger.debug(f"[{self.id}] send transform_clients {res}")
                     elif action == "set_gui_rec":
                         await self.ocu_interface.set_gui_rec(payload)
-                        logger.info(f"[{self.id}] set_gui_rec {payload}")
+                        logger.debug(f"[{self.id}] set_gui_rec {payload}")
                     elif action == "set_task_exec_rec":
                         await self.ocu_interface.set_task_exec_rec(payload)
                         logger.debug(f"[{self.id}] set_task_exec_rec {payload}")

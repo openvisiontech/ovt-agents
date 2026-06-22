@@ -118,24 +118,24 @@ Here describes the url string to the data and the meaning of the returned json s
   }
   ```   
 
-#### Retrieve the available agents from all the discovered assets
+#### Retrieve the agent abstractions that meet the app access requirements from all the discovered assets
 
-- **url string**: "data://any/core_clients.DbDataStore?location=subsystemagents&id=0"
+- **url string**: "data://any/core_clients.DbDataStore?location=subsystemagentabstractions&id=0"
 - **returned json**:
   ```json
   {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "SubsystemAgentsResponse",
+    "title": "SubsystemAgentAbstractionsResponse",
     "type": "object",
     "properties": {
-      "subsystemagents": {
+      "subsystemagentabstractions": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/SubsystemAgents"
+          "$ref": "#/definitions/SubsystemAgentAbstractions"
         }
       }
     },
-    "required": ["subsystemagents"],
+    "required": ["subsystemagentabstractions"],
     "additionalProperties": false
   }
   ```
@@ -280,24 +280,24 @@ Here describes the url string to the data and the meaning of the returned json s
 > 
 > The status details is a list of the status detail of all the components in the subsystem. The status detail includes the descriptions of the component, the operating mode of the component, the management state of the component, the number of seconds the component has been running, the time the link test was last performed, the round trip time of the link test, the time the link test was last performed, the subscription records of the component, the health summary of the component, and the service health records of the component. 
 
-#### Retrieve the list of the availabel agents of the selected subsystem
+#### Retrieve the agent abstractions that meet the app access requirements from the selected asset.
 
-- **url string**: "data://any/core_clients.DataStore?location=agentlist"
+- **url string**: "data://any/core_clients.DbDataStore?location=agentabstractions"
 - **returned json**:
   ```json
   {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "AgentListResponse",
+    "title": "AgentAbstractionsResponse",
     "type": "object",
     "properties": {
-      "agentlist": {
+      "agentabstractions": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/AgentRec"
+          "$ref": "#/definitions/AgentAbstractionRec"
         }
       }
     },
-    "required": ["agentlist"],
+    "required": ["agentabstractions"],
     "additionalProperties": false
   }
   ```
@@ -377,32 +377,6 @@ Here describes the url string to the data and the meaning of the returned json s
 > 
 > The data topics is a list of the data topics the selected subsystem is publishing. The comp data topic includes the component which is publishing the data topic, the url of the data topic stream, whether the data topic stream is forwarded, the url of the forwarded data topic stream, and the status of the data topic stream. The status of the data topic stream indicates whether the client has subscribed through the data topic stream or the client does not have the right to subscribe.
 
-#### Retrieve the list of the schemas of the data topics that the selected subsystem is publishing
-
-- **url string**: "data://any/core_clients.DataStore?location=compdatatopicschemalist"
-- **returned json**:
-  ```json
-  {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "CompDataTopicSchemaListResponse",
-    "type": "object",
-    "properties": {
-      "compdatatopicschemalist": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/CompDataTopicSchema"
-        }
-      }
-    },
-    "required": ["compdatatopicschemalist"],
-    "additionalProperties": false
-  }
-  ```
-
-> [!NOTE]
->
-> The comp data topic schema is the schema of the data topic that the component is publishing.
-
 #### Retrieve the list of the clients who are subscribing to the data topics the selected subsystem is publishing
 
 - **url string**: "data://any/core_clients.DataStore?location=datatopicclientlist"
@@ -429,6 +403,32 @@ Here describes the url string to the data and the meaning of the returned json s
 > 
 > 1. The data topics is a list of the data topics the selected subsystem is publishing. The comp data topic includes the component which is publishing the data topic, the url of the data topic stream, whether the data topic stream is forwarded, the url of the forwarded data topic stream, and the status of the data topic stream. The status of the data topic stream indicates whether the client has subscribed through the data topic stream or the client does not have the right to subscribe.
 > 2. The SubscribeDataTopics is a list of the data topics the client is subscribing from the data topic service of the component of the selected subsystem. The count indicates the number of times the client has sent the subscribe request messages to the data topic service.
+
+#### Retrieve the list of the schemas of the data topics that the selected subsystem is publishing
+
+- **url string**: "data://any/core_clients.DataStore?location=compdatatopicschemalist"
+- **returned json**:
+  ```json
+  {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "CompDataTopicSchemaListResponse",
+    "type": "object",
+    "properties": {
+      "compdatatopicschemalist": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/CompDataTopicSchema"
+        }
+      }
+    },
+    "required": ["compdatatopicschemalist"],
+    "additionalProperties": false
+  }
+  ```
+
+> [!NOTE]
+>
+> The comp data topic schema is the schema of the data topic that the component is publishing.
 
 #### Retrieve the list of the transform reporters of the selected subsystem
 
@@ -489,7 +489,7 @@ Here describes the url string to the data and the meaning of the returned json s
 
 Describes the url string to the data and the meaning of the json string.
 
-#### Set the gui record. The gui record is to set gui data that is used to control the subsystem.
+#### Set the gui record. The gui record is to set gui data that is used to control the vehicle.
 
 - **url string**: "data://ocu.apps.uli_sdk/core_clients.DataStore?location=guirec"
 - **json string**:
@@ -524,7 +524,7 @@ Describes the url string to the data and the meaning of the json string.
 > 7. OperatingCategory: The operating category. It can be STANDARD or ADMINISTRATIVE.
 > 8. OperatingMode: The operating mode. It can be STANDARD_OPERATING, REDUCED, RIGOROUS, SILENT, HIBERNATED, TRAINING, or MAINTENANCE. All of the components in the subsystem will be notified of the operating mode.
 
-#### Set the task exec record. The task exec record commands to `run` or `idle` of the agent.
+#### Set the task exec record. The task exec record is to set the task exec data that is used to interact with the agent.
 - **url string**: "data://ocu.apps.uli_sdk/core_clients.DataStore?location=taskexecrec"
 - **json string**:
   ```json
@@ -549,7 +549,7 @@ Describes the url string to the data and the meaning of the json string.
 > 3. RunningCmd: The agent running command. It can be IDLE, RUN. The Ocu will command the selected agent to go through Request, Control, and Complete stages, when the AgentRunningCmd is "RUN".
 > 4. CompletionTimeout: The agent completion timeout is the timeout for the agent to complete the task. The time is started when the agent is in the Control stage. If the agent is not in the Control stage, the agent completion timeout is not set. If the AgentCompletionTimeout is set to zero, then there is no timeout constraint. If the AgentCompletionTimeout is reached, the agent will be stopped and the agent will be set to the Complete stage.
 
-#### Set the task control record. The task control record is to change the running state of the agent.
+#### Set the task control record. The task control record is to set the task control data that is used to control the vehicle.
 - **url string**: "data://ocu.apps.uli_sdk/core_clients.DataStore?location=taskcontrolrec"
 - **json string**:
   ```json
@@ -1209,7 +1209,7 @@ Receive the topic streams published by the Data Topic Services of the selected s
       ],
       "additionalProperties": false
     },
-    "AgentRec": {
+    "AgentAbstractionRec": {
       "type": "object",
       "properties": {
         "Name": {
@@ -1244,7 +1244,45 @@ Receive the topic streams published by the Data Topic Services of the selected s
         },
         "Context": {
           "type": "string"
-        }
+        },
+        "ProfileImage": {
+          "type": "string"
+        },
+        "Requestor": {
+          "$ref": "#/definitions/Address"
+        },
+        "CompletionTimeout": {
+          "type": "number"
+        },
+        "RunTime": {
+          "type": "number"
+        },
+        "EnterStateTime": {
+          "type": "number"
+        },
+        "State": {
+          "type": "string",
+          "enum": [
+            "UNKNOWN",
+            "REQUEST_WAIT",
+            "CONTROL_WAIT",
+            "RUNNING",
+            "PAUSED",
+            "COMPLETE_WAIT",
+            "COMPLETE"
+          ]
+        },
+        "FeedbackData": {
+          "type": "string"
+        },
+        "CompletionCode": {
+          "type": "string",
+          "enum": [
+            "UNKNOWN",
+            "SUCCESS",
+            "FAIL"
+          ]
+        },        
       },
       "required": [
         "Name",
@@ -1253,11 +1291,19 @@ Receive the topic streams published by the Data Topic Services of the selected s
         "Comp",
         "Configuration",
         "RequiredAppAccessRight",
-        "Context"
+        "Context",
+        "ProfileImage",
+        "Requestor",
+        "CompletionTimeout",
+        "RunTime",
+        "EnterStateTime",
+        "State",
+        "FeedbackData",
+        "CompletionCode"
       ],
       "additionalProperties": false
     },
-    "SubsystemAgents": {
+    "SubsystemAgentAbstractions": {
       "type": "object",
       "properties": {
         "Address": {
@@ -1277,10 +1323,10 @@ Receive the topic streams published by the Data Topic Services of the selected s
         "Name": {
           "type": "string"
         },
-        "AgentRecList": {
+        "AgentAbstractionRecList": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/AgentRec"
+            "$ref": "#/definitions/AgentAbstractionRec"
           }
         }
       },
@@ -1288,7 +1334,7 @@ Receive the topic streams published by the Data Topic Services of the selected s
         "Address",
         "SubsystemType",
         "Name",
-        "AgentRecList"
+        "AgentAbstractionRecList"
       ],
       "additionalProperties": false
     },
@@ -1458,9 +1504,6 @@ Receive the topic streams published by the Data Topic Services of the selected s
         "Comp": {
           "$ref": "#/definitions/Address"
         },
-        "Readiness": {
-          "type": "string"
-        },
         "RequestUuid": {
           "type": "string"
         },
@@ -1510,7 +1553,6 @@ Receive the topic streams published by the Data Topic Services of the selected s
         "Name",
         "Uri",
         "Comp",
-        "Readiness",
         "RequestUuid",
         "Requestor",
         "Configuration",

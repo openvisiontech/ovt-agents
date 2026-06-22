@@ -40,6 +40,7 @@ void processActionRequests(dynamic message) async {
     count += 10;
 
     final actionRequests = container.read(actionRequestsProvider.notifier);
+    final guiData = container.read(guiDataProvider.notifier);
     final assetData = container.read(assetDataProvider.notifier);
     final webrtcClient = WebRTCClient();
 
@@ -47,13 +48,13 @@ void processActionRequests(dynamic message) async {
     if (count % 50 == 0) {
       if (actionRequests.assetListUpdate) {
         webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_all_abstractions", "payload": {}}),
+          jsonEncode({"action": "get_asset_abstractions", "payload": {}}),
         );
         actionRequests.assetListUpdate = false;
       }
       if (actionRequests.agentListUpdate) {
         webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_agent_list", "payload": {}}),
+          jsonEncode({"action": "get_agent_abstractions", "payload": {}}),
         );
         actionRequests.agentListUpdate = false;
       }
@@ -106,8 +107,10 @@ void processActionRequests(dynamic message) async {
 
     // Every 100ms
     if (count % 100 == 0) {
+      Map<String, dynamic> guiRec = assetData.guiRec;
+      guiRec['EstopButton'] = guiData.estop;
       webrtcClient.chatRequestQueue.add(
-        jsonEncode({"action": "set_gui_rec", "payload": assetData.guiRec}),
+        jsonEncode({"action": "set_gui_rec", "payload": guiRec}),
       );
       webrtcClient.chatRequestQueue.add(
         jsonEncode({
@@ -127,7 +130,7 @@ void processActionRequests(dynamic message) async {
     if (count % 250 == 0) {
       if (actionRequests.assetListAutoUpdate) {
         webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_all_abstractions", "payload": {}}),
+          jsonEncode({"action": "get_asset_abstractions", "payload": {}}),
         );
       }
       webrtcClient.chatRequestQueue.add(

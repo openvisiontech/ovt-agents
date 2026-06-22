@@ -29,19 +29,19 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../style.dart';
 
-class AssetList extends StatefulWidget {
-  final List<Map<String, dynamic>> assets;
+class AgentList extends StatefulWidget {
+  final List<Map<String, dynamic>> agents;
   final int selectedIndex;
   final VoidCallback onUpPressed;
   final VoidCallback onDownPressed;
   final VoidCallback onCheckPressed;
   final VoidCallback onClosePressed;
   final ValueChanged<int> onItemTapped;
-  final void Function(Map<String, dynamic> asset) onInfoPressed;
+  final void Function(Map<String, dynamic> agent) onInfoPressed;
 
-  const AssetList({
+  const AgentList({
     super.key,
-    required this.assets,
+    required this.agents,
     required this.selectedIndex,
     required this.onUpPressed,
     required this.onDownPressed,
@@ -52,17 +52,17 @@ class AssetList extends StatefulWidget {
   });
 
   @override
-  State<AssetList> createState() => _AssetListState();
+  State<AgentList> createState() => _AgentListState();
 }
 
-class _AssetListState extends State<AssetList> {
+class _AgentListState extends State<AgentList> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, Uint8List> _imageCache = {};
 
   void _cleanImageCache() {
     final activeBase64s = <String>{};
-    for (final asset in widget.assets) {
-      final profileStr = asset['ProfileImage']?.toString() ?? '';
+    for (final agent in widget.agents) {
+      final profileStr = agent['ProfileImage']?.toString() ?? '';
       if (profileStr.startsWith("data:image/jpeg;base64,")) {
         activeBase64s.add(profileStr.substring("data:image/jpeg;base64,".length));
       }
@@ -71,7 +71,7 @@ class _AssetListState extends State<AssetList> {
   }
 
   @override
-  void didUpdateWidget(covariant AssetList oldWidget) {
+  void didUpdateWidget(covariant AgentList oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.selectedIndex != oldWidget.selectedIndex) {
       _scrollToIndex(widget.selectedIndex);
@@ -82,12 +82,12 @@ class _AssetListState extends State<AssetList> {
   void _scrollToIndex(int index) {
     if (!_scrollController.hasClients ||
         index < 0 ||
-        index >= widget.assets.length) {
+        index >= widget.agents.length) {
       return;
     }
 
-    // Rough estimate of card height (including margin)
-    const double cardHeight = 220.0;
+    // Estimate card height (including margin)
+    const double cardHeight = 290.0;
     final double targetTop = index * cardHeight;
     final double targetBottom = targetTop + cardHeight;
     final double viewportHeight = _scrollController.position.viewportDimension;
@@ -114,49 +114,55 @@ class _AssetListState extends State<AssetList> {
     super.dispose();
   }
 
-  Color _getControlStatusColor(String status) {
-    switch (status.toUpperCase()) {
-      case 'NOT_AVAILABLE':
-        return Colors.red;
-      case 'NOT_CONTROLLED':
+  Color _getStateColor(String state) {
+    switch (state.toUpperCase()) {
+      case 'RUNNING':
         return Colors.green;
-      case 'UNDER_CONTROLLED':
+      case 'PAUSED':
         return Colors.orange;
+      case 'REQUEST_WAIT':
+      case 'CONTROL_WAIT':
+      case 'COMPLETE_WAIT':
+        return Colors.amber.shade800;
+      case 'COMPLETE':
+        return Colors.blue;
       default:
         return Colors.grey;
     }
   }
 
-  Widget _buildPoseLabel(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.grey.shade300, width: 0.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "$label: ",
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: Colors.black54,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 10,
-              color: Colors.black87,
-              fontFamily: 'monospace',
-            ),
-          ),
-        ],
-      ),
-    );
+  Color _getCompletionCodeColor(String code) {
+    switch (code.toUpperCase()) {
+      case 'SUCCESS':
+        return Colors.green;
+      case 'FAIL':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Color _getAccessRightColor(String right) {
+    switch (right.toUpperCase()) {
+      case 'OPERATOR':
+        return Colors.blue.shade700;
+      case 'MAINTAINER':
+        return Colors.purple.shade700;
+      case 'ADMINISTRATOR':
+        return Colors.red.shade700;
+      case 'NOT_ALLOWED':
+        return Colors.red;
+      default:
+        return Colors.grey.shade700;
+    }
+  }
+
+  String _formatAddress(Map<String, dynamic>? address) {
+    if (address == null) return "N/A";
+    final subsystemId = address['SubsystemId'] ?? 0;
+    final nodeId = address['NodeId'] ?? 0;
+    final compId = address['CompId'] ?? 0;
+    return "$subsystemId.$nodeId.$compId";
   }
 
   String _formatNum(dynamic val, int decimals) {
@@ -171,6 +177,74 @@ class _AssetListState extends State<AssetList> {
     return val.toString();
   }
 
+  Widget _buildFieldBadge(String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color, width: 0.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "$label: ",
+            style: const TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              color: Colors.black54,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextBox(String label, String value) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.grey.shade200, width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              color: Colors.black54,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value.isEmpty ? "None" : value,
+            style: const TextStyle(
+              fontSize: 9,
+              color: Colors.black87,
+              fontFamily: 'monospace',
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -183,7 +257,7 @@ class _AssetListState extends State<AssetList> {
       ),
       child: Column(
         children: [
-          // Header (consistency with sidebar layout)
+          // Header
           Container(
             height: 50,
             decoration: BoxDecoration(
@@ -211,7 +285,7 @@ class _AssetListState extends State<AssetList> {
                 const Expanded(
                   child: Center(
                     child: Text(
-                      "Assets",
+                      "Agents",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -229,10 +303,10 @@ class _AssetListState extends State<AssetList> {
           ),
           // Sidebar List of Cards
           Expanded(
-            child: widget.assets.isEmpty
+            child: widget.agents.isEmpty
                 ? const Center(
                     child: Text(
-                      "No Subsystems Discovered",
+                      "No Agents Available",
                       style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
                   )
@@ -241,24 +315,24 @@ class _AssetListState extends State<AssetList> {
                     child: ListView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                      itemCount: widget.assets.length,
+                      itemCount: widget.agents.length,
                       itemBuilder: (context, index) {
-                        final asset = widget.assets[index];
-                        final name = asset['Name']?.toString() ?? 'Unknown';
-                        final type = asset['SubsystemType']?.toString() ?? 'UNKNOWN';
+                        final agent = widget.agents[index];
+                        final name = agent['Name']?.toString() ?? 'Unknown Agent';
+                        final uri = agent['Uri']?.toString() ?? 'Unknown Uri';
                         
-                        final address = asset['Address'] as Map<String, dynamic>? ?? {};
-                        final subsystemId = address['SubsystemId'] ?? 0;
-                        final nodeId = address['NodeId'] ?? 0;
-                        final compId = address['CompId'] ?? 0;
+                        final stateVal = agent['State']?.toString() ?? 'UNKNOWN';
+                        final completionCode = agent['CompletionCode']?.toString() ?? 'UNKNOWN';
+                        final accessRight = agent['RequiredAppAccessRight']?.toString() ?? 'UNKNOWN';
                         
-                        final controlStatus = asset['ControlStatus']?.toString() ?? 'UNKNOWN';
-                        final controlAvailable = !(controlStatus == 'UNKNOWN' || controlStatus == 'NOT_AVAILABLE');
-                        
-                        final pose = asset['Pose'] as Map<String, dynamic>?;
-                        final frame = pose?['Frame']?.toString() ?? 'unknown';
+                        final runTime = agent['RunTime'];
+                        final timeout = agent['CompletionTimeout'];
+                        final requestor = agent['Requestor'] as Map<String, dynamic>?;
 
-                        final profileStr = asset['ProfileImage']?.toString() ?? '';
+                        final config = agent['Configuration']?.toString() ?? '';
+                        final feedback = agent['FeedbackData']?.toString() ?? '';
+
+                        final profileStr = agent['ProfileImage']?.toString() ?? '';
                         Widget? profileWidget;
                         if (profileStr.startsWith("data:image/jpeg;base64,")) {
                           try {
@@ -279,26 +353,6 @@ class _AssetListState extends State<AssetList> {
                         }
 
                         if (profileWidget == null) {
-                          IconData typeIcon;
-                          switch (type.toUpperCase()) {
-                            case 'UNMANNED':
-                              typeIcon = Icons.directions_car;
-                              break;
-                            case 'AI_AGENT':
-                              typeIcon = Icons.smart_toy;
-                              break;
-                            case 'CONTROLLER':
-                              typeIcon = Icons.gamepad;
-                              break;
-                            case 'META_HUMAN':
-                              typeIcon = Icons.person;
-                              break;
-                            case 'PROCESS_TOOL':
-                              typeIcon = Icons.build;
-                              break;
-                            default:
-                              typeIcon = Icons.help_outline;
-                          }
                           profileWidget = Container(
                             width: 44,
                             height: 44,
@@ -310,7 +364,7 @@ class _AssetListState extends State<AssetList> {
                               ),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(typeIcon, color: Colors.white, size: 22),
+                            child: const Icon(Icons.smart_toy, color: Colors.white, size: 22),
                           );
                         }
 
@@ -335,7 +389,7 @@ class _AssetListState extends State<AssetList> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Header Row: Avatar, Subsystem Name/ID, Info button
+                                  // Header Row: Avatar, Agent Name/Uri, Info button
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
@@ -350,26 +404,20 @@ class _AssetListState extends State<AssetList> {
                                               name,
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 14,
+                                                fontSize: 13,
                                                 color: Colors.black87,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
-                                              "Subsystem ID: $subsystemId",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey.shade700,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Text(
-                                              "Addr: $subsystemId.$nodeId.$compId",
+                                              uri,
                                               style: TextStyle(
                                                 fontSize: 10,
-                                                color: Colors.grey.shade500,
+                                                color: Colors.grey.shade600,
+                                                fontFamily: 'monospace',
                                               ),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
                                         ),
@@ -378,109 +426,49 @@ class _AssetListState extends State<AssetList> {
                                         icon: const Icon(Icons.info_outline, color: Colors.blue, size: 20),
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
-                                        onPressed: () => widget.onInfoPressed(asset),
+                                        onPressed: () => widget.onInfoPressed(agent),
                                         tooltip: "Show context info",
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  // Control Available Status Row
+                                  
+                                  // Row 1: State & Completion Code
                                   Row(
                                     children: [
-                                      Icon(
-                                        Icons.sports_esports,
-                                        size: 14,
-                                        color: controlAvailable ? Colors.green : Colors.grey,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        "Control: ${controlAvailable ? 'Available' : 'Unavailable'}",
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: controlAvailable ? Colors.green.shade700 : Colors.grey.shade600,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                        decoration: BoxDecoration(
-                                          color: _getControlStatusColor(controlStatus).withOpacity(0.12),
-                                          borderRadius: BorderRadius.circular(4),
-                                          border: Border.all(
-                                            color: _getControlStatusColor(controlStatus),
-                                            width: 0.5,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          controlStatus,
-                                          style: TextStyle(
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.bold,
-                                            color: _getControlStatusColor(controlStatus),
-                                          ),
-                                        ),
-                                      ),
+                                      _buildFieldBadge("State", stateVal, _getStateColor(stateVal)),
+                                      const SizedBox(width: 6),
+                                      _buildFieldBadge("Result", completionCode, _getCompletionCodeColor(completionCode)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  
+                                  // Row 2: RequiredAppAccessRight & RunTime
+                                  Row(
+                                    children: [
+                                      _buildFieldBadge("Access", accessRight, _getAccessRightColor(accessRight)),
+                                      const SizedBox(width: 6),
+                                      _buildFieldBadge("RunTime", "${_formatNum(runTime, 1)}s", Colors.blueGrey),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+
+                                  // Row 3: Requestor & Timeout
+                                  Row(
+                                    children: [
+                                      _buildFieldBadge("Req", _formatAddress(requestor), Colors.teal),
+                                      const SizedBox(width: 6),
+                                      _buildFieldBadge("Timeout", timeout != null && timeout > 0 ? "${_formatNum(timeout, 0)}s" : "None", Colors.brown),
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  // Pose Details Area
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(8.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade50,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: Colors.grey.shade200, width: 1),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Text(
-                                              "Pose Info",
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
-                                            Text(
-                                              "Frame: $frame",
-                                              style: const TextStyle(
-                                                fontSize: 9,
-                                                color: Colors.black54,
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        if (pose == null)
-                                          const Text(
-                                            "Pose is not available",
-                                            style: TextStyle(fontSize: 10, color: Colors.grey),
-                                          )
-                                        else
-                                          Wrap(
-                                            spacing: 6,
-                                            runSpacing: 4,
-                                            children: [
-                                              _buildPoseLabel("Lat", _formatNum(pose['Latitude'], 5)),
-                                              _buildPoseLabel("Lon", _formatNum(pose['Longitude'], 5)),
-                                              _buildPoseLabel("X", "${_formatNum(pose['XPosition'], 2)}m"),
-                                              _buildPoseLabel("Y", "${_formatNum(pose['YPosition'], 2)}m"),
-                                              _buildPoseLabel("Z", "${_formatNum(pose['ZPosition'], 2)}m (${pose['ZPositionType'] ?? 'UNKNOWN'})"),
-                                              _buildPoseLabel("Roll", "${_formatNum(pose['Roll'], 1)}°"),
-                                              _buildPoseLabel("Pitch", "${_formatNum(pose['Pitch'], 1)}°"),
-                                              _buildPoseLabel("Heading", "${_formatNum(pose['Heading'], 1)}°"),
-                                            ],
-                                          ),
-                                      ],
-                                    ),
-                                  ),
+
+                                  // TextBox: Configuration
+                                  _buildTextBox("Configuration", config),
+                                  const SizedBox(height: 6),
+
+                                  // TextBox: FeedbackData
+                                  _buildTextBox("Feedback Data", feedback),
                                 ],
                               ),
                             ),

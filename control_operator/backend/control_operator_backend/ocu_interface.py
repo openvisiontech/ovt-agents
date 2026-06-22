@@ -37,7 +37,7 @@ class OcuInterface:
 # The wrapper below is still marked as async def, whith ensures compatibility with the webrtc_connection.py.
 # so that no further cascading changes are required there.
 
-    async def get_all_abstractions(self):
+    async def get_asset_abstractions(self):
         url = f"data://{self.domain}/core_clients.DbDataStore?location=subsystemabstractions&id=0"
         async with self._lock:
             return self.ocu.get_data(url)
@@ -67,8 +67,8 @@ class OcuInterface:
         async with self._lock:
             return self.ocu.get_data(url)
 
-    async def get_agent_list(self):
-        url = f"data://{self.domain}/core_clients.DataStore?location=agentlist"
+    async def get_agent_abstractions(self):
+        url = f"data://{self.domain}/core_clients.DataStore?location=agentabstractions"
         async with self._lock:
             return self.ocu.get_data(url)
 

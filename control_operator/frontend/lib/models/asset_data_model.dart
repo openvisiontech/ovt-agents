@@ -48,9 +48,12 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   Map<String, dynamic> _operatingModeInfo = {};
   List<Map<String, dynamic>> _statusDetails = [];
 
-  List<Map<String, dynamic>> _agentList = [];
+  List<Map<String, dynamic>> _agentAbstractions = [];
   int _currentAgentIndex = -1;
   List<String> _agentItems = [];
+  List<String> _agentProfileImages = [];
+  List<String> _agentContexts = [];
+
   Map<String, dynamic> _agentInfo = {};
   List<Map<String, dynamic>> _agentStatus = [];
   Map<String, dynamic> _agentDetails = {};
@@ -69,7 +72,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   List<String> _insightMenuItems = [
     "Comp Status",
     "Agent Status",
-    "Data Topics Clients",
+    "Data Topic Clients",
     "Transform Reporters",
   ];
   int _currentInsightMenuItemIndex = -1;
@@ -146,7 +149,10 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _operatingModeInfo = {};
     _statusDetails = [];
 
-    _agentList = [];
+    _agentAbstractions = [];
+    _agentItems = [];
+    _agentProfileImages = [];
+    _agentContexts = [];
     _agentStatus = [];
     _agentDetails = {};
 
@@ -200,7 +206,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   void selectAgent() {
     if (_currentAgentIndex >= 0 && _currentAgentIndex < _agentItems.length) {
-      _agentInfo = _agentList[_currentAgentIndex];
+      _agentInfo = _agentAbstractions[_currentAgentIndex];
       _agentConfiguration = {};
       _agentRunningCmd = "IDLE";
       _agentControlCmd = "UNKNOWN";
@@ -263,9 +269,17 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _stateInfo = {};
     _operatingModeInfo = {};
     _statusDetails = [];
-    _agentList = [];
+
+    _agentAbstractions = [];
+    _currentAgentIndex = -1;
+    _agentItems = [];
+    _agentProfileImages = [];
+    _agentContexts = [];
+
+    _agentInfo = {};
     _agentStatus = [];
     _agentDetails = {};
+
     _dataTopicList = [];
     _schemaList = [];
     _dataTopicClientList = [];
@@ -290,11 +304,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _subsystemStateCmd = "UNKNOWN";
     _operatingCategory = "UNKNOWN";
     _operatingMode = "UNKNOWN";
-
-    _agentList = [];
-    _agentItems = [];
-    _currentAgentIndex = -1;
-    _agentInfo = {};
 
     _agentConfiguration = {};
     _agentRunningCmd = "UNKNOWN";
@@ -324,7 +333,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     "AgentUri": _agentInfo['Uri'] ?? "",
     "Configuration": json.encode(_agentConfiguration),
     "RunningCmd": _agentRunningCmd,
-    "AgentCompletionTimeout": _agentCompletionTimeout,
+    "CompletionTimeout": _agentCompletionTimeout,
   };
   Map<String, dynamic> get _taskControlRec => {
     "AgentUri": _agentInfo['Uri'] ?? "",
@@ -348,6 +357,9 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   int get currentAgentIndex => _currentAgentIndex;
   List<String> get agentItems => _agentItems;
+  List<String> get agentProfileImages => _agentProfileImages;
+  List<String> get agentContexts => _agentContexts;
+  List<Map<String, dynamic>> get agentAbstractions => _agentAbstractions;
 
   Map<String, dynamic> get agentInfo => _agentInfo;
   List<Map<String, dynamic>> get agentStatus => _agentStatus;
@@ -448,10 +460,16 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     state = this;
   }
 
-  set agentList(List<Map<String, dynamic>> val) {
-    _agentList = val;
+  set agentAbstractions(List<Map<String, dynamic>> val) {
+    _agentAbstractions = val;
     _agentItems = val.map((e) {
       return "${e['Name']} (${e['Uri']})";
+    }).toList();
+    _agentProfileImages = val.map((e) {
+      return e['ProfileImage'].toString();
+    }).toList();
+    _agentContexts = val.map((e) {
+      return e['Context'].toString();
     }).toList();
 
     if (_currentAgentIndex >= _agentItems.length) {
@@ -459,6 +477,10 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     }
 
     state = this;
+  }
+
+  set agentList(List<Map<String, dynamic>> val) {
+    agentAbstractions = val;
   }
 
   set agentStatus(List<Map<String, dynamic>> val) {

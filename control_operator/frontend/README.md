@@ -95,3 +95,35 @@ To package the Web build, create a compressed archive of the web directory:
 tar -czvf control_operator_web.tar.gz -C build/web/ .
 ```
 For deployment, you can extract this archive or directly copy the contents of the `build/web/` directory to your web server's document root (e.g., Nginx, Apache, or a cloud-based static hosting service).
+
+## 4. How to build and run examples
+
+The repository includes several standalone widget/component examples under the `lib/` directory:
+- `asset_list_example_main.dart`
+- `comp_data_topic_list_example_main.dart`
+- `comp_popup_viewer_example_main.dart`
+- `selectable_list_example_main.dart`
+
+To run or build any of these examples, specify the entry point using the `-t` (or `--target`) option.
+
+### 4.1 Running Examples during Development
+
+* **Web (Chrome):**
+  ```bash
+  flutter run -d chrome -t lib/asset_list_example_main.dart
+  ```
+* **Linux Desktop:**
+  ```bash
+  flutter run -d linux -t lib/asset_list_example_main.dart
+  ```
+
+### 4.2 Building Example Releases
+
+* **Web:**
+  ```bash
+  flutter build web -t lib/asset_list_example_main.dart
+  ```
+* **Linux Desktop:**
+  ```bash
+  flutter build linux -t lib/asset_list_example_main.dart
+  ```
