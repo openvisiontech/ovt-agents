@@ -35,6 +35,7 @@ import '../components/comp_popup_viewer.dart';
 import '../components/asset_list.dart';
 import '../components/agent_list.dart';
 import '../components/insight_list.dart';
+import '../components/selectable_list.dart';
 import '../3d/scene_widget.dart';
 
 class AssetScreen extends ConsumerStatefulWidget {
@@ -47,7 +48,6 @@ class AssetScreen extends ConsumerStatefulWidget {
 class _AssetScreenState extends ConsumerState<AssetScreen> {
   @override
   Widget build(BuildContext context) {
-    final headerData = ref.watch(headerDataProvider);
     final guiData = ref.watch(guiDataProvider);
     final assetData = ref.watch(assetDataProvider);
     final actionRequests = ref.watch(actionRequestsProvider);
@@ -63,11 +63,12 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
         backgroundColor: Style.navigatorBackgroundColor,
         hoverColor: Style.navigatorBtnHoverColor,
         iconSize: Style.navigatorBtnIconPixelSize,
+        flashing: actionRequests.assetListAutoUpdate,
         highlight:
             guiData.assetLeftSidebarVisible &&
             guiData.assetLeftSidebarState == 'Assets',
         onPressed: () {
-          actionRequests.assetListUpdate = true;
+          actionRequests.toggleAssetListAutoUpdate();
           guiData.assetLeftSidebarState = 'Assets';
           guiData.showAssetLeftSidebar();
           guiData.hideAssetPopup();
@@ -111,27 +112,12 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
             guiData.assetLeftSidebarVisible &&
             guiData.assetLeftSidebarState == 'Data',
         onPressed: () {
+          assetData.clearDataTopics();
           actionRequests.dataTopicListUpdate = true;
+          actionRequests.schemaListUpdate = true;
           guiData.assetLeftSidebarState = 'Data';
           guiData.showAssetLeftSidebar();
           guiData.hideAssetPopup();
-        },
-      ),
-      SizedBox(
-        width: isSmallScreen ? Style.navigatorBtnSpacing : 0,
-        height: isSmallScreen ? 0 : Style.navigatorBtnSpacing,
-      ),
-      IconTextBtn(
-        icon: Icons.support_agent, // AI Assist
-        description: "AI Assist",
-        width: Style.navigatorBtnWidth,
-        height: Style.navigatorBtnHeight,
-        backgroundColor: Style.navigatorBackgroundColor,
-        hoverColor: Style.navigatorBtnHoverColor,
-        iconSize: Style.navigatorBtnIconPixelSize,
-        highlight: guiData.assetRightSidebarVisible,
-        onPressed: () {
-          guiData.toggleAssetRightSidebar();
         },
       ),
       const Spacer(),
@@ -180,19 +166,21 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
       color: Style.backgroundColor,
       child: Stack(
         children: [
+          //three js window
           const Positioned.fill(child: SceneWidget()),
-          if (guiData.assetPopupVisible && !isSmallScreen)
+          //popup window
+          if (guiData.assetPopupVisible)
             Center(
               child: FractionallySizedBox(
-                widthFactor: 0.70,
-                heightFactor: 0.80,
+                widthFactor: isSmallScreen ? 1.0 : 0.70,
+                heightFactor: isSmallScreen ? 1.0 : 0.80,
                 child: Builder(
                   builder: (context) {
                     dynamic popupJson;
-                    String? popupMarkdown = guiData.popupMarkdown;
+                    String? popupMarkdown = guiData.assetPopupMarkdown;
 
-                    if (guiData.popupInsightType != null) {
-                      switch (guiData.popupInsightType) {
+                    if (guiData.assetPopupInsightType != null) {
+                      switch (guiData.assetPopupInsightType) {
                         case "Comp Status":
                           popupJson = {
                             "statusdetails": assetData.statusDetails,
@@ -219,17 +207,54 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                           break;
                       }
                     } else {
-                      popupJson = guiData.popupJson;
+                      popupJson = guiData.assetPopupJson;
                     }
 
                     return CompPopupViewer(
-                      title: guiData.popupTitle,
+                      title: guiData.assetPopupTitle,
                       json: popupJson,
                       markdown: popupMarkdown,
                       onClose: () =>
                           ref.read(guiDataProvider.notifier).hideAssetPopup(),
                     );
                   },
+                ),
+              ),
+            ),
+          //selection popup on top of the existing popup window
+          if (guiData.assetSelectionPopupVisible)
+            Center(
+              child: FractionallySizedBox(
+                widthFactor: isSmallScreen ? 1.0 : 0.5,
+                heightFactor: isSmallScreen ? 1.0 : 0.5,
+                child: SelectableList(
+                  title: guiData.assetSelectionPopupTitle,
+                  items: guiData.assetSelectionPopupItems,
+                  selectedIndex: guiData.assetSelectionPopupSelectedIndex,
+                  statusColors: guiData.assetSelectionPopupStatusColors,
+                  profileImages: guiData.assetSelectionPopupProfileImages,
+                  onUpPressed: () => ref
+                      .read(guiDataProvider.notifier)
+                      .moveAssetSelectionPopupUp(),
+                  onDownPressed: () => ref
+                      .read(guiDataProvider.notifier)
+                      .moveAssetSelectionPopupDown(),
+                  onCheckPressed: () {
+                    final selectedIndex =
+                        guiData.assetSelectionPopupSelectedIndex;
+                    if (guiData.assetSelectionPopupOnCheck != null) {
+                      guiData.assetSelectionPopupOnCheck!(selectedIndex);
+                    }
+                    ref
+                        .read(guiDataProvider.notifier)
+                        .hideAssetSelectionPopup();
+                  },
+                  onClosePressed: () => ref
+                      .read(guiDataProvider.notifier)
+                      .hideAssetSelectionPopup(),
+                  onItemTapped: (index) => ref
+                      .read(guiDataProvider.notifier)
+                      .setAssetSelectionPopupSelectedIndex(index),
                 ),
               ),
             ),
@@ -301,6 +326,10 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                                   (assetData.haveControl == "YES")
                                   ? "WATCH"
                                   : "CONTROL";
+                              assetData.subsystemStateCmd =
+                                  (assetData.haveControl == "YES")
+                                  ? "UNKNOWN"
+                                  : "OPERATIONAL";
                             },
                           ),
                           SizedBox(width: Style.commanderBtnSpacing),
@@ -314,7 +343,34 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                             iconSize: Style.commanderBtnIconPixelSize,
                             greyout: assetData.haveControl != "YES",
                             onPressed: () {
-                              // Open Mode Dialog
+                              if (assetData.controlAvail == false) return;
+                              guiData.showAssetSelectionPopup(
+                                title: "Select Operating Mode",
+                                items: assetData.operatingCategory == "UNKNOWN"
+                                    ? [
+                                        "STANDARD_OPERATING",
+                                        "REDUCED",
+                                        "RIGOROUS",
+                                        "SILENT",
+                                        "HIBERNATED",
+                                        "TRAINING",
+                                        "MAINTENANCE",
+                                      ]
+                                    : (assetData.operatingCategory == "STANDARD"
+                                          ? [
+                                              "STANDARD_OPERATING",
+                                              "REDUCED",
+                                              "RIGOROUS",
+                                              "SILENT",
+                                              "HIBERNATED",
+                                            ]
+                                          : ["TRAINING", "MAINTENANCE"]),
+                                selectedIndex: 0,
+                                onCheck: (index) {
+                                  assetData.operatingMode =
+                                      guiData.assetSelectionPopupItems[index];
+                                },
+                              );
                             },
                           ),
                           SizedBox(width: Style.commanderBtnSpacing),
@@ -328,7 +384,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                             iconSize: Style.commanderBtnIconPixelSize,
                             greyout: assetData.haveControl != "YES",
                             onPressed: () {
-                              // Reset command
+                              assetData.subsystemStateCmd = "RESET";
                             },
                           ),
                           SizedBox(width: Style.commanderBtnSpacing),
@@ -342,7 +398,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                             iconSize: Style.commanderBtnIconPixelSize,
                             greyout: assetData.haveControl != "YES",
                             onPressed: () {
-                              // Render Useless command
+                              assetData.subsystemStateCmd = "RENDER_USELESS";
                             },
                           ),
                           SizedBox(width: Style.commanderBtnSpacing),
@@ -356,7 +412,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                             iconSize: Style.commanderBtnIconPixelSize,
                             greyout: assetData.haveControl != "YES",
                             onPressed: () {
-                              // Shutdown command
+                              assetData.subsystemStateCmd = "SHUTDOWN";
                             },
                           ),
                         ],
@@ -420,48 +476,46 @@ class AssetLeftSidebar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final headerData = ref.watch(headerDataProvider);
     final guiData = ref.watch(guiDataProvider);
     final assetData = ref.watch(assetDataProvider);
-
+    final actionRequests = ref.watch(actionRequestsProvider);
     final state = guiData.assetLeftSidebarState;
 
     if (state == 'Assets') {
       return AssetList(
         assets: assetData.assetAbstractions,
         selectedIndex: assetData.currentAssetIndex,
-        onUpPressed: () => ref.read(assetDataProvider.notifier).moveAssetUp(),
-        onDownPressed: () =>
-            ref.read(assetDataProvider.notifier).moveAssetDown(),
+        onUpPressed: () => assetData.moveAssetUp(),
+        onDownPressed: () => assetData.moveAssetDown(),
         onCheckPressed: () {
-          ref.read(assetDataProvider.notifier).selectAsset();
-          ref.read(headerDataProvider.notifier).assetSelected = true;
+          assetData.selectAsset();
+          headerData.assetSelected = true;
         },
         onClosePressed: () {
-          ref.read(guiDataProvider.notifier).hideAssetLeftSidebar();
+          guiData.hideAssetLeftSidebar();
+          actionRequests.assetListAutoUpdate = false;
         },
         onItemTapped: (index) {
-          ref.read(assetDataProvider.notifier).setCurrentAssetIndex(index);
+          assetData.setCurrentAssetIndex(index);
         },
         onInfoPressed: (asset) {
           final name = asset['Name']?.toString() ?? 'Asset';
           final contextStr = asset['Context']?.toString() ?? '';
-          ref
-              .read(guiDataProvider.notifier)
-              .showPopup(
-                title: "$name Context",
-                markdown: contextStr.isNotEmpty
-                    ? contextStr
-                    : "No context available for this asset.",
-              );
+          guiData.showAssetPopup(
+            title: "$name Context",
+            markdown: contextStr.isNotEmpty
+                ? contextStr
+                : "No context available for this asset.",
+          );
         },
       );
     } else if (state == 'Agents') {
       return AgentList(
         agents: assetData.agentAbstractions,
         selectedIndex: assetData.currentAgentIndex,
-        onUpPressed: () => ref.read(assetDataProvider.notifier).moveAgentUp(),
-        onDownPressed: () =>
-            ref.read(assetDataProvider.notifier).moveAgentDown(),
+        onUpPressed: () => assetData.moveAgentUp(),
+        onDownPressed: () => assetData.moveAgentDown(),
         onCheckPressed: () =>
             ref.read(assetDataProvider.notifier).selectAgent(),
         onClosePressed: () {
@@ -474,14 +528,12 @@ class AssetLeftSidebar extends ConsumerWidget {
         onInfoPressed: (agent) {
           final name = agent['Name']?.toString() ?? 'Agent';
           final contextStr = agent['Context']?.toString() ?? '';
-          ref
-              .read(guiDataProvider.notifier)
-              .showPopup(
-                title: "$name Context",
-                markdown: contextStr.isNotEmpty
-                    ? contextStr
-                    : "No context available for this agent.",
-              );
+          guiData.showAssetPopup(
+            title: "$name Context",
+            markdown: contextStr.isNotEmpty
+                ? contextStr
+                : "No context available for this agent.",
+          );
         },
       );
     } else if (state == 'Data') {
@@ -490,27 +542,22 @@ class AssetLeftSidebar extends ConsumerWidget {
         items: assetData.dataTopicList,
         selectedUris: assetData.selectedTopicUris,
         onCheck: (uri) {
-          ref.read(assetDataProvider.notifier).toggleTopicSelected(uri);
+          assetData.toggleTopicSelected(uri);
         },
         onClosePressed: () {
-          ref.read(guiDataProvider.notifier).hideAssetLeftSidebar();
-          ref.read(actionRequestsProvider.notifier).dataTopicListUpdate = false;
+          guiData.hideAssetLeftSidebar();
         },
         onInfoPressed: (topic) {
           final uri = topic['Uri']?.toString() ?? 'Topic';
           final topicContext =
               topic['Context']?.toString() ?? 'No topic context available.';
           final schemaName = topic['Schema']?.toString() ?? '';
-          final schemaContext = ref
-              .read(assetDataProvider.notifier)
-              .getSchemaContext(schemaName);
+          final schemaContext = assetData.getSchemaContext(schemaName);
 
           final md =
               '## Topic Context\n$topicContext\n\n---\n## Schema: $schemaName\n${schemaContext ?? "No schema context available."}';
 
-          ref
-              .read(guiDataProvider.notifier)
-              .showPopup(title: "$uri Details", markdown: md);
+          guiData.showAssetPopup(title: "$uri Details", markdown: md);
         },
       );
     } else if (state == 'Insights') {
@@ -523,75 +570,53 @@ class AssetLeftSidebar extends ConsumerWidget {
         transformReportersCount:
             assetData.transformReporterList.length +
             assetData.transformClientList.length,
-        onUpPressed: () =>
-            ref.read(assetDataProvider.notifier).moveInsightMenuItemUp(),
-        onDownPressed: () =>
-            ref.read(assetDataProvider.notifier).moveInsightMenuItemDown(),
+        onUpPressed: () => assetData.moveInsightMenuItemUp(),
+        onDownPressed: () => assetData.moveInsightMenuItemDown(),
         onCheckPressed: () {
-          ref.read(assetDataProvider.notifier).selectInsightMenuItem();
-          final selected = ref
-              .read(assetDataProvider.notifier)
-              .selectedInsightMenuItem;
+          assetData.selectInsightMenuItem();
+          final selected = assetData.selectedInsightMenuItem;
           switch (selected) {
             case "Comp Status":
-              ref.read(actionRequestsProvider.notifier).leavingAssetScreen();
-              ref.read(actionRequestsProvider.notifier).statusDetailsUpdate =
-                  true;
-              ref
-                  .read(guiDataProvider.notifier)
-                  .showPopup(
-                    title: "Component Status Details",
-                    insightType: "Comp Status",
-                  );
+              actionRequests.leavingAssetScreen();
+              actionRequests.statusDetailsUpdate = true;
+              guiData.showAssetPopup(
+                title: "Component Status Details",
+                insightType: "Comp Status",
+              );
               break;
             case "Agent Status":
-              ref.read(actionRequestsProvider.notifier).leavingAssetScreen();
-              ref.read(actionRequestsProvider.notifier).agentStatusUpdate =
-                  true;
-              ref
-                  .read(guiDataProvider.notifier)
-                  .showPopup(
-                    title: "Agent Status List",
-                    insightType: "Agent Status",
-                  );
+              actionRequests.leavingAssetScreen();
+              actionRequests.agentStatusUpdate = true;
+              guiData.showAssetPopup(
+                title: "Agent Status List",
+                insightType: "Agent Status",
+              );
               break;
             case "Data Topic Clients":
-              ref.read(actionRequestsProvider.notifier).leavingAssetScreen();
-              ref
-                      .read(actionRequestsProvider.notifier)
-                      .dataTopicClientListUpdate =
-                  true;
-              ref
-                  .read(guiDataProvider.notifier)
-                  .showPopup(
-                    title: "Data Topic Clients",
-                    insightType: "Data Topic Clients",
-                  );
+              actionRequests.leavingAssetScreen();
+              actionRequests.dataTopicClientListUpdate = true;
+              guiData.showAssetPopup(
+                title: "Data Topic Clients",
+                insightType: "Data Topic Clients",
+              );
               break;
             case "Transform Reporters":
-              ref.read(actionRequestsProvider.notifier).leavingAssetScreen();
-              ref
-                      .read(actionRequestsProvider.notifier)
-                      .transformReporterListUpdate =
-                  true;
-              ref
-                  .read(guiDataProvider.notifier)
-                  .showPopup(
-                    title: "Transform Reporters & Clients",
-                    insightType: "Transform Reporters",
-                  );
+              actionRequests.leavingAssetScreen();
+              actionRequests.transformReporterListUpdate = true;
+              guiData.showAssetPopup(
+                title: "Transform Reporters & Clients",
+                insightType: "Transform Reporters",
+              );
               break;
             default:
               break;
           }
         },
         onClosePressed: () {
-          ref.read(guiDataProvider.notifier).hideAssetLeftSidebar();
+          guiData.hideAssetLeftSidebar();
         },
         onItemTapped: (index) {
-          ref
-              .read(assetDataProvider.notifier)
-              .setCurrentInsightMenuItemIndex(index);
+          assetData.setCurrentInsightMenuItemIndex(index);
         },
       );
     }

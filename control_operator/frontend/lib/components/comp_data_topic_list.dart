@@ -47,9 +47,7 @@ class CompDataTopicList extends StatelessWidget {
             height: 50,
             decoration: const BoxDecoration(
               color: Style.headerBackgroundColor,
-              border: Border(
-                bottom: BorderSide(color: Colors.black, width: 1),
-              ),
+              border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(10),
                 topRight: Radius.circular(10),
@@ -81,10 +79,7 @@ class CompDataTopicList extends StatelessWidget {
                 ? const Center(
                     child: Text(
                       "No Data Topics Available",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
                   )
                 : ListView.builder(
@@ -92,13 +87,22 @@ class CompDataTopicList extends StatelessWidget {
                     itemCount: items.length,
                     itemBuilder: (context, index) {
                       final item = items[index];
-                      final compRec = item['CompRec'] as Map<String, dynamic>? ?? {};
-                      final compName = compRec['Name']?.toString() ?? 'Unknown Component';
-                      final address = compRec['Address'] as Map<String, dynamic>? ?? {};
-                      final addressStr = "${address['SubsystemId'] ?? 0}.${address['NodeId'] ?? 0}.${address['CompId'] ?? 0}";
-                      final streamUrl = item['Url']?.toString() ?? '';
+                      final compRec =
+                          item['CompRec'] as Map<String, dynamic>? ?? {};
+                      final compName =
+                          compRec['Name']?.toString() ?? 'Unknown Component';
+                      final compDescriptor =
+                          compRec['Descriptor']?.toString() ?? '';
+                      final address =
+                          compRec['Address'] as Map<String, dynamic>? ?? {};
+                      final addressStr =
+                          "${address['SubsystemId'] ?? 0}.${address['NodeId'] ?? 0}.${address['CompId'] ?? 0}";
+                      final streamUrl = item['Forwarded'] == "true"
+                          ? item['ForwardedUrl']?.toString() ?? ''
+                          : item['Url']?.toString() ?? '';
                       final status = item['Status']?.toString() ?? 'UNKNOWN';
-                      final topicRecs = item['DataTopicRecList'] as List<dynamic>? ?? [];
+                      final topicRecs =
+                          item['DataTopicRecList'] as List<dynamic>? ?? [];
 
                       final isStreamChecked = selectedUris.contains(streamUrl);
 
@@ -107,10 +111,15 @@ class CompDataTopicList extends StatelessWidget {
                         elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(color: Colors.grey.shade300, width: 1),
+                          side: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
                         ),
                         child: Theme(
-                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                          data: Theme.of(
+                            context,
+                          ).copyWith(dividerColor: Colors.transparent),
                           child: ExpansionTile(
                             leading: Checkbox(
                               activeColor: Style.btnHighlightColor,
@@ -125,7 +134,8 @@ class CompDataTopicList extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "$compName ($addressStr)",
@@ -133,6 +143,10 @@ class CompDataTopicList extends StatelessWidget {
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
                                         ),
+                                      ),
+                                      Text(
+                                        "${compDescriptor.isNotEmpty ? compDescriptor : 'Not Specified'}",
+                                        style: const TextStyle(fontSize: 14),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
@@ -148,11 +162,19 @@ class CompDataTopicList extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: _getStatusColor(status).withOpacity(0.15),
+                                    color: _getStatusColor(
+                                      status,
+                                    ).withOpacity(0.15),
                                     borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: _getStatusColor(status), width: 1),
+                                    border: Border.all(
+                                      color: _getStatusColor(status),
+                                      width: 1,
+                                    ),
                                   ),
                                   child: Text(
                                     status,
@@ -172,21 +194,35 @@ class CompDataTopicList extends StatelessWidget {
                                   padding: EdgeInsets.all(12.0),
                                   child: Text(
                                     "No individual topic records",
-                                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                 )
                               else
                                 ...topicRecs.map<Widget>((topicDynamic) {
-                                  final topic = topicDynamic as Map<String, dynamic>? ?? {};
-                                  final topicUri = topic['Uri']?.toString() ?? '';
-                                  final accessRight = topic['RequiredDataAccessRight']?.toString() ?? 'UNKNOWN';
-                                  final isTopicChecked = selectedUris.contains(topicUri);
+                                  final topic =
+                                      topicDynamic as Map<String, dynamic>? ??
+                                      {};
+                                  final topicUri =
+                                      topic['Uri']?.toString() ?? '';
+                                  final accessRight =
+                                      topic['RequiredDataAccessRight']
+                                          ?.toString() ??
+                                      'UNKNOWN';
+                                  final isTopicChecked = selectedUris.contains(
+                                    topicUri,
+                                  );
 
                                   return Container(
                                     decoration: BoxDecoration(
                                       color: Colors.grey.shade50,
                                       border: Border(
-                                        bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+                                        bottom: BorderSide(
+                                          color: Colors.grey.shade200,
+                                          width: 1,
+                                        ),
                                       ),
                                     ),
                                     child: ListTile(
@@ -202,14 +238,24 @@ class CompDataTopicList extends StatelessWidget {
                                       ),
                                       title: Text(
                                         topicUri,
-                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                       subtitle: Text(
                                         "Access: $accessRight",
-                                        style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey.shade600,
+                                        ),
                                       ),
                                       trailing: IconButton(
-                                        icon: const Icon(Icons.info_outline, color: Colors.blue, size: 18),
+                                        icon: const Icon(
+                                          Icons.info_outline,
+                                          color: Colors.blue,
+                                          size: 18,
+                                        ),
                                         onPressed: () => onInfoPressed(topic),
                                       ),
                                     ),

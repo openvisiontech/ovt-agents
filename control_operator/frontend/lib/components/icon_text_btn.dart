@@ -24,6 +24,7 @@
  **********************************************************************************
  */
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../style.dart';
 
@@ -40,6 +41,7 @@ class IconTextBtn extends StatefulWidget {
   final Color greyoutColor;
   final bool highlight;
   final bool greyout;
+  final bool flashing;
 
   const IconTextBtn({
     super.key,
@@ -55,6 +57,7 @@ class IconTextBtn extends StatefulWidget {
     this.greyoutColor = Style.btnGreyoutColor,
     this.highlight = false,
     this.greyout = false,
+    this.flashing = false,
   });
 
   @override
@@ -63,6 +66,41 @@ class IconTextBtn extends StatefulWidget {
 
 class _IconTextBtnState extends State<IconTextBtn> {
   bool _isHovering = false;
+  Timer? _flashTimer;
+  bool _flashHighlight = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant IconTextBtn oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.flashing != oldWidget.flashing) {
+      _updateTimer();
+    }
+  }
+
+  void _updateTimer() {
+    _flashTimer?.cancel();
+    _flashTimer = null;
+    if (widget.flashing) {
+      _flashHighlight = true;
+      _flashTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          _flashHighlight = !_flashHighlight;
+        });
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _flashTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +110,9 @@ class _IconTextBtnState extends State<IconTextBtn> {
     } else if (_isHovering) {
       currentColor = widget.hoverColor;
     }
+
+    final bool isHighlighted = widget.flashing ? _flashHighlight : widget.highlight;
+    final Color contentColor = isHighlighted ? widget.highlightColor : Colors.white;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
@@ -91,15 +132,13 @@ class _IconTextBtnState extends State<IconTextBtn> {
               Icon(
                 widget.icon,
                 size: widget.iconSize ?? 24,
-                color: widget.highlight ? widget.highlightColor : Colors.white,
+                color: contentColor,
               ),
               if (widget.description.isNotEmpty)
                 Text(
                   widget.description,
                   style: TextStyle(
-                    color: widget.highlight
-                        ? widget.highlightColor
-                        : Colors.white,
+                    color: contentColor,
                     fontSize: 12,
                   ),
                   textAlign: TextAlign.center,

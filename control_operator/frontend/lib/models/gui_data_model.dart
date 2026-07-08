@@ -24,6 +24,7 @@
  **********************************************************************************
  */
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GuiDataModel extends Notifier<GuiDataModel> {
@@ -108,32 +109,91 @@ class GuiDataModel extends Notifier<GuiDataModel> {
   bool assetPopupVisible = false;
   bool assetCommanderVisible = true;
 
-  String popupTitle = "";
-  dynamic popupJson;
-  String? popupMarkdown;
-  String? popupInsightType;
+  String assetPopupTitle = "";
+  dynamic assetPopupJson;
+  String? assetPopupMarkdown;
+  String? assetPopupInsightType;
 
-  void showPopup({
+  bool assetSelectionPopupVisible = false;
+  String assetSelectionPopupTitle = "";
+  List<String> assetSelectionPopupItems = [];
+  int assetSelectionPopupSelectedIndex = -1;
+  List<Color>? assetSelectionPopupStatusColors;
+  List<String>? assetSelectionPopupProfileImages;
+  void Function(int)? assetSelectionPopupOnCheck;
+
+  void showAssetPopup({
     required String title,
     dynamic json,
     String? markdown,
     String? insightType,
   }) {
-    popupTitle = title;
-    popupJson = json;
-    popupMarkdown = markdown;
-    popupInsightType = insightType;
+    assetPopupTitle = title;
+    assetPopupJson = json;
+    assetPopupMarkdown = markdown;
+    assetPopupInsightType = insightType;
     assetPopupVisible = true;
     state = this;
   }
 
   void hideAssetPopup() {
     assetPopupVisible = false;
-    popupTitle = "";
-    popupJson = null;
-    popupMarkdown = null;
-    popupInsightType = null;
+    assetPopupTitle = "";
+    assetPopupJson = null;
+    assetPopupMarkdown = null;
+    assetPopupInsightType = null;
     state = this;
+  }
+
+  void showAssetSelectionPopup({
+    required String title,
+    required List<String> items,
+    int selectedIndex = 0,
+    List<Color>? statusColors,
+    List<String>? profileImages,
+    void Function(int)? onCheck,
+  }) {
+    assetSelectionPopupTitle = title;
+    assetSelectionPopupItems = items;
+    assetSelectionPopupSelectedIndex = selectedIndex;
+    assetSelectionPopupStatusColors = statusColors;
+    assetSelectionPopupProfileImages = profileImages;
+    assetSelectionPopupOnCheck = onCheck;
+    assetSelectionPopupVisible = true;
+    state = this;
+  }
+
+  void hideAssetSelectionPopup() {
+    assetSelectionPopupVisible = false;
+    assetSelectionPopupTitle = "";
+    assetSelectionPopupItems = [];
+    assetSelectionPopupSelectedIndex = -1;
+    assetSelectionPopupStatusColors = null;
+    assetSelectionPopupProfileImages = null;
+    assetSelectionPopupOnCheck = null;
+    state = this;
+  }
+
+  void setAssetSelectionPopupSelectedIndex(int index) {
+    if (index >= 0 && index < assetSelectionPopupItems.length) {
+      assetSelectionPopupSelectedIndex = index;
+      state = this;
+    }
+  }
+
+  void moveAssetSelectionPopupUp() {
+    if (assetSelectionPopupSelectedIndex > 0) {
+      assetSelectionPopupSelectedIndex--;
+      state = this;
+    }
+  }
+
+  void moveAssetSelectionPopupDown() {
+    if (assetSelectionPopupSelectedIndex <
+        assetSelectionPopupItems.length - 1) {
+      assetSelectionPopupSelectedIndex++;
+      state = this;
+    }
   }
 
   bool aiAssistLeftSidebarVisible = false;
@@ -222,6 +282,11 @@ class GuiDataModel extends Notifier<GuiDataModel> {
     state = this;
   }
 
+  set estop(bool val) {
+    _estop = val;
+    state = this;
+  }
+
   bool get estop => _estop;
   String get previousScreen => _previousScreen;
   String get currentScreen => _currentScreen;
@@ -233,11 +298,6 @@ class GuiDataModel extends Notifier<GuiDataModel> {
 
   set navigatorBoxOnoff(bool val) {
     _navigatorBoxOnoff = val;
-    state = this;
-  }
-
-  set estop(bool val) {
-    _estop = val;
     state = this;
   }
 

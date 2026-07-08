@@ -5,24 +5,25 @@ description: Describes the interface provided by the uli sdk app ocu through the
 
 # ULI SDK app ocu interface
 
-## overview
+## Overview
 
-ULI SDK app ocu is to discover the assets in the Uli SDK infrastructure, view the data obtained from the assets, and control the assets.
+ULI SDK app ocu is to discover the assets in the Uli SDK infrastructure, view the data obtained from the assets, and control the assets through agents implemented by the asset.
+
 This document is to describe the interface provided by the uli app ocu through the get_data() and set_data() methods.
 
 ## Interface implementation
 
 Reference implementation is in the `reference_implementations/uli_py/ocu.py` file.
 
-The interactions with the uli sdk app ocu are through the get_data() and set_data() methods. The get_data() method is used to get the data and status from the uli sdk app ocu, and the set_data() method is used to set the data to the uli sdk app ocu. Both get_data() and set_data() methods take a url string to the data as an argument. The set_data() method also takes a json string as an argument. The get_data() method returns a json string.
+The interactions with ocu are through the get_data() and set_data() methods. The get_data() method is used to get the data and status from the ocu, and the set_data() method is used to set the data to ocu. Both get_data() and set_data() methods take a url string to the data as an argument. The set_data() method also takes a json string as an argument. The get_data() method returns a json string.
 
 The url string to the data is in the format of "data://<app_domain>/<service_uri>?<query_string>".
 
-- **app_domain**: either "any" for any application or the full name of the uli app. The full name of the uli app is the name space of the uli app, separated by "." in the reverse order, for example: "ocu.apps.uli_sdk". 
+- **app_domain**: either "any" for any application or the full name of the uli sdk app - the name space of the uli sdk app, separated by "." in the reverse order, for example: "ocu.apps.uli_sdk". 
 - **service_uri**: the uri of the service, such as "core_clients.DashBoard".
-- **query_string**: contains the location key, which specifies the location of the data within the service specified by the service_uri. The query string may also include other (key, value) pairs to further specify the data to be retrieved.
+- **query_string**: contains the location key, which specifies the location of the data within the service specified by the service_uri. The query string may also include other (key, value) pairs to further refine the location of the data to be retrieved.
 
-### get_data details
+### Description of the get_data function  
 
 Here describes the url string to the data and the meaning of the returned json string.
 
@@ -485,7 +486,7 @@ Here describes the url string to the data and the meaning of the returned json s
 > 1. The transform client is a component that retrieves the transform from the transform reporter client.  The list includes the name of the transform client, the description of the transform client, the uri of the transform client, the component which is retrieving the transform, and the list of the transform definitions.
 > 2. The transform definition includes the parent frame and the child frame.
 
-### set_data details
+### Description of the set_data function
 
 Describes the url string to the data and the meaning of the json string.
 
@@ -2079,3 +2080,8 @@ Receive the topic streams published by the Data Topic Services of the selected s
   }
 }
 ```
+
+---
+
+## 📋 Mission Execution Workflow
+

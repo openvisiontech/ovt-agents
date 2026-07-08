@@ -35,7 +35,7 @@ The backend is modularized into several core specialized Python files:
 }
 ```
 
--   **`working_dir`**: Default system working directory targeting DataViewer implementations. Relative paths (like `.`) indicate the current process directory.
+-   **`working_dir`**: Default system working directory for the ocu to obtain the ocu.json. It usually should be in the `~/uli_deploy` directory.
 -   **`agent_config.model`**: Specifies the initial target AI model configurations for DeepAgent integration logic.
 -   **`agent_config.claude_api_key`**: API key to authenticate with Anthropic services for Claude models.
 -   **`agent_config.gemini_api_key`**: API key to authenticate with Google services for Gemini models.
@@ -48,19 +48,24 @@ The backend is modularized into several core specialized Python files:
 - aiortc
 - uli_py
 
+## 4. Building uli_sdk applications
+
 Follow the instructions below to build and deploy uli_py:
 
+1. Navigate to the `ulikaya` directory on the development host:
 ```bash
-cd ../uli_sdk
-
-# Build the pybinds
-./build/pkg_build.sh -d x86_64 -p //pybinds/uli_py:uli_py-pkg
-./build/pkg_stage.sh -d x86_64 --clean
-./build/pkg_stage.sh -d x86_64 //pybinds/uli_py:uli_py-pkg
-./build/pkg_deploy.sh -d x86_64 -h localhost --deploy_path uli_deploy/pybinds/uli_py
+cd ../uli_sdk/ulikaya
+```
+2. Build the `uli_py` application package for the target host.
+```bash
+./scripts/ocu_ui_pkg.sh -h localhost
+```
+3. Install configurations
+```bash
+./scripts/install_controller.sh -h localhost
 ```
 
-## 4. Installation
+## 5. Installing backend
 
 The backend is packaged as a standard Python module using `pyproject.toml`. You can install it locally using `pip` or `uv` to automatically satisfy all Python dependencies:
 
@@ -70,7 +75,7 @@ uv pip install -e .
 # Or simply pip install -e .
 ```
 
-## 5. How to Run
+## 6. How to Run
 
 After installation, the `control-operator-backend` CLI command is automatically registered in your environment. You can launch the backend webserver from anywhere in the filesystem:
 
@@ -89,7 +94,7 @@ cd /home/ovt/develop/ovt-agents/control_operator
 The WebRTC Signalling Server will become available at:
 `ws://localhost:8080/ws/rtc`
 
-## 6. MCP Server Integration
+## 7. MCP Server Integration
 
 The backend features a fully integrated [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server. This exposes the native `OcuInterface` capabilities directly to connected AI Agents via HTTP SSE transport. 
 

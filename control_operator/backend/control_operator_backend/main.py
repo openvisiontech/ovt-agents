@@ -9,11 +9,11 @@ distribution of this software and related documentation without an express
 license agreement from Open Vision Technology, LLC. is strictly prohibited.
 '''
 
-import argparse
+from control_operator_backend.mcp_server import create_json_topic
 import asyncio
 import logging
 from contextlib import asynccontextmanager
-from typing import Dict
+from typing import Dict, List
 import uuid
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
@@ -38,6 +38,9 @@ except ImportError:
         def receive_topics(self): return []
         def snapshot_topics(self): return []
 
+from uli_py import UliTopicReader
+from uli_py.json_topic import create_json_topic
+
 from .config import load_config
 from .webrtc_connection import WebRTCConnection
 from .ocu_interface import OcuInterface
@@ -46,7 +49,11 @@ from .agent_handler import DeepAgentHandler
 from mcp.server.sse import SseServerTransport
 from .mcp_server import mcp_server
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 logger = logging.getLogger("backend_main")
 
 connections: Dict[uuid.UUID, WebRTCConnection] = {}
@@ -57,12 +64,19 @@ async def ocu_topic_distribution_task(ocu: Ocu):
     try:
         while True:
             loop = asyncio.get_event_loop()
-            topics = await loop.run_in_executor(None, ocu.receive_topics)
+            topic_readers: List[UliTopicReader] = await loop.run_in_executor(None, ocu.receive_topics)
             
-            if topics:
+            if topic_readers:
                 # put topics into the topic queue of each WebRTC connection
                 for conn in connections.values():
-                    conn.topic_queue.put_nowait(topics)
+                    for topic_reader in topic_readers:
+                        try:
+                            json_topic = create_json_topic(topic_reader)
+                            if json_topic:
+                                conn.topic_queue.put_nowait(json_topic)
+                                logger.debug(f"[{conn.id}] Topic {topic_reader.uri}")
+                        except Exception as e:
+                            logger.error(f"[{conn.id}] Error processing topic: {e}")
             
             await asyncio.sleep(0.1)
     except asyncio.CancelledError:

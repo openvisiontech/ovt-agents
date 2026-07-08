@@ -19,6 +19,9 @@ from aiortc import RTCPeerConnection, RTCSessionDescription
 from fastapi import WebSocket
 from starlette.websockets import WebSocketState
 
+from uli_py import JsonTopic
+from uli_py import StreamTopicWriter
+
 from .ocu_interface import OcuInterface
 from .agent_handler import DeepAgentHandler
 
@@ -224,9 +227,15 @@ class WebRTCConnection:
     async def process_topic_queue(self):
         logger.info(f"[{self.id}] Starting topic queue task")
         try:
+            writer = StreamTopicWriter()
             while True:
-                message = await self.topic_queue.get()
-                # To be implemented: Topic forwarding
-                self.topic_queue.task_done()
+                json_topic: JsonTopic = await self.topic_queue.get()
+                try:
+                    serialized_bytes = writer.write(json_topic)
+                    await self.send_stream(serialized_bytes)
+                except Exception as e:
+                    logger.error(f"[{self.id}] Error processing topic: {e}")
+                finally:
+                    self.topic_queue.task_done()
         except asyncio.CancelledError:
             logger.info(f"[{self.id}] Topic task cancelled")

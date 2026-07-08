@@ -60,9 +60,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   List<Map<String, dynamic>> _dataTopicList = [];
   List<Map<String, dynamic>> _schemaList = [];
-  List<String> _dataTopicItems = [];
-  int _currentDataTopicIndex = -1;
-  Map<String, dynamic> _dataTopicInfo = {};
   List<Map<String, dynamic>> _dataTopicClientList = [];
   final Set<String> _selectedTopicUris = {};
 
@@ -315,6 +312,15 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     state = this;
   }
 
+  void clearDataTopics() {
+    _dataTopicList = [];
+    _schemaList = [];
+    _dataTopicClientList = [];
+    _selectedTopicUris.clear();
+
+    state = this;
+  }
+
   // Getters
   Map<String, dynamic> get _guiRec => {
     "UserPresent": "UNKNOWN", //will be filled later
@@ -365,9 +371,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   List<Map<String, dynamic>> get agentStatus => _agentStatus;
   Map<String, dynamic> get agentDetails => _agentDetails;
 
-  int get currentDataTopicIndex => _currentDataTopicIndex;
-  List<String> get dataTopicItems => _dataTopicItems;
-  Map<String, dynamic> get dataTopicInfo => _dataTopicInfo;
   List<Map<String, dynamic>> get dataTopicList => _dataTopicList;
   List<Map<String, dynamic>> get dataTopicClientList => _dataTopicClientList;
   Set<String> get selectedTopicUris => _selectedTopicUris;
@@ -495,12 +498,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   set dataTopicList(List<Map<String, dynamic>> val) {
     _dataTopicList = val;
-    _dataTopicItems = val.map((e) {
-      return "${e['CompDataTopic']}";
-    }).toList();
-    if (_currentDataTopicIndex >= _dataTopicItems.length) {
-      _currentDataTopicIndex = _dataTopicItems.length - 1;
-    }
     state = this;
   }
 
@@ -534,18 +531,27 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     state = this;
   }
 
-  set subsystemStateCmd(String val) {
-    _subsystemStateCmd = val;
-    state = this;
-  }
-
-  set operatingCategory(String val) {
-    _operatingCategory = val;
-    state = this;
-  }
-
   set operatingMode(String val) {
     _operatingMode = val;
+
+    if (_operatingMode == "STANDARD_OPERATING" ||
+        _operatingMode == "REDUCED" ||
+        _operatingMode == "RIGOROUS" ||
+        _operatingMode == "SILENT" ||
+        _operatingMode == "HIBERNATED") {
+      _operatingCategory = "STANDARD";
+    } else if (_operatingMode == "TRAINING" ||
+        _operatingMode == "MAINTENANCE") {
+      _operatingCategory = "ADMINISTRATIVE";
+    } else {
+      _operatingCategory = "UNKNOWN";
+    }
+
+    state = this;
+  }
+
+  set subsystemStateCmd(String val) {
+    _subsystemStateCmd = val;
     state = this;
   }
 
@@ -580,9 +586,9 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   }
 
   String? getSchemaContext(String schemaName) {
-    for (var schemaObj in _schemaList) {
+    for (var compSchema in _schemaList) {
       final schemaRecList =
-          schemaObj['DataTopicSchemaRecList'] as List<dynamic>? ?? [];
+          compSchema['DataTopicSchemaRecList'] as List<dynamic>? ?? [];
       for (var rec in schemaRecList) {
         if (rec['Schema']?.toString() == schemaName) {
           return rec['Context']?.toString();

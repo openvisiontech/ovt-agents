@@ -40,7 +40,7 @@ void processActionRequests(dynamic message) async {
     count += 10;
 
     final actionRequests = container.read(actionRequestsProvider.notifier);
-    final guiData = container.read(guiDataProvider.notifier);
+    final headerData = container.read(headerDataProvider.notifier);
     final assetData = container.read(assetDataProvider.notifier);
     final webrtcClient = WebRTCClient();
 
@@ -108,7 +108,7 @@ void processActionRequests(dynamic message) async {
     // Every 100ms
     if (count % 100 == 0) {
       Map<String, dynamic> guiRec = assetData.guiRec;
-      guiRec['EstopButton'] = guiData.estop;
+      guiRec['EstopButton'] = headerData.estop;
       webrtcClient.chatRequestQueue.add(
         jsonEncode({"action": "set_gui_rec", "payload": guiRec}),
       );
