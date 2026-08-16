@@ -327,6 +327,8 @@ class _AgentListState extends State<AgentList> {
                         
                         final runTime = agent['RunTime'];
                         final timeout = agent['CompletionTimeout'];
+                        final num? timeoutNum = timeout is num ? timeout : num.tryParse(timeout?.toString() ?? '');
+                        final bool hasTimeout = timeoutNum != null && timeoutNum > 0;
                         final requestor = agent['Requestor'] as Map<String, dynamic>?;
 
                         final config = agent['Configuration']?.toString() ?? '';
@@ -458,7 +460,7 @@ class _AgentListState extends State<AgentList> {
                                     children: [
                                       _buildFieldBadge("Req", _formatAddress(requestor), Colors.teal),
                                       const SizedBox(width: 6),
-                                      _buildFieldBadge("Timeout", timeout != null && timeout > 0 ? "${_formatNum(timeout, 0)}s" : "None", Colors.brown),
+                                      _buildFieldBadge("Timeout", hasTimeout ? "${_formatNum(timeoutNum, 0)}s" : "None", Colors.brown),
                                     ],
                                   ),
                                   const SizedBox(height: 8),

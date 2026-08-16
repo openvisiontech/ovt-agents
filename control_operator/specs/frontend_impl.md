@@ -371,9 +371,9 @@ The UI Main Layout and the subscreens are the same as the reference implementati
 
 ### 6.2 **`MainLayout`**
 
-The main layout includes the header and the context box. It dynamically injects the sub-screens into the context box based on `guiData.currentScreen`.
+The main layout includes the header and the content box. It dynamically injects the sub-screens into the content box based on `guiData.currentScreen`.
 
-The header includes the navigation buttons, estop button, and the menu button. The navigation buttons are used to navigate between the sub-screens. The menu button is used to toggle the visibility of the navigation box of the sub-screen.
+The header includes the view buttons, estop button, and the menu button. The view buttons are used to navigate between the sub-screens. The menu button is used to toggle the visibility of the navigation box of the sub-screen.
 
 The Header Center View is the area for the sub-screen to display its header information. For example, the asset screen displays information releated to the currently selected asset, including:
 
@@ -399,7 +399,7 @@ All the sub-screens have the same layout structure below. The difference is the 
   2) CenterBox - host the main view of the sub-screen. It consists of three parts:
    
     - LeftSideBar: 1/4 of the CenterBox width if visible, else 0. It is populated with the list of items, for example, asset list in the domain screen, agent list in the asset screen.
-    - MainContent: rest of the CenterBox width. It hosts a foating fractionally sized window for displaying detailed information of the selected item.
+    - MainContent: rest of the CenterBox width. It hosts two foating fractionally sized windows for displaying detailed information of the selected item or presenting choices for further actions.
     - RightSideBar: 1/4 of the CenterBox width if visible, else 0.
    
     The LeftSideBar and RightSideBar are in the same row with the MainContent, and the MainContent is in the middle of the LeftSideBar and RightSideBar.

@@ -70,7 +70,6 @@ class _AgentListExamplesState extends State<AgentListExamples> {
         {
           "Name": "Path Planner Agent",
           "Uri": "agent://scout_ugv_01/navigation/path_planner",
-          "User": "YES",
           "Comp": {
             "SubsystemId": 1,
             "NodeId": 10,
@@ -100,7 +99,6 @@ Responsible for computing obstacle-free trajectories from current pose to design
         {
           "Name": "Thermal Threat Detector",
           "Uri": "agent://scout_ugv_01/perception/thermal_threat",
-          "User": "NO",
           "Comp": {
             "SubsystemId": 1,
             "NodeId": 10,
@@ -126,7 +124,6 @@ Monitors thermal video feed to identify heat signatures exceeding ambient levels
         {
           "Name": "Diagnostics Self-Test",
           "Uri": "agent://scout_ugv_01/system/diagnostics",
-          "User": "NO",
           "Comp": {
             "SubsystemId": 1,
             "NodeId": 10,
@@ -152,7 +149,6 @@ Performs a deep diagnostic scan of internal modules including drive motors, batt
         {
           "Name": "Calibration Agent",
           "Uri": "agent://scout_ugv_01/system/calibration",
-          "User": "YES",
           "Comp": {
             "SubsystemId": 1,
             "NodeId": 10,

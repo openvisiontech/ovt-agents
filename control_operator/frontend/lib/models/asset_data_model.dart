@@ -36,11 +36,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   List<Map<String, dynamic>> _assetAbstractions = [];
   int _currentAssetIndex = -1;
 
-  List<String> _assetItems = [];
-  List<String> _assetControlStatuses = [];
-  List<String> _assetProfileImages = [];
-  List<String> _assetContexts = [];
-
   Map<String, dynamic> _assetInfo = {};
   Map<String, dynamic> _accessInfo = {};
   Map<String, dynamic> _controlInfo = {};
@@ -50,9 +45,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   List<Map<String, dynamic>> _agentAbstractions = [];
   int _currentAgentIndex = -1;
-  List<String> _agentItems = [];
-  List<String> _agentProfileImages = [];
-  List<String> _agentContexts = [];
 
   Map<String, dynamic> _agentInfo = {};
   List<Map<String, dynamic>> _agentStatus = [];
@@ -108,14 +100,14 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   }
 
   void moveAssetDown() {
-    if (_currentAssetIndex < _assetItems.length - 1) {
+    if (_currentAssetIndex < _assetAbstractions.length - 1) {
       _currentAssetIndex++;
       state = this;
     }
   }
 
   void setCurrentAssetIndex(int index) {
-    if (index >= 0 && index < _assetItems.length) {
+    if (index >= 0 && index < _assetAbstractions.length) {
       _currentAssetIndex = index;
       state = this;
     }
@@ -147,9 +139,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     _statusDetails = [];
 
     _agentAbstractions = [];
-    _agentItems = [];
-    _agentProfileImages = [];
-    _agentContexts = [];
     _agentStatus = [];
     _agentDetails = {};
 
@@ -188,21 +177,21 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   }
 
   void moveAgentDown() {
-    if (_currentAgentIndex < agentItems.length - 1) {
+    if (_currentAgentIndex < _agentAbstractions.length - 1) {
       _currentAgentIndex++;
       state = this;
     }
   }
 
   void setCurrentAgentIndex(int index) {
-    if (index >= 0 && index < _agentItems.length) {
+    if (index >= 0 && index < _agentAbstractions.length) {
       _currentAgentIndex = index;
       state = this;
     }
   }
 
   void selectAgent() {
-    if (_currentAgentIndex >= 0 && _currentAgentIndex < _agentItems.length) {
+    if (_currentAgentIndex >= 0 && _currentAgentIndex < _agentAbstractions.length) {
       _agentInfo = _agentAbstractions[_currentAgentIndex];
       _agentConfiguration = {};
       _agentRunningCmd = "IDLE";
@@ -256,9 +245,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   void clear() {
     _assetAbstractions = [];
     _currentAssetIndex = -1;
-    _assetItems = [];
-    _assetProfileImages = [];
-    _assetContexts = [];
 
     _assetInfo = {};
     _accessInfo = {};
@@ -269,10 +255,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
     _agentAbstractions = [];
     _currentAgentIndex = -1;
-    _agentItems = [];
-    _agentProfileImages = [];
-    _agentContexts = [];
-
     _agentInfo = {};
     _agentStatus = [];
     _agentDetails = {};
@@ -347,12 +329,9 @@ class AssetDataModel extends Notifier<AssetDataModel> {
     "ControlParams": json.encode(_agentControlParams),
     "UserParams": json.encode(_agentUserParams),
   };
-  int get currentAssetIndex => _currentAssetIndex;
-  List<String> get assetItems => _assetItems;
-  List<String> get assetControlStatuses => _assetControlStatuses;
-  List<String> get assetProfileImages => _assetProfileImages;
-  List<String> get assetContexts => _assetContexts;
+
   List<Map<String, dynamic>> get assetAbstractions => _assetAbstractions;
+  int get currentAssetIndex => _currentAssetIndex;
 
   Map<String, dynamic> get assetInfo => _assetInfo;
   Map<String, dynamic> get accessInfo => _accessInfo;
@@ -361,11 +340,8 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   Map<String, dynamic> get operatingModeInfo => _operatingModeInfo;
   List<Map<String, dynamic>> get statusDetails => _statusDetails;
 
-  int get currentAgentIndex => _currentAgentIndex;
-  List<String> get agentItems => _agentItems;
-  List<String> get agentProfileImages => _agentProfileImages;
-  List<String> get agentContexts => _agentContexts;
   List<Map<String, dynamic>> get agentAbstractions => _agentAbstractions;
+  int get currentAgentIndex => _currentAgentIndex;
 
   Map<String, dynamic> get agentInfo => _agentInfo;
   List<Map<String, dynamic>> get agentStatus => _agentStatus;
@@ -415,20 +391,8 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   // Setters
   set assetAbstractions(List<Map<String, dynamic>> val) {
     _assetAbstractions = val;
-    _assetItems = val.map((e) {
-      return "${e['Address']['SubsystemId'] ?? 0} ${e['Name'] ?? ''} (${e['SubsystemType'] ?? ''})";
-    }).toList();
-    _assetControlStatuses = val.map((e) {
-      return e['ControlStatus']?.toString() ?? "UNKNOWN";
-    }).toList();
-    _assetProfileImages = val.map((e) {
-      return e['ProfileImage'].toString();
-    }).toList();
-    _assetContexts = val.map((e) {
-      return e['Context'].toString();
-    }).toList();
-    if (_currentAssetIndex >= _assetItems.length) {
-      _currentAssetIndex = _assetItems.length - 1;
+    if (_currentAssetIndex >= _assetAbstractions.length) {
+      _currentAssetIndex = _assetAbstractions.length - 1;
     }
 
     state = this;
@@ -465,25 +429,12 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   set agentAbstractions(List<Map<String, dynamic>> val) {
     _agentAbstractions = val;
-    _agentItems = val.map((e) {
-      return "${e['Name']} (${e['Uri']})";
-    }).toList();
-    _agentProfileImages = val.map((e) {
-      return e['ProfileImage'].toString();
-    }).toList();
-    _agentContexts = val.map((e) {
-      return e['Context'].toString();
-    }).toList();
 
-    if (_currentAgentIndex >= _agentItems.length) {
-      _currentAgentIndex = _agentItems.length - 1;
+    if (_currentAgentIndex >= _agentAbstractions.length) {
+      _currentAgentIndex = _agentAbstractions.length - 1;
     }
 
     state = this;
-  }
-
-  set agentList(List<Map<String, dynamic>> val) {
-    agentAbstractions = val;
   }
 
   set agentStatus(List<Map<String, dynamic>> val) {

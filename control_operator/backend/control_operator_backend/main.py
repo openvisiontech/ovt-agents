@@ -35,8 +35,23 @@ except ImportError:
         def destroy(self): pass
         async def get_data(self, url): return "{}"
         async def set_data(self, url, data): return
+
+try:
+    from uli_py import DataViewer
+except ImportError:
+    # Dummy class to prevent crash if not compiled locally
+    logging.warning("uli_py not found. Mocking DataViewer for testing.")
+    class DataViewer:
+        def __init__(self, *args, **kwargs): pass
+        def initialize(self): pass
+        def instantiate(self): pass
+        def set_up_actions(self): pass
+        def start_up_actions(self): pass
+        def shutdown(self): pass
+        def destroy(self): pass
+        async def get_data(self, url): return "{}"
+        async def set_data(self, url, data): return
         def receive_topics(self): return []
-        def snapshot_topics(self): return []
 
 from uli_py import UliTopicReader
 from uli_py.json_topic import create_json_topic
@@ -59,26 +74,26 @@ logger = logging.getLogger("backend_main")
 connections: Dict[uuid.UUID, WebRTCConnection] = {}
 ocu = None
 
-async def ocu_topic_distribution_task(ocu: Ocu):
+async def topic_distribution_task(data_viewer: DataViewer):
     logger.info("[TopicDist] Starting global topic distribution task")
     try:
         while True:
             loop = asyncio.get_event_loop()
-            topic_readers: List[UliTopicReader] = await loop.run_in_executor(None, ocu.receive_topics)
+            topic_readers: List[UliTopicReader] = await loop.run_in_executor(None, data_viewer.receive_topics)
             
             if topic_readers:
                 # put topics into the topic queue of each WebRTC connection
                 for conn in connections.values():
                     for topic_reader in topic_readers:
                         try:
-                            json_topic = create_json_topic(topic_reader)
-                            if json_topic:
-                                conn.topic_queue.put_nowait(json_topic)
-                                logger.debug(f"[{conn.id}] Topic {topic_reader.uri}")
+                            logger.debug(f"[{conn.id}] Topic {topic_reader.uri}")
+                            # json_topic = create_json_topic(topic_reader)
+                            # if json_topic:
+                            #     conn.topic_queue.put_nowait(json_topic)
                         except Exception as e:
                             logger.error(f"[{conn.id}] Error processing topic: {e}")
             
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0)
     except asyncio.CancelledError:
         logger.info("[TopicDist] Topic distribution task cancelled")
 
@@ -102,10 +117,17 @@ async def lifespan(app: FastAPI):
     logger.info(f"[Main] Working directory: {working_dir}")
     
     ocu = Ocu(working_dir)
+
     ocu.initialize()
     ocu.instantiate()
     ocu.set_up_actions()
-    
+
+    data_viewer = DataViewer(working_dir)
+
+    data_viewer.initialize()
+    data_viewer.instantiate()
+    data_viewer.set_up_actions()
+
     # Initialize Interfaces Contexts
     ocu_intf = OcuInterface()
     ocu_intf.set_ocu(ocu)
@@ -114,10 +136,11 @@ async def lifespan(app: FastAPI):
     agent_handler.initialize()
     
     # Start tasks
-    dist_task = asyncio.create_task(ocu_topic_distribution_task(ocu))
+    dist_task = asyncio.create_task(topic_distribution_task(data_viewer))
     agent_task = asyncio.create_task(agent_response_distribution_task())
     
     ocu.start_up_actions()
+    data_viewer.start_up_actions()
     
     yield
     
@@ -131,6 +154,7 @@ async def lifespan(app: FastAPI):
             logger.error(f"[Main] Error closing connection {conn.id}: {e}")
             
     try:
+        data_viewer.shutdown()
         ocu.shutdown()
     except Exception as e:
         logger.error(f"[Main] Error in Ocu shutdown: {e}")
@@ -145,6 +169,7 @@ async def lifespan(app: FastAPI):
         pass
     
     agent_handler.shutdown()
+    data_viewer.destroy()
     ocu.destroy()
 
 app = FastAPI(lifespan=lifespan)

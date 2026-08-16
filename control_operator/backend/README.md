@@ -94,7 +94,69 @@ cd /home/ovt/develop/ovt-agents/control_operator
 The WebRTC Signalling Server will become available at:
 `ws://localhost:8080/ws/rtc`
 
-## 7. MCP Server Integration
+## 7. How to Debug
+Interactive debugging with gdb and run the uvicorn server through Python inside GDB:
+
+```bash
+export PYTHONPATH=/home/ovt/uli_deploy/pybinds:$PYTHONPATH
+cd /home/ovt/develop/ovt-agents/control_operator/backend
+
+gdb --args .venv/bin/python3 -m uvicorn control_operator_backend.main:app --host 0.0.0.0 --port 8080 --reload
+```
+
+Or, add the following configuration in `.vscode/launch.json`. In this configuration, add the location of uli sdk python bindings into `PYTHONPATH`. The uli sdk python bindings were built with `-s` when calling `build/pkg_build.sh` script that sets the compilation mode to "dbg" and strip to "sometimes" for bazel. This enables debugging with gdb.
+
+The "sourceFileMap" field is used to map source files location where the uli sdk python bindings were built.
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Backend (C++ Bindings & Python)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/control_operator/backend/.venv/bin/python3",
+            "args": [
+                "-m",
+                "uvicorn",
+                "control_operator_backend.main:app",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "8080"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/control_operator/backend",
+            "environment": [
+                {
+                    "name": "PYTHONPATH",
+                    "value": "/home/ovt/uli_deploy/pybinds:${env:PYTHONPATH}"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "sourceFileMap": {
+                "/proc/self/cwd": "/home/ovt/ovt22/uli_sdk"
+            },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Catch std::bad_alloc exceptions",
+                    "text": "catch throw std::bad_alloc",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
+```
+
+## 8. MCP Server Integration
 
 The backend features a fully integrated [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server. This exposes the native `OcuInterface` capabilities directly to connected AI Agents via HTTP SSE transport. 
 
