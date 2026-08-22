@@ -87,9 +87,9 @@ async def topic_distribution_task(data_viewer: DataViewer):
                     for topic_reader in topic_readers:
                         try:
                             logger.debug(f"[{conn.id}] Topic {topic_reader.uri}")
-                            # json_topic = create_json_topic(topic_reader)
-                            # if json_topic:
-                            #     conn.topic_queue.put_nowait(json_topic)
+                            json_topic = create_json_topic(topic_reader)
+                            if json_topic:
+                                conn.topic_queue.put_nowait(json_topic)
                         except Exception as e:
                             logger.error(f"[{conn.id}] Error processing topic: {e}")
             
