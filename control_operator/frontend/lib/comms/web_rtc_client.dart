@@ -124,7 +124,7 @@ class WebRTCClient {
           if (_chatChannel == null ||
               _chatChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
             chatRequestQueue.clear();
-            _log.warning('Chat channel not open, clearing chat request queue');
+            _log.fine('Chat channel not open, clearing chat request queue');
           } else {
             final msg = chatRequestQueue.removeAt(0);
             _chatChannel!.send(RTCDataChannelMessage(msg));
@@ -145,7 +145,7 @@ class WebRTCClient {
           if (_streamChannel == null ||
               _streamChannel!.state != RTCDataChannelState.RTCDataChannelOpen) {
             streamRequestQueue.clear();
-            _log.warning(
+            _log.fine(
               'Stream channel not open, clearing stream request queue',
             );
           } else {

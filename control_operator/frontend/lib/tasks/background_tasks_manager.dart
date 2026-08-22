@@ -35,12 +35,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BackgroundTasksManager {
   static Future<void> startAll(ProviderContainer container) async {
-    processActionRequests(container);
-    processMediaRequests(container);
-    processChat(container);
-    processStream(container);
-    processGamepad(container);
-    expireStreamData(container);
+
+    ProcessActionRequestsTask.start(container);
+    ProcessChatTask.start(container);
+    ProcessStreamTask.start(container);
+
+    ProcessMediaRequestsTask.start(container);
+    ExpireStreamDataTask.start(container);
+    ProcessGamepadTask.start(container);
   }
 
   static void stopAll() {

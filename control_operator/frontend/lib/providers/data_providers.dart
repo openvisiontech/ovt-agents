@@ -36,10 +36,6 @@ final headerDataProvider = NotifierProvider<HeaderDataModel, HeaderDataModel>(
   HeaderDataModel.new,
 );
 
-final domainDataProvider = NotifierProvider<DomainDataModel, DomainDataModel>(
-  DomainDataModel.new,
-);
-
 final assetDataProvider = NotifierProvider<AssetDataModel, AssetDataModel>(
   AssetDataModel.new,
 );

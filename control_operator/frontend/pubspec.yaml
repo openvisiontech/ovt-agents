@@ -44,6 +44,9 @@ dependencies:
   logging: ^1.0.0
   flutter_markdown: ^0.7.3
 
+  uli_ffi: 
+    path: /home/ovt/uli_deploy/dart/uli_ffi-1.0.0
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter

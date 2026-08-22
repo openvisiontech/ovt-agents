@@ -24,9 +24,25 @@
  **********************************************************************************
  */
 
-void expireStreamData(dynamic message) async {
-  // Loop interval of 100ms
-  while (true) {
-    await Future.delayed(Duration(milliseconds: 100));
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
+import '../providers/data_providers.dart';
+
+class ExpireStreamDataTask {
+  static final _log = Logger('ExpireStreamDataTask');
+
+  static start(ProviderContainer container) {
+    _runLoop(container);
+  }
+
+  static Future<void> _runLoop(ProviderContainer container) async {
+    final streamData = container.read(streamDataProvider.notifier);
+
+    // Loop interval of 10ms
+    while (true) {
+      await Future.delayed(Duration(milliseconds: 10));
+      streamData.removeExpiredTopics();
+    }
   }
 }
+

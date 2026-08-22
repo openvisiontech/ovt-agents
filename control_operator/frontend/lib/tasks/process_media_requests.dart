@@ -24,9 +24,21 @@
  **********************************************************************************
  */
 
-void processMediaRequests(dynamic message) async {
-  // Loop interval of 10ms
-  while (true) {
-    await Future.delayed(Duration(milliseconds: 10));
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
+
+class ProcessMediaRequestsTask {
+  static final _log = Logger('ProcessMediaRequestsTask');
+
+  static start(ProviderContainer container) {
+    _runLoop(container);
+  }
+
+  static Future<void> _runLoop(ProviderContainer container) async {
+    // Loop interval of 10ms
+    while (true) {
+      await Future.delayed(Duration(milliseconds: 10));
+    }
   }
 }
+

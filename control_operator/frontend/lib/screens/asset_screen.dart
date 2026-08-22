@@ -514,6 +514,9 @@ class AssetLeftSidebar extends ConsumerWidget {
       return AgentList(
         agents: assetData.agentAbstractions,
         selectedIndex: assetData.currentAgentIndex,
+        isAgentSelected: assetData.isAgentSelected,
+        haveControl: assetData.haveControl,
+        agentRunningCmd: assetData.agentRunningCmd,
         onUpPressed: () => assetData.moveAgentUp(),
         onDownPressed: () => assetData.moveAgentDown(),
         onCheckPressed: () =>
@@ -534,6 +537,17 @@ class AssetLeftSidebar extends ConsumerWidget {
                 ? contextStr
                 : "No context available for this agent.",
           );
+        },
+        onRunPressed: () {
+          ref.read(assetDataProvider.notifier).agentRunningCmd = "RUN";
+          ref.read(assetDataProvider.notifier).agentControlCmd = "RESUME";
+          ref.read(actionRequestsProvider.notifier).agentStatusAutoUpdate = true;
+        },
+        onPausePressed: () {
+          ref.read(assetDataProvider.notifier).agentControlCmd = "PAUSE";
+        },
+        onCancelPressed: () {
+          ref.read(assetDataProvider.notifier).agentControlCmd = "CANCEL";
         },
       );
     } else if (state == 'Data') {

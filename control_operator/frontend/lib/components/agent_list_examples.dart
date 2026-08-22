@@ -39,6 +39,10 @@ class AgentListExamples extends StatefulWidget {
 class _AgentListExamplesState extends State<AgentListExamples> {
   late List<Map<String, dynamic>> _agents;
   int _selectedIndex = 0;
+  bool _isAgentSelected = true;
+  String _haveControl = "YES";
+  String _agentRunningCmd = "UNKNOWN";
+  String _agentControlCmd = "UNKNOWN";
 
   // Popup state
   bool _popupVisible = false;
@@ -258,6 +262,9 @@ Allows administrators to calibrate LiDAR extrinsic parameters against known refe
                   child: AgentList(
                     agents: _agents,
                     selectedIndex: _selectedIndex,
+                    isAgentSelected: _isAgentSelected,
+                    haveControl: _haveControl,
+                    agentRunningCmd: _agentRunningCmd,
                     onUpPressed: _onUpPressed,
                     onDownPressed: _onDownPressed,
                     onCheckPressed: _onCheckPressed,
@@ -273,6 +280,22 @@ Allows administrators to calibrate LiDAR extrinsic parameters against known refe
                       });
                     },
                     onInfoPressed: _onInfoPressed,
+                    onRunPressed: () {
+                      setState(() {
+                        _agentRunningCmd = "RUN";
+                        _agentControlCmd = "RESUME";
+                      });
+                    },
+                    onPausePressed: () {
+                      setState(() {
+                        _agentControlCmd = "PAUSE";
+                      });
+                    },
+                    onCancelPressed: () {
+                      setState(() {
+                        _agentControlCmd = "CANCEL";
+                      });
+                    },
                   ),
                 ),
               ),

@@ -24,8 +24,38 @@
  **********************************************************************************
  */
 
-void processStream(dynamic message) async {
-  while (true) {
-    await Future.delayed(Duration(milliseconds: 10));
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
+import 'package:uli_ffi/uli.dart';
+import '../providers/data_providers.dart';
+import '../comms/web_rtc_client.dart';
+
+class ProcessStreamTask {
+  static final _log = Logger('ProcessStreamTask');
+  static final _topicReader = StreamTopicReader();
+
+  static void start(ProviderContainer container) {
+    _runLoop(container);
+  }
+
+  static Future<void> _runLoop(ProviderContainer container) async {
+    final streamData = container.read(streamDataProvider.notifier);
+    final client = WebRTCClient();
+
+    while (true) {
+      try {
+        if (client.streamQueue.isNotEmpty) {
+          final binaryData = client.streamQueue.removeAt(0);
+          final JsonTopic? topic = _topicReader.read(binaryData);
+          if (topic != null) {
+            _log.fine('Parsed JsonTopic: ${topic.uri}');
+            streamData.addTopic(topic);
+          }
+        }
+      } catch (e) {
+        _log.severe('Error processing stream message: $e');
+      }
+      await Future.delayed(const Duration(milliseconds: 1));
+    }
   }
 }

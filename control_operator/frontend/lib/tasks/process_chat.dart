@@ -26,98 +26,98 @@
 
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import '../providers/data_providers.dart';
 import '../comms/web_rtc_client.dart';
 
-void processChat(dynamic message) async {
-  if (message is! ProviderContainer) return;
-  final container = message;
-  int count = 0;
+class ProcessChatTask{
+  static final _log = Logger('ProcessChatTask');
 
-  // Loop interval of 10ms
-  while (true) {
-    await Future.delayed(const Duration(milliseconds: 10));
-    count += 10;
+  static void start(ProviderContainer container) {
+    _runLoop(container);
+  }
 
-    final webrtcClient = WebRTCClient();
-
+  static Future<void> _runLoop(ProviderContainer container) async {
+    final client = WebRTCClient();
     final assetData = container.read(assetDataProvider.notifier);
 
-    while (webrtcClient.chatQueue.isNotEmpty) {
-      final msgStr = webrtcClient.chatQueue.removeAt(0);
-      try {
-        final decoded = jsonDecode(msgStr) as Map<String, dynamic>;
-        final action = decoded['action'] as String?;
-        final payload = decoded['payload'] as Map<String, dynamic>? ?? {};
+    // Loop interval of 1ms
+    while (true) {
 
-        switch (action) {
-          case 'asset_abstractions':
-            assetData.assetAbstractions = List<Map<String, dynamic>>.from(
-              payload['subsystemabstractions'] ?? [],
-            );
-            break;
-          case 'access_info':
-            assetData.accessInfo = payload['accessclient'] ?? {};
-            break;
-          case 'control_info':
-            assetData.controlInfo = payload['controlclient'] ?? {};
-            break;
-          case 'state_info':
-            assetData.stateInfo = payload['stateclient'] ?? {};
-            break;
-          case 'operating_mode_info':
-            assetData.operatingModeInfo = payload['operatingmodeclient'] ?? {};
-            break;
-          case 'status_details':
-            assetData.statusDetails = List<Map<String, dynamic>>.from(
-              payload['statusdetails'] ?? [],
-            );
-            break;
-          case 'agent_abstractions':
-            assetData.agentAbstractions = List<Map<String, dynamic>>.from(
-              payload['agentabstractions'] ?? [],
-            );
-            break;
-          case 'agent_status':
-            assetData.agentStatus = List<Map<String, dynamic>>.from(
-              payload['agentstatuslist'] ?? [],
-            );
-            break;
-          case 'agent_details':
-            assetData.agentDetails = payload['agentdetails'] ?? {};
-            break;
-          case 'data_topic_list':
-            assetData.dataTopicList = List<Map<String, dynamic>>.from(
-              payload['compdatatopiclist'] ?? [],
-            );
-            break;
-          case 'schema_list':
-            assetData.schemaList = List<Map<String, dynamic>>.from(
-              payload['compdatatopicschemalist'] ?? [],
-            );
-            break;
-          case 'data_topic_clients':
-            assetData.dataTopicClientList = List<Map<String, dynamic>>.from(
-              payload['datatopicclientlist'] ?? [],
-            );
-            break;
-          case 'transform_reporters':
-            assetData.transformReporterList = List<Map<String, dynamic>>.from(
-              payload['transformreporterlist'] ?? [],
-            );
-            break;
-          case 'transform_clients':
-            assetData.transformClientList = List<Map<String, dynamic>>.from(
-              payload['transformclientlist'] ?? [],
-            );
-            break;
+      while (client.chatQueue.isNotEmpty) {
+        final msgStr = client.chatQueue.removeAt(0);
+        try {
+          final decoded = jsonDecode(msgStr) as Map<String, dynamic>;
+          final action = decoded['action'] as String?;
+          final payload = decoded['payload'] as Map<String, dynamic>? ?? {};
+
+          switch (action) {
+            case 'asset_abstractions':
+              assetData.assetAbstractions = List<Map<String, dynamic>>.from(
+                payload['subsystemabstractions'] ?? [],
+              );
+              break;
+            case 'access_info':
+              assetData.accessInfo = payload['accessclient'] ?? {};
+              break;
+            case 'control_info':
+              assetData.controlInfo = payload['controlclient'] ?? {};
+              break;
+            case 'state_info':
+              assetData.stateInfo = payload['stateclient'] ?? {};
+              break;
+            case 'operating_mode_info':
+              assetData.operatingModeInfo = payload['operatingmodeclient'] ?? {};
+              break;
+            case 'status_details':
+              assetData.statusDetails = List<Map<String, dynamic>>.from(
+                payload['statusdetails'] ?? [],
+              );
+              break;
+            case 'agent_abstractions':
+              assetData.agentAbstractions = List<Map<String, dynamic>>.from(
+                payload['agentabstractions'] ?? [],
+              );
+              break;
+            case 'agent_status':
+              assetData.agentStatus = List<Map<String, dynamic>>.from(
+                payload['agentstatuslist'] ?? [],
+              );
+              break;
+            case 'agent_details':
+              assetData.agentDetails = payload['agentdetails'] ?? {};
+              break;
+            case 'data_topic_list':
+              assetData.dataTopicList = List<Map<String, dynamic>>.from(
+                payload['compdatatopiclist'] ?? [],
+              );
+              break;
+            case 'schema_list':
+              assetData.schemaList = List<Map<String, dynamic>>.from(
+                payload['compdatatopicschemalist'] ?? [],
+              );
+              break;
+            case 'data_topic_clients':
+              assetData.dataTopicClientList = List<Map<String, dynamic>>.from(
+                payload['datatopicclientlist'] ?? [],
+              );
+              break;
+            case 'transform_reporters':
+              assetData.transformReporterList = List<Map<String, dynamic>>.from(
+                payload['transformreporterlist'] ?? [],
+              );
+              break;
+            case 'transform_clients':
+              assetData.transformClientList = List<Map<String, dynamic>>.from(
+                payload['transformclientlist'] ?? [],
+              );
+              break;
+          }
+        } catch (e) {
+          _log.severe('Error processing chat message: $e');
         }
-      } catch (e) {
-        // Ignore decoding errors or unrecognized patterns silently in loop
       }
+      await Future.delayed(const Duration(milliseconds: 10));
     }
-
-    // Reset loop counter
-    if (count >= 1000) count = 0;
   }
 }

@@ -32,7 +32,6 @@ import 'style.dart';
 import 'components/icon_text_btn.dart';
 import 'providers/data_providers.dart';
 import 'screens/asset_screen.dart';
-import 'screens/domain_screen.dart';
 import 'screens/ai_assist_screen.dart';
 import 'comms/web_rtc_client.dart';
 
@@ -49,8 +48,6 @@ class MainLayout extends ConsumerWidget {
     Widget currentHeaderWidget = const SizedBox.shrink();
     if (guiData.currentScreen == 'AssetScreen') {
       currentHeaderWidget = AssetHeaderWidget(isSmallScreen: isSmallScreen);
-    } else if (guiData.currentScreen == 'DomainScreen') {
-      currentHeaderWidget = DomainHeaderWidget(isSmallScreen: isSmallScreen);
     } else if (guiData.currentScreen == 'AIAssistScreen') {
       currentHeaderWidget = AIAssistHeaderWidget(isSmallScreen: isSmallScreen);
     }
@@ -71,31 +68,6 @@ class MainLayout extends ConsumerWidget {
               child: Row(
                 children: [
                   IconTextBtn(
-                    icon: Icons.domain,
-                    description: "Domain",
-                    width: Style.headerBtnWidth,
-                    height: double.infinity,
-                    backgroundColor: Style.headerBackgroundColor,
-                    hoverColor: Style.headerBtnHoverColor,
-                    iconSize: Style.headerIconPixelSize,
-                    highlight: guiData.currentScreen == 'DomainScreen',
-                    onPressed: () {
-                      if (guiData.currentScreen != 'DomainScreen') {
-                        if (guiData.currentScreen == 'AssetScreen') {
-                          ref
-                              .read(actionRequestsProvider.notifier)
-                              .leavingAssetScreen();
-                        } else if (guiData.currentScreen == 'AIAssistScreen') {
-                          ref
-                              .read(actionRequestsProvider.notifier)
-                              .leavingAIAssistScreen();
-                        }
-                        guiData.goDomainScreen();
-                      }
-                    },
-                  ),
-                  const SizedBox(width: Style.margin),
-                  IconTextBtn(
                     icon: Icons.web_asset,
                     description: "Asset",
                     width: Style.headerBtnWidth,
@@ -106,11 +78,10 @@ class MainLayout extends ConsumerWidget {
                     highlight: guiData.currentScreen == 'AssetScreen',
                     onPressed: () {
                       if (guiData.currentScreen != 'AssetScreen') {
-                        if (guiData.currentScreen == 'DomainScreen') {
+                        if (guiData.currentScreen == 'AIAssistScreen') {
                           ref
                               .read(actionRequestsProvider.notifier)
-                              .leavingDomainScreen();
-                          ref.read(domainDataProvider.notifier).clear();
+                              .leavingAIAssistScreen();
                         }
                         guiData.goAssetScreen();
                       }
@@ -128,12 +99,7 @@ class MainLayout extends ConsumerWidget {
                     highlight: guiData.currentScreen == 'AIAssistScreen',
                     onPressed: () {
                       if (guiData.currentScreen != 'AIAssistScreen') {
-                        if (guiData.currentScreen == 'DomainScreen') {
-                          ref
-                              .read(actionRequestsProvider.notifier)
-                              .leavingDomainScreen();
-                          ref.read(domainDataProvider.notifier).clear();
-                        } else if (guiData.currentScreen == 'AssetScreen') {
+                        if (guiData.currentScreen == 'AssetScreen') {
                           ref
                               .read(actionRequestsProvider.notifier)
                               .leavingAssetScreen();
@@ -153,12 +119,7 @@ class MainLayout extends ConsumerWidget {
                     iconSize: Style.headerIconPixelSize,
                     onPressed: () {
                       // goSettings
-                      if (guiData.currentScreen == 'DomainScreen') {
-                        ref
-                            .read(actionRequestsProvider.notifier)
-                            .leavingDomainScreen();
-                        ref.read(domainDataProvider.notifier).clear();
-                      } else if (guiData.currentScreen == 'AssetScreen') {
+                      if (guiData.currentScreen == 'AssetScreen') {
                         ref
                             .read(actionRequestsProvider.notifier)
                             .leavingAssetScreen();
@@ -266,11 +227,8 @@ class MainLayout extends ConsumerWidget {
                   builder: (context) {
                     if (guiData.currentScreen == 'AssetScreen') {
                       return const AssetScreen();
-                    } else if (guiData.currentScreen == 'AIAssistScreen') {
-                      return const AIAssistScreen();
-                    } else {
-                      return const DomainScreen();
                     }
+                    return const AIAssistScreen();
                   },
                 ),
               ),

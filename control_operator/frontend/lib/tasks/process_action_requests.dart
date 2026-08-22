@@ -26,128 +26,141 @@
 
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import '../providers/data_providers.dart';
 import '../comms/web_rtc_client.dart';
 
-void processActionRequests(dynamic message) async {
-  if (message is! ProviderContainer) return;
-  final container = message;
-  int count = 0;
+class ProcessActionRequestsTask {
+  static final _log = Logger('ProcessActionRequestsTask');
 
-  // Loop interval of 10ms
-  while (true) {
-    await Future.delayed(const Duration(milliseconds: 10));
-    count += 10;
+  static void start(ProviderContainer container) {
+    _runLoop(container);
+  }
 
+  static Future<void> _runLoop(ProviderContainer container) async {
     final actionRequests = container.read(actionRequestsProvider.notifier);
     final headerData = container.read(headerDataProvider.notifier);
     final assetData = container.read(assetDataProvider.notifier);
-    final webrtcClient = WebRTCClient();
+    final client = WebRTCClient();    
+    
+    int count = 0;
 
-    // Every 50ms
-    if (count % 50 == 0) {
-      if (actionRequests.assetListUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_asset_abstractions", "payload": {}}),
-        );
-        actionRequests.assetListUpdate = false;
+    // Loop interval of 10ms
+    while (true) {
+
+      // Every 50ms
+      if (count % 50 == 0) {
+        if (actionRequests.assetListUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_asset_abstractions", "payload": {}}),
+          );
+          actionRequests.assetListUpdate = false;
+        }
+        if (actionRequests.agentListUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_agent_abstractions", "payload": {}}),
+          );
+          actionRequests.agentListUpdate = false;
+        }
+        if (actionRequests.dataTopicListUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_data_topic_list", "payload": {}}),
+          );
+          actionRequests.dataTopicListUpdate = false;
+        }
+        if (actionRequests.schemaListUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_schema_list", "payload": {}}),
+          );
+          actionRequests.schemaListUpdate = false;
+        }
+        if (actionRequests.dataTopicClientListUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_data_topic_clients", "payload": {}}),
+          );
+          actionRequests.dataTopicClientListUpdate = false;
+        }
+        if (actionRequests.transformReporterListUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_transform_reporters", "payload": {}}),
+          );
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_transform_clients", "payload": {}}),
+          );
+          actionRequests.transformReporterListUpdate = false;
+        }
+        if (actionRequests.statusDetailsUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_status_details", "payload": {}}),
+          );
+          actionRequests.statusDetailsUpdate = false;
+        }
+        if (actionRequests.agentStatusUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_agent_status", "payload": {}}),
+          );
+          actionRequests.agentStatusUpdate = false;
+        }
+        if (actionRequests.agentDetailsUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_agent_details", "payload": {}}),
+          );
+          actionRequests.agentDetailsUpdate = false;
+        }
       }
-      if (actionRequests.agentListUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_agent_abstractions", "payload": {}}),
+
+      // Every 100ms
+      if (count % 100 == 0) {
+        Map<String, dynamic> guiRec = assetData.guiRec;
+        guiRec['EstopButton'] = headerData.estop;
+        client.chatRequestQueue.add(
+          jsonEncode({"action": "set_gui_rec", "payload": guiRec}),
         );
-        actionRequests.agentListUpdate = false;
+        client.chatRequestQueue.add(
+          jsonEncode({
+            "action": "set_task_exec_rec",
+            "payload": assetData.taskExecRec,
+          }),
+        );
+        client.chatRequestQueue.add(
+          jsonEncode({
+            "action": "set_task_control_rec",
+            "payload": assetData.taskControlRec,
+          }),
+        );
       }
-      if (actionRequests.dataTopicListUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_data_topic_list", "payload": {}}),
+
+      // Every 250ms
+      if (count % 250 == 0) {
+        if (actionRequests.assetListAutoUpdate) {
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_asset_abstractions", "payload": {}}),
+          );
+        }
+        if(actionRequests.agentStatusAutoUpdate){
+          client.chatRequestQueue.add(
+            jsonEncode({"action": "get_agent_status", "payload": {}}),
+          );
+        }
+        client.chatRequestQueue.add(
+          jsonEncode({"action": "get_access_info", "payload": {}}),
         );
-        actionRequests.dataTopicListUpdate = false;
+        client.chatRequestQueue.add(
+          jsonEncode({"action": "get_control_info", "payload": {}}),
+        );
+        client.chatRequestQueue.add(
+          jsonEncode({"action": "get_state_info", "payload": {}}),
+        );
+        client.chatRequestQueue.add(
+          jsonEncode({"action": "get_operating_mode_info", "payload": {}}),
+        );
       }
-      if (actionRequests.schemaListUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_schema_list", "payload": {}}),
-        );
-        actionRequests.schemaListUpdate = false;
-      }
-      if (actionRequests.dataTopicClientListUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_data_topic_clients", "payload": {}}),
-        );
-        actionRequests.dataTopicClientListUpdate = false;
-      }
-      if (actionRequests.transformReporterListUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_transform_reporters", "payload": {}}),
-        );
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_transform_clients", "payload": {}}),
-        );
-        actionRequests.transformReporterListUpdate = false;
-      }
-      if (actionRequests.statusDetailsUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_status_details", "payload": {}}),
-        );
-        actionRequests.statusDetailsUpdate = false;
-      }
-      if (actionRequests.agentStatusUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_agent_status", "payload": {}}),
-        );
-        actionRequests.agentStatusUpdate = false;
-      }
-      if (actionRequests.agentDetailsUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_agent_details", "payload": {}}),
-        );
-        actionRequests.agentDetailsUpdate = false;
-      }
+      
+      await Future.delayed(const Duration(milliseconds: 10));
+      count += 10;
+
+      // Reset loop counter
+      if (count >= 1000) count = 0;
     }
-
-    // Every 100ms
-    if (count % 100 == 0) {
-      Map<String, dynamic> guiRec = assetData.guiRec;
-      guiRec['EstopButton'] = headerData.estop;
-      webrtcClient.chatRequestQueue.add(
-        jsonEncode({"action": "set_gui_rec", "payload": guiRec}),
-      );
-      webrtcClient.chatRequestQueue.add(
-        jsonEncode({
-          "action": "set_task_exec_rec",
-          "payload": assetData.taskExecRec,
-        }),
-      );
-      webrtcClient.chatRequestQueue.add(
-        jsonEncode({
-          "action": "set_task_control_rec",
-          "payload": assetData.taskControlRec,
-        }),
-      );
-    }
-
-    // Every 250ms
-    if (count % 250 == 0) {
-      if (actionRequests.assetListAutoUpdate) {
-        webrtcClient.chatRequestQueue.add(
-          jsonEncode({"action": "get_asset_abstractions", "payload": {}}),
-        );
-      }
-      webrtcClient.chatRequestQueue.add(
-        jsonEncode({"action": "get_access_info", "payload": {}}),
-      );
-      webrtcClient.chatRequestQueue.add(
-        jsonEncode({"action": "get_control_info", "payload": {}}),
-      );
-      webrtcClient.chatRequestQueue.add(
-        jsonEncode({"action": "get_state_info", "payload": {}}),
-      );
-      webrtcClient.chatRequestQueue.add(
-        jsonEncode({"action": "get_operating_mode_info", "payload": {}}),
-      );
-    }
-
-    // Reset loop counter
-    if (count >= 1000) count = 0;
   }
 }

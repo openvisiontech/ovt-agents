@@ -344,6 +344,7 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   int get currentAgentIndex => _currentAgentIndex;
 
   Map<String, dynamic> get agentInfo => _agentInfo;
+  bool get isAgentSelected => _agentInfo.isNotEmpty;
   List<Map<String, dynamic>> get agentStatus => _agentStatus;
   Map<String, dynamic> get agentDetails => _agentDetails;
 
@@ -410,7 +411,6 @@ class AssetDataModel extends Notifier<AssetDataModel> {
 
   set controlInfo(Map<String, dynamic> val) {
     _controlInfo = val;
-    _haveControl = val['HaveControl']?.toString() ?? "UNKNOWN";
 
     state = this;
   }
@@ -418,7 +418,8 @@ class AssetDataModel extends Notifier<AssetDataModel> {
   set stateInfo(Map<String, dynamic> val) {
     _stateInfo = val;
     _subsystemState = val['State']?.toString() ?? "UNKNOWN";
-
+    _haveControl = val['HaveControl']?.toString() ?? "UNKNOWN";
+    
     state = this;
   }
 

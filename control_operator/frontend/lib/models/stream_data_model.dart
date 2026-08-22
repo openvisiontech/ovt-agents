@@ -25,6 +25,7 @@
  */
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uli_ffi/uli.dart';
 
 class StreamDataModel extends Notifier<StreamDataModel> {
   @override
@@ -33,15 +34,28 @@ class StreamDataModel extends Notifier<StreamDataModel> {
   bool updateShouldNotify(StreamDataModel previous, StreamDataModel next) =>
       true;
 
-  List<dynamic> jsonTopics = [];
+  List<JsonTopic> jsonTopics = [];
 
-  void addTopic(dynamic topic) {
+  void addTopic(JsonTopic topic) {
     jsonTopics.add(topic);
+    // Keep a maximum buffer of 200 topics in memory
+    if (jsonTopics.length > 200) {
+      jsonTopics.removeAt(0);
+    }
     state = this;
   }
 
   void removeExpiredTopics() {
     // Logic to be implemented or driven by isolates
+    final nowNano = DateTime.now().microsecondsSinceEpoch * 1000;
+    // Expire topics older than 10 seconds
+    const maxAgeNano = 10000000000; 
+    jsonTopics.removeWhere((topic) => (nowNano - topic.pubTime) > maxAgeNano);
+    state = this;
+  }
+
+  void clear() {
+    jsonTopics.clear();
     state = this;
   }
 }

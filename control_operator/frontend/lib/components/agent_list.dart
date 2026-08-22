@@ -39,6 +39,13 @@ class AgentList extends StatefulWidget {
   final ValueChanged<int> onItemTapped;
   final void Function(Map<String, dynamic> agent) onInfoPressed;
 
+  final bool isAgentSelected;
+  final String haveControl;
+  final String agentRunningCmd;
+  final VoidCallback? onRunPressed;
+  final VoidCallback? onPausePressed;
+  final VoidCallback? onCancelPressed;
+
   const AgentList({
     super.key,
     required this.agents,
@@ -49,6 +56,12 @@ class AgentList extends StatefulWidget {
     required this.onClosePressed,
     required this.onItemTapped,
     required this.onInfoPressed,
+    this.isAgentSelected = false,
+    this.haveControl = "UNKNOWN",
+    this.agentRunningCmd = "UNKNOWN",
+    this.onRunPressed,
+    this.onPausePressed,
+    this.onCancelPressed,
   });
 
   @override
@@ -245,8 +258,45 @@ class _AgentListState extends State<AgentList> {
     );
   }
 
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required bool isEnabled,
+    required Color activeColor,
+    required VoidCallback? onPressed,
+  }) {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isEnabled ? activeColor : Colors.grey.shade300,
+        foregroundColor: isEnabled ? Colors.white : Colors.grey.shade600,
+        disabledBackgroundColor: Colors.grey.shade300,
+        disabledForegroundColor: Colors.grey.shade600,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        minimumSize: const Size(70, 32),
+        elevation: isEnabled ? 2 : 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
+      ),
+      icon: Icon(icon, size: 14),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: isEnabled ? Colors.white : Colors.grey.shade600,
+        ),
+      ),
+      onPressed: isEnabled ? onPressed : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool isRunEnabled =
+        widget.isAgentSelected && widget.haveControl.toUpperCase() == 'YES';
+    final bool isControlEnabled = widget.agentRunningCmd.toUpperCase() == 'RUN';
+
     return Container(
       decoration: ShapeDecoration(
         color: Colors.white,
@@ -297,6 +347,42 @@ class _AgentListState extends State<AgentList> {
                 IconButton(
                   icon: const Icon(Icons.close, color: Colors.white),
                   onPressed: widget.onClosePressed,
+                ),
+              ],
+            ),
+          ),
+          // Action Buttons: RUN, PAUSE, CANCEL
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade300, width: 1.0),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildActionButton(
+                  label: "RUN",
+                  icon: Icons.play_arrow,
+                  isEnabled: isRunEnabled,
+                  activeColor: Colors.green.shade700,
+                  onPressed: widget.onRunPressed,
+                ),
+                _buildActionButton(
+                  label: "PAUSE",
+                  icon: Icons.pause,
+                  isEnabled: isControlEnabled,
+                  activeColor: Colors.orange.shade700,
+                  onPressed: widget.onPausePressed,
+                ),
+                _buildActionButton(
+                  label: "CANCEL",
+                  icon: Icons.cancel,
+                  isEnabled: isControlEnabled,
+                  activeColor: Colors.red.shade700,
+                  onPressed: widget.onCancelPressed,
                 ),
               ],
             ),
